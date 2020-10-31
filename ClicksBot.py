@@ -11,11 +11,15 @@ import os
 white = getColorCode("white")
 
 
-logging.basicConfig(level=logging.INFO, format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
+logging.basicConfig(level=logging.DEBUG, format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
 lg = logging.getLogger(__name__)
 fl = logging.FileHandler(r"C:\Users\Henrik\PycharmProjects\Clicks-Bot\logs\log.log")
-fl.setLevel("ERROR")
+fl.setLevel(logging.INFO)
+fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
+fl.setFormatter(fmt)
+
+lg.addHandler(fl)
 
 path = os.path.expanduser("~")
 
@@ -46,18 +50,32 @@ async def on_ready():
 @bot.event
 async def on_member_join(member):
 
-    logger.log_join(member)
+    lg.info(member)
 
-    await member.create_dm()
-    await member.dm_channel.send(f"Test {member.name}")
+    #await member.create_dm()
+    #await member.send("Wilkommen")
 
+
+@bot.event
+async def on_message_delete(message):
+
+    if message.author == bot.user:
+        return
+
+    await message.channel.send("Deine Nachricht wurde gelöscht!", delete_after=5)
+    lg.info(f"Deleted '{message.content}' from {message.channel} by {message.author.name}")
+
+
+@bot.event
+async def on_message_edit(before, after):
+
+    await before.channel.send("Deine Nachricht wurde editiert!", delete_after=5)
+    lg.info(f"Edited '{before.content}' to '{after.content} from {before.channel} by {before.author.nick}")
 
 @bot.event
 async def on_error(event, *args, **kwargs):
 
     lg.error(event)
-    fl.emit(event)
-
 
 
 @bot.event
@@ -103,6 +121,10 @@ async def on_command_error(ctx, error):
 async def helpcmd(ctx):
 
     test_string = "This is my test message"
+
+    await ctx.author.create_dm()
+    await ctx.author.send(test_string)
+
 
     await ctx.send(test_string)
     await logger.log_recv(ctx)
