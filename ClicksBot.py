@@ -1,20 +1,15 @@
 import discord
 import logging
-import clicks_util.file_io
-from clicks_util.json_util import *
-from clicks_util.ansi_util import getColorCode
-
 import logger
 from discord.ext import commands
 import os
-
-white = getColorCode("white")
+import MessageHandler
 
 
 logging.basicConfig(level=logging.DEBUG, format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
 lg = logging.getLogger(__name__)
-fl = logging.FileHandler(r"C:\Users\Henrik\PycharmProjects\Clicks-Bot\logs\log.log")
+fl = logging.FileHandler(r"D:\GitHub Repos\Clicks-Bot\logs\log.log")
 fl.setLevel(logging.INFO)
 fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 fl.setFormatter(fmt)
@@ -22,8 +17,10 @@ fl.setFormatter(fmt)
 lg.addHandler(fl)
 
 path = os.path.expanduser("~")
+intentions = discord.Intents.default()
+intentions.members = True
 
-bot = commands.Bot(command_prefix='$')
+bot = commands.Bot(command_prefix='$', intents=intentions)
 
 
 @bot.event
@@ -43,8 +40,18 @@ async def on_ready():
 
         lg.info(
             f'{bot.user} is connected to the following guild:\n'
-            f'{guild.name}(id: {guild.id})'
+            f'{guild.name})'
         )
+
+        for member in guild.members:
+
+            if member.nick == None:
+                lg.info(f"- {member.name}")
+
+            else:
+                lg.info(f"- {member.nick}")
+
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="dich an"))
 
 
 @bot.event
@@ -71,12 +78,12 @@ async def on_message_edit(before, after):
 
     await before.channel.send("Deine Nachricht wurde editiert!", delete_after=5)
     lg.info(f"Edited '{before.content}' to '{after.content} from {before.channel} by {before.author.nick}")
-
+'''
 @bot.event
 async def on_error(event, *args, **kwargs):
 
     lg.error(event)
-
+'''
 
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -125,14 +132,13 @@ async def helpcmd(ctx):
     await ctx.author.create_dm()
     await ctx.author.send(test_string)
 
-
     await ctx.send(test_string)
     await logger.log_recv(ctx)
     await logger.log_send(ctx, test_string)
 
 
 @bot.event
-async def on_typing(channel, user, when):
+async def on_typing_start(channel, user, when):
 
     await logger.log_typing(channel, user, when)
 
@@ -152,18 +158,65 @@ async def shutdown(ctx):
     await ctx.bot.logout()
 
 
+@bot.command(name="mute", help="Mutes a user")
+@commands.has_role("Administrator")
+async def mute(ctx, user):
+    user_list = user.split("#")
+    user = discord.utils.get(ctx.author.guild.members, name=str(user_list[0]))
+
+    lg.info(user_list)
+
+    user = discord.utils.get(ctx.author.guild.members, name=str(user_list[0]))
+
+    await ctx.send(f"Muted {user_list[0]}#{user_list[1]}")
+
+    lg.info(f"Muted {user}")
+    await user.edit(mute=True)
 
 
+@bot.command(name="muteall", help="Mutes all users in channels")
+@commands.has_role("Administrator")
+async def muteall(ctx):
 
-'''@bot.event
+    try:
+        for user in ctx.author.voice.channel.members:
+            await user.edit(mute=True)
+    except Exception as e:
+        await ctx.send("Du bist in keinem Voice Channel")
+        lg.error(e)
+
+
+@bot.command(name="unmuteall", help="Unmutes all users in channels")
+@commands.has_role("Administrator")
+async def muteall(ctx):
+
+    try:
+        for user in ctx.author.voice.channel.members:
+            await user.edit(mute=False)
+    except Exception as e:
+        await ctx.send("Du bist in keinem Voice Channel")
+        lg.error(e)
+
+
+@bot.command(name="status", help="Changes the Status of the bot")
+@commands.has_role("Developer Access")
+async def status(ctx, *args):
+
+    lg.info(args)
+
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{}".format(" ".join(args))))
+    await ctx.send("Changing status to {}".format(" ".join(args)))
+
+
+@bot.event
 async def on_message(message):
 
     if message.author == bot.user:
 
         return
 
-    await MessageHandler.log(message)'''
-
+    await MessageHandler.log(message)
+    await bot.process_commands(message)
 
 
 bot.run("NzcxNDY5NDA1NTM1MjA3NDY1.X5sk3w.7R3_Jma2q6yibAVTVjSMGeLW3Ao")

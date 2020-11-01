@@ -2,7 +2,7 @@ import logging
 
 lg = logging.getLogger(__name__)
 
-fl = logging.FileHandler(r"C:\Users\Henrik\PycharmProjects\Clicks-Bot\logs\log.log")
+fl = logging.FileHandler(r"D:\GitHub Repos\Clicks-Bot\logs\log.log")
 fl.setLevel(logging.INFO)
 
 
