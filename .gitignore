@@ -15,3 +15,5 @@ __pycache__/testing.cpython-38.pyc
 *.pyc
 removed
 util/config.json
+*.pyc
+__pycache__/ClicksBot.cpython-38.pyc

@@ -47,6 +47,11 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=config.getStatus()))
 
 
+async def delete_cmd(ctx):
+
+    await ctx.message.delete()
+
+
 @bot.event
 async def on_member_join(member):
 
@@ -111,11 +116,13 @@ async def on_command_error(ctx, error):
 
         error_msg = "Du hast nicht genügend Rechte für diesen Befehl!"
 
-        await ctx.send(error_msg)
+        await ctx.send(error_msg, delete_after=5)
         await logger.log_error(error_msg)
 
     else:
         await logger.log_error(error)
+
+    await delete_cmd(ctx)
 
 
 @bot.event
@@ -130,13 +137,12 @@ async def shutdown(ctx):
 
     shutdown_msg = "Bot1 going dark... ... ..."
 
-    await ctx.send(shutdown_msg)
+    await ctx.send(shutdown_msg, delete_after=5)
     await logger.log_send(ctx, shutdown_msg)
     await lg.warning(f"Shutting down")
-
-
-
     await ctx.bot.logout()
+
+    await delete_cmd(ctx)
 
 
 @bot.command(name="mute", help="Mutes a user")
@@ -149,10 +155,12 @@ async def mute(ctx, user):
 
     user = discord.utils.get(ctx.author.guild.members, name=str(user_list[0]))
 
-    await ctx.send(f"Muted {user_list[0]}#{user_list[1]}")
+    await ctx.send(f"Muted {user_list[0]}#{user_list[1]}", delete_after=5)
 
     lg.info(f"Muted {user}")
     await user.edit(mute=True)
+
+    await delete_cmd(ctx)
 
 
 @bot.command(name="muteall", help=strings.get_help("help_muteall"))
@@ -163,11 +171,13 @@ async def muteall(ctx):
         for user in ctx.author.voice.channel.members:
             await user.edit(mute=True)
 
-        await ctx.send(f"Muted all users in {ctx.author.voice.channel.name}")
+        await ctx.send(f"Muted all users in {ctx.author.voice.channel.name}", delete_after=5)
 
     except Exception as e:
-        await ctx.send("Du bist in keinem Voice Channel")
+        await ctx.send("Du bist in keinem Voice Channel", delete_after=5)
         lg.error(e)
+
+    await delete_cmd(ctx)
 
 
 @bot.command(name="unmuteall", help=strings.get_help("help_unmuteall"))
@@ -178,11 +188,13 @@ async def muteall(ctx):
         for user in ctx.author.voice.channel.members:
             await user.edit(mute=False)
 
-        await ctx.send(f"Unmuted all users in '{ctx.author.voice.channel.name}'")
+        await ctx.send(f"Unmuted all users in '{ctx.author.voice.channel.name}'", delete_after=5)
 
     except Exception as e:
-        await ctx.send("Du bist in keinem Voice Channel")
+        await ctx.send("Du bist in keinem Voice Channel", delete_after=5)
         lg.error(e)
+
+    await delete_cmd(ctx)
 
 
 @bot.command(name="status", help="Changes the Status of the bot")
@@ -191,8 +203,9 @@ async def status(ctx, *args):
 
     lg.info(args)
 
+    await delete_cmd(ctx)
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{}".format(" ".join(args))))
-    await ctx.send("Changing status to {}".format(" ".join(args)))
+    await ctx.send("Changing status to {}".format(" ".join(args)), delete_after=5)
 
 
 @bot.event
@@ -202,7 +215,7 @@ async def on_message(message):
 
         return
 
-    await MessageHandler.log(message)
+    lg.info(f"[{message.author}] - {message.content}")
     await bot.process_commands(message)
 
 

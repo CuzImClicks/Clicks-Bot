@@ -1,7 +1,7 @@
 import logging
-import discord
 import os
 from util import config
+from ClicksBot import bot
 
 path = os.getcwd()
 
@@ -21,5 +21,5 @@ async def log(msg):
 
 async def send_back(msg):
 
-    await msg.channel.send(f"This is a test message!")
+    await msg.channel.send(f"This is a test message!", delete_after=5)
     lg.info(f"Sent message to {str(msg.channel)} containing 'This is a test message!'")
