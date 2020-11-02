@@ -4,18 +4,24 @@ import logger
 from discord.ext import commands
 import os
 import MessageHandler
+import config
+from configparser import ConfigParser
 
-logging.basicConfig(level=logging.INFO, format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
+
+
+
+path = os.getcwd()
+
+logging.basicConfig(level=config.getLoggingLevel(), format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
 lg = logging.getLogger(__name__)
-fl = logging.FileHandler(r"D:\GitHub Repos\Clicks-Bot\logs\log.log")
-fl.setLevel(logging.INFO)
+fl = logging.FileHandler(f"{path}\logs\log.log")
+fl.setLevel(config.getFileLoggingLevel())
 fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 fl.setFormatter(fmt)
 
 lg.addHandler(fl)
 
-path = os.path.expanduser("~")
 intentions = discord.Intents.default()
 intentions.members = True
 
@@ -224,4 +230,4 @@ async def on_message(message):
     await bot.process_commands(message)
 
 
-bot.run("NzcxNDY5NDA1NTM1MjA3NDY1.X5sk3w.7R3_Jma2q6yibAVTVjSMGeLW3Ao")
+bot.run(config.getToken())

@@ -7,3 +7,4 @@ Clicks-Bot/.idea/*
 Clicks-Bot/__pycache__/*
 
 *.xml
+*.pyc
