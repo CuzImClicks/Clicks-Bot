@@ -44,15 +44,7 @@ async def on_ready():
             f'{guild.name})'
         )
 
-        for member in guild.members:
-
-            if member.nick == None:
-                lg.info(f"- {member.name}")
-
-            else:
-                lg.info(f"- {member.nick}")
-
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="dich an"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=config.getStatus()))
 
 
 @bot.event
@@ -79,12 +71,7 @@ async def on_message_edit(before, after):
 
     await before.channel.send("Deine Nachricht wurde editiert!", delete_after=5)
     lg.info(f"Edited '{before.content}' to '{after.content} from {before.channel} by {before.author.nick}")
-'''
-@bot.event
-async def on_error(event, *args, **kwargs):
 
-    lg.error(event)
-'''
 
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -103,8 +90,6 @@ async def on_raw_reaction_add(payload):
         emoji = payload.emoji
         lg.info("Got emoji")
         await message.remove_reaction(emoji, user)
-
-
 
     else:
         pass
@@ -131,20 +116,6 @@ async def on_command_error(ctx, error):
 
     else:
         await logger.log_error(error)
-
-'''
-@bot.command(name='test', help="A test command")
-@commands.has_role("Bot Access")
-async def helpcmd(ctx):
-
-    test_string = "This is my test message"
-
-    await ctx.author.create_dm()
-    await ctx.author.send(test_string)
-
-    await ctx.send(test_string)
-    await logger.log_recv(ctx)
-    await logger.log_send(ctx, test_string)'''
 
 
 @bot.event

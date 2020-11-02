@@ -1,7 +1,17 @@
 import logging
 import discord
+import os
+from util import config
+
+path = os.getcwd()
 
 lg = logging.getLogger(__name__)
+fl = logging.FileHandler(f"{path}\logs\chat.log")
+fl.setLevel(config.getFileLoggingLevel())
+fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
+fl.setFormatter(fmt)
+
+lg.addHandler(fl)
 
 
 async def log(msg):

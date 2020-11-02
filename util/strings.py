@@ -1,5 +1,3 @@
-
-
 def get_help(name):
     help_muteall = "Dieser Befehl der nur für Admins verfügbar ist schaltet alle Personen in deinem Sprachkanal stumm." \
                    " Personen können sich nicht mehr selbst entmuten und können nur von admins einzeln entmuted werden," \

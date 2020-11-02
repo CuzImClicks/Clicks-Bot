@@ -2,12 +2,7 @@ from configparser import ConfigParser
 import logging
 from clicks_util import json_util
 
-'''file = 'config.ini'
-config = ConfigParser()
-config.read(file)'''
-
 jf = json_util.json_file("config.json", "D:/GitHub Repos/Clicks-Bot/util")
-
 
 
 def getLoggingLevel():
@@ -60,3 +55,8 @@ def getToken():
 def getCommandPrefix():
 
     return jf.read()["command_prefix"]
+
+
+def getStatus():
+
+    return jf.read()["status"]
