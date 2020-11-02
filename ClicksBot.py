@@ -5,8 +5,7 @@ from discord.ext import commands
 import os
 import MessageHandler
 
-
-logging.basicConfig(level=logging.DEBUG, format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
+logging.basicConfig(level=logging.INFO, format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
 lg = logging.getLogger(__name__)
 fl = logging.FileHandler(r"D:\GitHub Repos\Clicks-Bot\logs\log.log")
@@ -181,6 +180,9 @@ async def muteall(ctx):
     try:
         for user in ctx.author.voice.channel.members:
             await user.edit(mute=True)
+
+        await ctx.send(f"Muted all users in {ctx.author.voice.channel.name}")
+
     except Exception as e:
         await ctx.send("Du bist in keinem Voice Channel")
         lg.error(e)
@@ -193,6 +195,9 @@ async def muteall(ctx):
     try:
         for user in ctx.author.voice.channel.members:
             await user.edit(mute=False)
+
+        await ctx.send(f"Unmuted all users in '{ctx.author.voice.channel.name}'")
+
     except Exception as e:
         await ctx.send("Du bist in keinem Voice Channel")
         lg.error(e)
