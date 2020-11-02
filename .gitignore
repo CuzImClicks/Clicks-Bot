@@ -1,0 +1,9 @@
+# Default ignored files
+/shelf/
+*.ini
+*.iml
+**.log
+Clicks-Bot/.idea/*
+Clicks-Bot/__pycache__/*
+
+*.xml
