@@ -1,10 +1,9 @@
 from configparser import ConfigParser
 import logging
 
-file = 'config.ini'
+file = '../config.ini'
 config = ConfigParser()
 config.read(file)
-
 
 
 def getLoggingLevel():
@@ -27,6 +26,7 @@ def getLoggingLevel():
 
         return logging.ERROR
 
+
 def getFileLoggingLevel():
 
     flevel = config.get("options_logging", "file_level")
@@ -46,6 +46,7 @@ def getFileLoggingLevel():
     elif "ERROR":
 
         return logging.ERROR
+
 
 def getToken():
 

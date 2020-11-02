@@ -1,14 +1,8 @@
 import discord
 import logging
-import logger
+from util import logger, MessageHandler, config
 from discord.ext import commands
 import os
-import MessageHandler
-import config
-from configparser import ConfigParser
-
-
-
 
 path = os.getcwd()
 
