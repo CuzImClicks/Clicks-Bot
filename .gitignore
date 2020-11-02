@@ -9,3 +9,5 @@ testing.py
 
 *.xml
 *.pyc
+__pycache__/testing.cpython-38.pyc
+__pycache__/ClicksBot.cpython-38.pyc
