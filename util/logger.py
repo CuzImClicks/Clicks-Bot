@@ -1,8 +1,9 @@
 import logging
+import os
 
 lg = logging.getLogger(__name__)
-
-fl = logging.FileHandler(r"/logs/log.log")
+path = os.getcwd()
+fl = logging.FileHandler(f"{path}\logs\log.log")
 fl.setLevel(logging.INFO)
 
 

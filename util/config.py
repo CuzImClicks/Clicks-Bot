@@ -1,14 +1,18 @@
 from configparser import ConfigParser
 import logging
+from clicks_util import json_util
 
-file = '../config.ini'
+'''file = 'config.ini'
 config = ConfigParser()
-config.read(file)
+config.read(file)'''
+
+jf = json_util.json_file("config.json", "D:/GitHub Repos/Clicks-Bot/util")
+
 
 
 def getLoggingLevel():
 
-    level = config.get("options_logging", "level")
+    level = jf.read()["level"]
 
     if level.upper() == "INFO":
 
@@ -29,7 +33,7 @@ def getLoggingLevel():
 
 def getFileLoggingLevel():
 
-    flevel = config.get("options_logging", "file_level")
+    flevel = jf.read()["file_level"]
 
     if flevel.upper() == "INFO":
 
@@ -50,4 +54,9 @@ def getFileLoggingLevel():
 
 def getToken():
 
-    return config.get("token", "token")
+    return jf.read()["token"]
+
+
+def getCommandPrefix():
+
+    return jf.read()["command_prefix"]

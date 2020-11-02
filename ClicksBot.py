@@ -2,9 +2,11 @@ import discord
 import logging
 from util import logger, MessageHandler, config
 from discord.ext import commands
+from util import strings
 import os
 
 path = os.getcwd()
+print(path)
 
 logging.basicConfig(level=config.getLoggingLevel(), format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
@@ -19,7 +21,7 @@ lg.addHandler(fl)
 intentions = discord.Intents.default()
 intentions.members = True
 
-bot = commands.Bot(command_prefix='$', intents=intentions)
+bot = commands.Bot(command_prefix=config.getCommandPrefix(), intents=intentions)
 
 
 @bot.event
@@ -91,9 +93,18 @@ async def on_raw_reaction_add(payload):
 
     if str(payload.message_id) == msg_id:
 
-        role2 = payload.member.guild.roles[9]
+        role2 = payload.member.guild.roles[11]
         await payload.member.add_roles(role2)
         await logger.log_role(payload, role2)
+
+        channel = bot.get_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
+        user = bot.get_user(payload.user_id)
+        emoji = payload.emoji
+        lg.info("Got emoji")
+        await message.remove_reaction(emoji, user)
+
+
 
     else:
         pass
@@ -121,7 +132,7 @@ async def on_command_error(ctx, error):
     else:
         await logger.log_error(error)
 
-
+'''
 @bot.command(name='test', help="A test command")
 @commands.has_role("Bot Access")
 async def helpcmd(ctx):
@@ -133,7 +144,7 @@ async def helpcmd(ctx):
 
     await ctx.send(test_string)
     await logger.log_recv(ctx)
-    await logger.log_send(ctx, test_string)
+    await logger.log_send(ctx, test_string)'''
 
 
 @bot.event
@@ -173,7 +184,7 @@ async def mute(ctx, user):
     await user.edit(mute=True)
 
 
-@bot.command(name="muteall", help="Mutes all users in channels")
+@bot.command(name="muteall", help=strings.get_help("help_muteall"))
 @commands.has_role("Administrator")
 async def muteall(ctx):
 
@@ -188,7 +199,7 @@ async def muteall(ctx):
         lg.error(e)
 
 
-@bot.command(name="unmuteall", help="Unmutes all users in channels")
+@bot.command(name="unmuteall", help=strings.get_help("help_unmuteall"))
 @commands.has_role("Administrator")
 async def muteall(ctx):
 
