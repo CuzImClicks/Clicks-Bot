@@ -5,6 +5,7 @@
 **.log
 Clicks-Bot/.idea/*
 Clicks-Bot/__pycache__/*
+testing.py
 
 *.xml
 *.pyc
