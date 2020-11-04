@@ -34,11 +34,11 @@ def get_help(name):
 
 def get_promotion_text(promoter, user):
 
-    text = f"Hey {user.name}, der Admin {promoter.name} hat dir nun Botaccess gewährt. Du kannst jetzt auf den Channel" \
+    text = f"Hey {user.name},\n der Admin {promoter.name} hat dir nun Botaccess gewährt.\n Du kannst jetzt auf den Channel" \
            " #bot-infos und #bot-testing" \
-           " zugreifen und Befehle an den Bot schreiben. Wenn du im #bot-testing $github schreibst erhälst du den Link" \
-           " zum Clicks-Bot Repo. Wenn du eine übersicht über die Hauptbefehle des Bots brauchst, gebe einfach " \
-           "$commands ein.Viel spaß!"
+           " zugreifen und Befehle an den Bot schreiben.\n Wenn du im #bot-testing $github schreibst erhälst du den Link" \
+           " zum Clicks-Bot Repo.\n Wenn du eine übersicht über die Hauptbefehle des Bots brauchst, gebe einfach " \
+           "$commands ein.\n Viel spaß!"
 
     return text
 

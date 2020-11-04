@@ -29,8 +29,28 @@ async def send_embed(bot, ctx, infos=(), names=(), values=(), inline=(), send=Tr
 
     await ctx.send(embed=embed)
 
+'''
+async def send_embed_dm(bot, target, infos=(), names=(), values=(), send=True):
 
+    try:
+        embed = discord.Embed(title=infos[0], description=infos[1], color=0x2b4f22)
 
+    except Exception as e:
 
+        await util.logger.log_error(e)
+
+    for i in range(0, len(names)):
+
+        try:
+            lg.info(len(values[i]))
+            embed.add_field(name=names[i], value=values[i], inline=False)
+
+        except Exception as e:
+
+            await util.logger.log_error(e)
+
+    await target.create_dm()
+    await target.dm_channel.send(embed=embed)
+'''
 
 

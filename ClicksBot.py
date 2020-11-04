@@ -131,7 +131,6 @@ async def on_raw_reaction_remove(payload):
     await logger.log_reaction_remove(payload)
 
 
-
 @bot.event
 async def on_command_error(ctx, error):
 
@@ -149,7 +148,7 @@ async def on_command_error(ctx, error):
 
 
 @bot.event
-async def on_typing_start(channel, user, when):
+async def on_typing(channel, user, when):
 
     await logger.log_typing(channel, user, when)
 
@@ -266,7 +265,9 @@ async def bot_access(ctx, target):
     await user.add_roles(role)
     lg.info(f"Added '{role.name}' to '{user.name}'")
 
-    await ctx.send(f"Added '{role.name} to {user.name}'")
+    #await embed.send_embed_dm(bot, user, infos=("Bot Access", "Bot Access Output"), names=("Granted bot access"), values=(strings.get_promotion_text(ctx.author, user)))
+
+    await ctx.send(f"Added '{role.name}' to '{user.name}'")
     await logger.log_send(ctx, f"Added '{role.name} to {user.name}'")
 
     await user.create_dm()
@@ -280,7 +281,7 @@ async def credits(ctx):
     #await ctx.send(strings.get_credits())
     #await logger.log_send(ctx, strings.get_credits())
 
-    await embed.send_embed(bot=bot,ctx=ctx, infos=("Credits", "Credits to the ones who deserve", 0x2b4f22), names=("Idee und Coding", "Textgestaltung", "Server Owner"), values=("Idee und coding: Henrik | Clicks", "Textgestaltung : Kai | K_Stein", "Bereitstellung des Servers : Luis | DasVakuum"), inline=(False, False, False))
+    await embed.send_embed(bot=bot, ctx=ctx, infos=("Credits", "Credits to the ones who deserve", 0x2b4f22), names=("Idee und Coding", "Textgestaltung", "Server Owner"), values=("Idee und coding: Henrik | Clicks", "Textgestaltung : Kai | K_Stein", "Bereitstellung des Servers : Luis | DasVakuum"), inline=(False, False, False))
 
 
 @bot.event
@@ -293,5 +294,9 @@ async def on_message(message):
     lg_chat.info(f"[{message.author}] in {message.channel} - {message.content}")
     await bot.process_commands(message)
 
+try:
+    bot.run(config.getToken())
 
-bot.run(config.getToken())
+except KeyboardInterrupt as e:
+
+    pass
