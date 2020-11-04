@@ -81,15 +81,18 @@ async def log_reaction(payload):
     lg.info(f"{payload.member.name} reacted with {payload.emoji} to message_id: {payload.message_id}")
 
 
-async def log_role(payload, *args):
+async def log_role(ctx, payload, *args):
 
     roless = []
 
     for role in args:
 
         roless.append(role.name)
+    if not payload == None:
+        lg.info(f"Added {roless} to {payload.member.nick}")
 
-    lg.info(f"Added {roless} to {payload.member.nick}")
+    else:
+        lg.info(f"Added {roless} to {ctx.author.nick}")
 
 
 async def log_reaction_remove(payload):

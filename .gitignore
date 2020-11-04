@@ -20,3 +20,7 @@ __pycache__/ClicksBot.cpython-38.pyc
 *.pyc
 *.log
 *.json
+*.pyc
+__pycache__/ClicksBot.cpython-38.pyc
+util/config.json
+*.log

@@ -30,3 +30,23 @@ def get_help(name):
     elif "help_status":
 
         return help_status
+
+
+def get_promotion_text(promoter, user):
+
+    text = f"Hey {user.name}, der Admin {promoter.name} hat dir nun Botaccess gewährt. Du kannst jetzt auf den Channel" \
+           " #bot-infos und #bot-testing" \
+           " zugreifen und Befehle an den Bot schreiben. Wenn du im #bot-testing $github schreibst erhälst du den Link" \
+           " zum Clicks-Bot Repo. Wenn du eine übersicht über die Hauptbefehle des Bots brauchst, gebe einfach " \
+           "$commands ein.Viel spaß!"
+
+    return text
+
+
+def get_credits():
+    '''
+    DEPREACHED replaced by a field
+    '''
+    text = f"Idee und coding: Henrik | Clicks \nTextgestaltung : Kai | K_Stein \n Bereitstellung des Servers : Luis | DasVakuum"
+
+    return text
