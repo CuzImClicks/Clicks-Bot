@@ -274,6 +274,14 @@ async def bot_access(ctx, target):
     await user.dm_channel.send(strings.get_promotion_text(ctx.author, user))
 
 
+@bot.command(name="ping")
+@commands.has_role("Bot Access")
+async def ping(ctx):
+
+    await ctx.send("Pong!")
+    logger.log_send("Pong!")
+
+
 @bot.command(name="credits", help="Gibt dir eine Übersicht von wem der Bot erstellt und geschrieben wurde.")
 @commands.has_role("Bot Access")
 async def credits(ctx):
