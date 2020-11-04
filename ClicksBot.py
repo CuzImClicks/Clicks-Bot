@@ -4,6 +4,7 @@ from util import logger, MessageHandler, config
 from discord.ext import commands
 from util import strings
 from util import embed
+import time
 import os
 
 path = os.getcwd()
@@ -58,6 +59,7 @@ async def on_ready():
 
 async def delete_cmd(ctx):
 
+    time.sleep(5)
     await ctx.message.delete()
 
 
@@ -168,17 +170,15 @@ async def shutdown(ctx):
 
 @bot.command(name="mute", help="Mutes a user")
 @commands.has_role("Administrator")
-async def mute(ctx, user):
-    user_list = user.split("#")
-    user = discord.utils.get(ctx.author.guild.members, name=str(user_list[0]))
+async def mute(ctx, target):
 
-    lg.info(user_list)
+    user = discord.utils.get(ctx.author.guild.members, name=str(target))
 
-    user = discord.utils.get(ctx.author.guild.members, name=str(user_list[0]))
+    lg.info(user.name)
 
-    await ctx.send(f"Muted {user_list[0]}#{user_list[1]}", delete_after=5)
+    await ctx.send(f"Muted {user.name}", delete_after=5)
 
-    lg.info(f"Muted {user}")
+    lg.info(f"Muted {user.name}")
     await user.edit(mute=True)
 
     await delete_cmd(ctx)
@@ -257,7 +257,7 @@ async def github(ctx):
 async def bot_access(ctx, target):
 
     lg.info(target)
-    user = discord.utils.get(ctx.author.guild.members, name=target)
+    user = discord.utils.get(ctx.author.guild.members, name=str(target))
 
     lg.info(f"Got User {user.name} as target for promotion")
     
@@ -292,9 +292,6 @@ async def on_message(message):
 
     lg_chat.info(f"[{message.author}] in {message.channel} - {message.content}")
     await bot.process_commands(message)
-
-
-
 
 
 bot.run(config.getToken())
