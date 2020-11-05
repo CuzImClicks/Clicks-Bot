@@ -4,6 +4,8 @@ from util import logger, MessageHandler, config
 from discord.ext import commands
 from util import strings
 from util import embed
+import youtube_dl
+from random import choice
 import time
 import os
 
@@ -27,6 +29,8 @@ fl.setFormatter(fmt)
 
 lg_chat.addHandler(fl_chat)
 lg.addHandler(fl)
+
+youtube_dl.utils.bug_reports_message = lambda msg: lg.error(msg)
 
 intentions = discord.Intents.default()
 intentions.members = True
@@ -200,12 +204,17 @@ async def unmute(ctx, target):
 
 
 @bot.command(name="muteall", help=strings.get_help("help_muteall"))
-@commands.has_role("Administrator")
+@commands.has_role("Bot Access")
 async def muteall(ctx):
 
     try:
         for user in ctx.author.voice.channel.members:
-            await user.edit(mute=True)
+
+            if user == bot.user:
+                return
+
+            else:
+                await user.edit(mute=True)
 
         await ctx.send(f"Muted all users in {ctx.author.voice.channel.name}", delete_after=5)
 
@@ -217,7 +226,7 @@ async def muteall(ctx):
 
 
 @bot.command(name="unmuteall", help=strings.get_help("help_unmuteall"))
-@commands.has_role("Administrator")
+@commands.has_role("Bot Access")
 async def unmuteall(ctx):
 
     try:
@@ -278,8 +287,12 @@ async def bot_access(ctx, target):
 @commands.has_role("Bot Access")
 async def ping(ctx):
 
-    await ctx.send("Pong!")
-    logger.log_send("Pong!")
+    msg = f"Pong! Dein Ping ist {round(bot.latency, 2)*1000}ms"
+
+    await ctx.send(msg, delete_after=5)
+    await logger.log_send(ctx, msg)
+
+    await delete_cmd(ctx)
 
 
 @bot.command(name="credits", help="Gibt dir eine Übersicht von wem der Bot erstellt und geschrieben wurde.")
@@ -290,6 +303,63 @@ async def credits(ctx):
     #await logger.log_send(ctx, strings.get_credits())
 
     await embed.send_embed(bot=bot, ctx=ctx, infos=("Credits", "Credits to the ones who deserve", 0x2b4f22), names=("Idee und Coding", "Textgestaltung", "Server Owner"), values=("Idee und coding: Henrik | Clicks", "Textgestaltung : Kai | K_Stein", "Bereitstellung des Servers : Luis | DasVakuum"), inline=(False, False, False))
+
+
+# Music bot
+
+@bot.command(name="join")
+@commands.has_role("Bot Access")
+async def join(ctx):
+
+    channel = ctx.author.voice.channel
+
+    delete_cmd(ctx)
+
+    await channel.connect()
+
+
+@bot.command(name="play")
+@commands.has_role("Bot Access")
+async def play(ctx):
+
+    if not ctx.message.author.voice:
+
+        await ctx.send("You are not connected to a voice channel!")
+        return
+
+    else:
+
+        channel = ctx.message.author.voice.channel
+
+        await channel.connect()
+
+
+@bot.command(name="pause")
+@commands.has_role("Bot Access")
+async def pause(ctx):
+
+    pass
+
+
+@bot.command(name="leave")
+@commands.has_role("Bot Access")
+async def leave(ctx):
+
+    if not ctx.message.author.voice:
+
+        await ctx.send("You are not connected to a voice channel!")
+
+        return
+
+    else:
+
+        voice_client = ctx.message.guild.voice_client
+        await voice_client.disconnect()
+
+
+
+
+
 
 
 @bot.event

@@ -9,6 +9,7 @@ embed.add_field(name="first_line", value="Idee und coding: Henrik | Clicks", inl
 embed.add_field(name="second_line", value="Textgestaltung : Kai | K_Stein", inline=False)
 embed.add_field(name="third_line", value="Bereitstellung des Servers : Luis | DasVakuum", inline=False)'''
 
+
 async def send_embed(bot, ctx, infos=(), names=(), values=(), inline=(), send=True):
 
     try:
