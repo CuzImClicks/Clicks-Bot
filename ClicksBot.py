@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 import logging
 from util import logger, MessageHandler, config
@@ -6,13 +8,14 @@ from util import strings
 from util import embed
 import youtube_dl
 from random import choice
+import ffmpeg
 import time
 import os
 
 path = os.getcwd()
 print(path)
-
-logging.basicConfig(level=config.getLoggingLevel(), format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
+#config.getLoggingLevel()
+logging.basicConfig(level=logging.DEBUG, format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
 lg = logging.getLogger(__name__)
 
@@ -31,6 +34,33 @@ lg_chat.addHandler(fl_chat)
 lg.addHandler(fl)
 
 youtube_dl.utils.bug_reports_message = lambda msg: lg.error(msg)
+
+queue = []
+
+
+ytdl = youtube_dl.YoutubeDL(strings.get_ytdl_format_options())
+
+class YTDLSource(discord.PCMVolumeTransformer):
+    def __init__(self, source, *, data, volume=0.5):
+        super().__init__(source, volume)
+
+        self.data = data
+
+        self.title = data.get('title')
+        self.url = data.get('url')
+
+    @classmethod
+    async def from_url(cls, url, *, loop=None, stream=False):
+        loop = loop or asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+
+        if 'entries' in data:
+            # take first item from a playlist
+            data = data['entries'][0]
+
+        filename = data['url'] if stream else ytdl.prepare_filename(data)
+        return cls(discord.FFmpegPCMAudio(filename, **strings.get_ytdl_ffmpeg_options()), data=data)
+
 
 intentions = discord.Intents.default()
 intentions.members = True
@@ -315,13 +345,6 @@ async def join(ctx):
 
     delete_cmd(ctx)
 
-    await channel.connect()
-
-
-@bot.command(name="play")
-@commands.has_role("Bot Access")
-async def play(ctx):
-
     if not ctx.message.author.voice:
 
         await ctx.send("You are not connected to a voice channel!")
@@ -333,10 +356,94 @@ async def play(ctx):
 
         await channel.connect()
 
+    await channel.connect()
+
+
+@bot.command(name="play")
+@commands.has_role("Bot Access")
+async def play(ctx):
+
+    global queue
+    server = ctx.message.author.guild
+
+    voice_channel = server.voice_client
+
+    async with ctx.typing():
+
+        player = await YTDLSource.from_url(queue[0], loop=bot.loop)
+
+        voice_channel.play(player, after=lambda e: lg.error(e) if e else None)
+
+    await ctx.send(f"Now playing: {player.title}")
+
+    del(queue[0])
+
+
+@bot.command(name="die")
+@commands.has_role("Bot Access")
+async def die(ctx):
+
+    responses = ["Clicks Bot going dark ... ... ...", ]
+
+    await ctx.send(choice(responses))
+
+
+@bot.command(name="queue")
+@commands.has_role("Bot Access")
+async def queue_func(ctx, url):
+
+    global queue
+
+    queue.append(url)
+    await ctx.send(f"Added {url} to queue")
+
+
+@bot.command(name="remove")
+@commands.has_role("Bot Access")
+async def remove(ctx, number):
+
+    global queue
+
+    try:
+        del(queue[int(number)])
+        await ctx.send("The song was added to the Queue")
+
+    except:
+        await ctx.send(f"The Queue is either empty or the number is too high")
+
+
+@bot.command(name="rick")
+@commands.has_role("Dev")
+async def rick(ctx):
+
+    pass
+
+
+
 
 @bot.command(name="pause")
 @commands.has_role("Bot Access")
 async def pause(ctx):
+
+    server = ctx.message.author.guild
+    voice_channel = server.voice_client
+
+    voice_channel.pause()
+
+
+@bot.command(name="resume")
+@commands.has_role("Bot Access")
+async def resume(ctx):
+
+    server = ctx.message.author.guild
+    voice_channel = server.voice_client
+
+    voice_channel.resume()
+
+
+@bot.command(name="volume")
+@commands.has_role("Bot Access")
+async def volume(ctx):
 
     pass
 
