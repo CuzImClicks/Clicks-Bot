@@ -8,14 +8,13 @@ from util import strings
 from util import embed
 import youtube_dl
 from random import choice
-import ffmpeg
 import time
 import os
 
 path = os.getcwd()
 print(path)
 #config.getLoggingLevel()
-logging.basicConfig(level=logging.DEBUG, format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
+logging.basicConfig(level=config.getLoggingLevel(), format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
 lg = logging.getLogger(__name__)
 
@@ -343,7 +342,7 @@ async def join(ctx):
 
     channel = ctx.author.voice.channel
 
-    delete_cmd(ctx)
+    await delete_cmd(ctx)
 
     if not ctx.message.author.voice:
 
@@ -353,6 +352,8 @@ async def join(ctx):
     else:
 
         channel = ctx.message.author.voice.channel
+        await ctx.send("If you want to add songs to the queue ues $queue, then if you want to play it use $play")
+        await logger.log_send(ctx, "If you want to add songs to the queue ues $queue, then if you want to play it use $play")
 
         await channel.connect()
 
@@ -374,7 +375,7 @@ async def play(ctx):
 
         voice_channel.play(player, after=lambda e: lg.error(e) if e else None)
 
-    await ctx.send(f"Now playing: {player.title}")
+    await ctx.send(f"Now playing: {player.title}", delete_after=5)
 
     del(queue[0])
 
@@ -386,6 +387,7 @@ async def die(ctx):
     responses = ["Clicks Bot going dark ... ... ...", ]
 
     await ctx.send(choice(responses))
+    await logger.log_send(ctx, choice(responses))
 
 
 @bot.command(name="queue")
@@ -395,7 +397,10 @@ async def queue_func(ctx, url):
     global queue
 
     queue.append(url)
-    await ctx.send(f"Added {url} to queue")
+    lg.info(f"Added {url} to queue")
+    await delete_cmd(ctx)
+    await ctx.send(f"Added {url} to queue", delete_after=5)
+    await logger.log_send(ctx, f"Added {url} to queue")
 
 
 @bot.command(name="remove")
@@ -406,10 +411,13 @@ async def remove(ctx, number):
 
     try:
         del(queue[int(number)])
+        lg.info(f"Deleted {queue[int(number)]} from queue")
         await ctx.send("The song was added to the Queue")
+        await logger.log_send(ctx, "The song was added to the Queue")
 
     except:
         await ctx.send(f"The Queue is either empty or the number is too high")
+        await logger.log_send(ctx, f"The Queue is either empty or the number is too high")
 
 
 @bot.command(name="rick")
@@ -427,6 +435,10 @@ async def pause(ctx):
     voice_channel = server.voice_client
 
     voice_channel.pause()
+    lg.info(f"Paused the song currently playing!")
+    await delete_cmd(ctx)
+    await ctx.send(f"Paused song currently playing!")
+    await logger.log_send(ctx, f"Paused song currently playing!")
 
 
 @bot.command(name="resume")
@@ -437,6 +449,10 @@ async def resume(ctx):
     voice_channel = server.voice_client
 
     voice_channel.resume()
+    lg.info(f"Resumed the song currently playing!")
+    await delete_cmd(ctx)
+    await ctx.send(f"Resumed song currently playing!", delete_after=5)
+    await logger.log_send(ctx, f"Resumed song currently playing!")
 
 
 @bot.command(name="volume")
@@ -452,7 +468,8 @@ async def leave(ctx):
 
     if not ctx.message.author.voice:
 
-        await ctx.send("You are not connected to a voice channel!")
+        await ctx.send("You are not connected to a voice channel!", delete_after=5)
+        await logger.log_send(ctx, "You are not connected to a voice channel!")
 
         return
 
@@ -460,11 +477,8 @@ async def leave(ctx):
 
         voice_client = ctx.message.guild.voice_client
         await voice_client.disconnect()
-
-
-
-
-
+        await lg.info(f"Disconnected from channel {ctx.message.author.voice.channel}")
+        await logger.log_send(ctx, f"Disconnected from channel {ctx.message.author.voice.channel}")
 
 
 @bot.event
