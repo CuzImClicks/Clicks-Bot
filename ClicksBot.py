@@ -419,8 +419,6 @@ async def rick(ctx):
     pass
 
 
-
-
 @bot.command(name="pause")
 @commands.has_role("Bot Access")
 async def pause(ctx):
