@@ -3,8 +3,7 @@
 *.ini
 *.iml
 **.log
-Clicks-Bot/.idea/*
-Clicks-Bot/__pycache__/*
+Clicks-Bot/.idea/
 testing.py
 removed.txt
 */config.ini
