@@ -6,6 +6,7 @@ from util import logger, MessageHandler, config
 from discord.ext import commands
 from util import strings
 from util import embed
+from util.logger import *
 import youtube_dl
 from random import choice
 import time
@@ -177,7 +178,7 @@ async def on_command_error(ctx, error):
     else:
         await logger.log_error(error)
 
-    await delete_cmd(ctx)
+    #await delete_cmd(ctx)
 
 
 @bot.event
@@ -246,6 +247,7 @@ async def muteall(ctx):
                 await user.edit(mute=True)
 
         await ctx.send(f"Muted all users in {ctx.author.voice.channel.name}", delete_after=5)
+        await resume(ctx)
 
     except Exception as e:
         await ctx.send("Du bist in keinem Voice Channel", delete_after=5)
@@ -263,6 +265,11 @@ async def unmuteall(ctx):
             await user.edit(mute=False)
 
         await ctx.send(f"Unmuted all users in '{ctx.author.voice.channel.name}'", delete_after=5)
+        await pause(ctx)
+
+        #await asyncio.sleep(60)
+
+        #await muteall(ctx)
 
     except Exception as e:
         await ctx.send("Du bist in keinem Voice Channel", delete_after=5)
@@ -334,10 +341,19 @@ async def credits(ctx):
     await embed.send_embed(bot=bot, ctx=ctx, infos=("Credits", "Credits to the ones who deserve", 0x2b4f22), names=("Idee und Coding", "Textgestaltung", "Server Owner"), values=("Idee und coding: Henrik | Clicks", "Textgestaltung : Kai | K_Stein", "Bereitstellung des Servers : Luis | DasVakuum"), inline=(False, False, False))
 
 
+@bot.command(name="delete_history")
+@commands.has_role("Dev")
+async def delete_history(ctx):
+
+    channel = ctx.message.channel
+
+    await channel.delete_messages(await channel.history().flatten())
+
+
 # Music bot
 
 @bot.command(name="join")
-@commands.has_role("Bot Access")
+@commands.has_role("Dev")
 async def join(ctx):
 
     channel = ctx.author.voice.channel
@@ -352,16 +368,16 @@ async def join(ctx):
     else:
 
         channel = ctx.message.author.voice.channel
-        await ctx.send("If you want to add songs to the queue ues $queue, then if you want to play it use $play")
-        await logger.log_send(ctx, "If you want to add songs to the queue ues $queue, then if you want to play it use $play")
 
+        await logger.log_send(ctx, "If you want to add songs to the queue ues $queue, then if you want to play it use $play")
         await channel.connect()
 
-    await channel.connect()
+    await ctx.send("If you want to add songs to the queue ues $queue, then if you want to play it use $play")
+
 
 
 @bot.command(name="play")
-@commands.has_role("Bot Access")
+@commands.has_role("Dev")
 async def play(ctx):
 
     global queue
@@ -371,18 +387,62 @@ async def play(ctx):
 
     async with ctx.typing():
 
-        player = await YTDLSource.from_url(queue[0], loop=bot.loop)
+        player = await YTDLSource.from_url(str(queue[0]), loop=bot.loop)
 
         voice_channel.play(player, after=lambda e: lg.error(e) if e else None)
 
-    await ctx.send(f"Now playing: {player.title}", delete_after=5)
+    await ctx.send(f"Now playing: {player.title}")
 
     del(queue[0])
 
 
+@bot.command(name="among_us")
+@commands.has_role("Dev")
+async def among_us(ctx):
+
+    interstellar_no_time_for_caution = "https://www.youtube.com/watch?v=m3zvVGJrTP8"
+    interstellar_main_theme = "https://www.youtube.com/watch?v=UDVtMYqUAyw"
+    last_heroes_dimensions = "https://www.youtube.com/watch?v=ZPuvoDZj2hM"
+
+    global queue
+
+    queue.clear()
+    list = []
+
+    list.append(interstellar_no_time_for_caution)
+    list.append(interstellar_main_theme)
+    list.append(last_heroes_dimensions)
+
+    for song in list:
+
+        queue.append(choice(list))
+
+    await ctx.send("Queued the Among Us songs")
+
+    await delete_cmd(ctx)
+
+    await play(ctx)
+
+
+
 @bot.command(name="die")
-@commands.has_role("Bot Access")
+@commands.has_role("Dev")
 async def die(ctx):
+
+    global queue
+    server = ctx.message.author.guild
+
+    voice_channel = server.voice_client
+
+    async with ctx.typing():
+
+        player = await YTDLSource.from_url(queue[1], loop=bot.loop)
+
+        voice_channel.play(player, after=lambda e: lg.error(e) if e else None)
+
+    await ctx.send(f"Now playing: {player.title}")
+
+    del(queue[0, 1])
 
     responses = ["Clicks Bot going dark ... ... ...", ]
 
@@ -390,21 +450,34 @@ async def die(ctx):
     await logger.log_send(ctx, choice(responses))
 
 
+
+
 @bot.command(name="queue")
-@commands.has_role("Bot Access")
-async def queue_func(ctx, url):
+@commands.has_role("Dev")
+async def queue_func(ctx, *args):
 
     global queue
 
-    queue.append(url)
-    lg.info(f"Added {url} to queue")
-    await delete_cmd(ctx)
-    await ctx.send(f"Added {url} to queue", delete_after=5)
-    await logger.log_send(ctx, f"Added {url} to queue")
+    url = args
+
+    if not url == ():
+
+        queue.append(url)
+        lg.info(f"Added {url} to queue")
+        await delete_cmd(ctx)
+        await ctx.send(f"Added {url} to queue", delete_after=5)
+        await logger.log_send(ctx, f"Added {url} to queue")
+
+    else:
+        for i in range(0, len(queue)):
+            await ctx.send(queue[i])
+            log_send(ctx, queue[i])
+
+    await play(ctx)
 
 
 @bot.command(name="remove")
-@commands.has_role("Bot Access")
+@commands.has_role("Dev")
 async def remove(ctx, number):
 
     global queue
@@ -427,8 +500,21 @@ async def rick(ctx):
     pass
 
 
+@bot.command(name="skip")
+@commands.has_role("Dev")
+async def skip(ctx):
+
+    global queue
+
+    server = ctx.message.author.guild
+    voice_channel = server.voice_client
+
+    voice_channel.pause()
+    await play(ctx)
+
+
 @bot.command(name="pause")
-@commands.has_role("Bot Access")
+@commands.has_role("Dev")
 async def pause(ctx):
 
     server = ctx.message.author.guild
@@ -442,7 +528,7 @@ async def pause(ctx):
 
 
 @bot.command(name="resume")
-@commands.has_role("Bot Access")
+@commands.has_role("Dev")
 async def resume(ctx):
 
     server = ctx.message.author.guild
@@ -456,14 +542,14 @@ async def resume(ctx):
 
 
 @bot.command(name="volume")
-@commands.has_role("Bot Access")
+@commands.has_role("Dev")
 async def volume(ctx):
 
     pass
 
 
 @bot.command(name="leave")
-@commands.has_role("Bot Access")
+@commands.has_role("Dev")
 async def leave(ctx):
 
     if not ctx.message.author.voice:
