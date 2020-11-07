@@ -1,5 +1,5 @@
 import time
-
+import discord
 from discord.ext import commands
 import logging
 from util import logger
@@ -16,7 +16,7 @@ class CommandEvents(commands.Cog):
 
         self.bot = client
 
-    async def delete_cmd(ctx):
+    async def delete_cmd(self, ctx):
 
         time.sleep(5)
         await ctx.message.delete()
@@ -36,13 +36,11 @@ class CommandEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):
-
-        self.delete_cmd(ctx)
-        lg.info(f"Command complete")
-
-
-
-
+        try:
+            await self.delete_cmd(ctx)
+            lg.info(f"Command complete")
+        except discord.errors.NotFound as e:
+            pass
 
 
 def setup(bot):

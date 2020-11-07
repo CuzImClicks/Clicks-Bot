@@ -9,8 +9,9 @@ import os
 
 lg = logging.getLogger(__name__)
 lg_chat = logging.getLogger("CHAT")
-
-path = os.getcwd()
+#TODO: revert path
+#path = os.getcwd()
+path = "D:/GitHub Repos/Clicks-Bot"
 
 fl_chat = logging.FileHandler(f"{path}\logs\chat.log")
 fl_chat.setLevel(config.getFileLoggingLevel())
@@ -27,21 +28,12 @@ class MessageEvents(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_message(self, message):
-
-        if message.author == self.bot.user:
-            return
-
-        lg_chat.info(f"[{message.author}] in {message.channel} - {message.content}")
-        await self.bot.process_commands(message)
-
-    @commands.Cog.listener()
     async def on_message_delete(self, message):
 
         if message.author == self.bot.user:
             return
 
-        elif "$" in message.content:
+        elif config.getCommandPrefix() in message.content:
             return
 
         else:
@@ -52,7 +44,7 @@ class MessageEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
 
-        if "$" in before.content:
+        if config.getCommandPrefix() in before.content:
             return
 
         elif before.author == self.bot.user:
@@ -66,6 +58,16 @@ class MessageEvents(commands.Cog):
     async def on_typing(self, channel, user, when):
 
         await log_typing(channel, user, when)
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+
+        if message.author == self.bot.user:
+            return
+
+        else:
+            lg_chat.info(f"[{message.author}] in {message.channel} - {message.content}")
+            await self.bot.process_commands(message)
 
 
 def setup(bot):

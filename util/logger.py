@@ -2,7 +2,9 @@ import logging
 import os
 
 lg = logging.getLogger(__name__)
-path = os.getcwd()
+#path = os.getcwd()
+#TODO: revert path
+path = "D:/GitHub Repos/Clicks-Bot"
 fl = logging.FileHandler(f"{path}\logs\log.log")
 fl.setLevel(logging.INFO)
 

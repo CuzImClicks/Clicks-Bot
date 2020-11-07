@@ -49,11 +49,9 @@ class MusicBot(commands.Cog):
 
     @commands.command(name="join", help="Mit $join joint der Musikbot deinem Sprachchannel.")
     @commands.has_role("Dev")
-    async def join(ctx):
+    async def join(self, ctx):
 
         channel = ctx.author.voice.channel
-
-        await (ctx)
 
         if not ctx.message.author.voice:
 
@@ -231,7 +229,6 @@ class MusicBot(commands.Cog):
 
         voice_channel.pause()
         lg.info(f"Paused the song currently playing!")
-        await (ctx)
         await ctx.send(f"Paused song currently playing!", delete_after=5)
         await logger.log_send(ctx, f"Paused song currently playing!")
 

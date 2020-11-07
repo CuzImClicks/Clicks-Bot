@@ -17,7 +17,8 @@ class Commands(commands.Cog):
     @commands.command(name="github")
     @commands.has_role("Member")
     async def github(self, ctx):
-        await ctx.send("Die GitHub Page des Bots ist https://github.com/CuzImClicks/Clicks-Bot")
+        await ctx.send("Die GitHub Page des Bots ist https://github.com/CuzImClicks/Clicks-Bot", delete_after=5)
+        await log_send(ctx, "Die GitHub Page des Bots ist https://github.com/CuzImClicks/Clicks-Bot")
 
     @commands.command(name="ping")
     @commands.has_role("Bot Access")
@@ -30,18 +31,11 @@ class Commands(commands.Cog):
     @commands.command(name="credits", help="Gibt dir eine Übersicht von wem der Bot erstellt und geschrieben wurde.")
     @commands.has_role("Bot Access")
     async def credits(self, ctx):
-        # await ctx.send(strings.get_credits())
-        # await logger.log_send(ctx, strings.get_credits())
 
         await embed.send_embed(bot=self.bot, ctx=ctx, infos=("Credits", "Credits to the ones who deserve", 0x2b4f22),
                                names=("Idee und Coding", "Textgestaltung", "Server Owner"), values=(
             "Idee und coding: Henrik | Clicks", "Textgestaltung : Kai | K_Stein",
             "Bereitstellung des Servers : Luis | DasVakuum"), inline=(False, False, False))
-
-    @commands.command(name="command_message")
-    @commands.has_role("Dev")
-    async def command_mesage(self, ctx):
-        pass
 
 
 def setup(bot):

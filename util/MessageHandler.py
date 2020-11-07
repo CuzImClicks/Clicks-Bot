@@ -2,8 +2,9 @@ import logging
 import os
 from util import config
 from ClicksBot import bot
-
-path = os.getcwd()
+#TODO: revert path
+#path = os.getcwd()
+path = "D:/GitHub Repos/Clicks-Bot"
 
 lg = logging.getLogger(__name__)
 fl = logging.FileHandler(f"{path}\logs\chat.log")

@@ -55,9 +55,9 @@ class Moderation(commands.Cog):
 
                 else:
                     await user.edit(mute=True)
+                    lg.info(f"Muted user: {user.nick}")
 
             await ctx.send(f"Muted all users in {ctx.author.voice.channel.name}", delete_after=5)
-            await MusicBot.resume(ctx)
 
         except Exception as e:
             await ctx.send("Du bist in keinem Voice Channel", delete_after=5)
@@ -70,9 +70,9 @@ class Moderation(commands.Cog):
         try:
             for user in ctx.author.voice.channel.members:
                 await user.edit(mute=False)
+                lg.info(f"Unmuted user: {user.nick}")
 
             await ctx.send(f"Unmuted all users in '{ctx.author.voice.channel.name}'", delete_after=5)
-            await MusicBot.pause(ctx)
 
         except Exception as e:
             await ctx.send("Du bist in keinem Voice Channel", delete_after=5)
