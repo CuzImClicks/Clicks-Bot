@@ -6,7 +6,7 @@
 *.log
 **.log
 *.webm
-
+/cogs/example_cog.py
 Clicks-Bot/.idea/
 testing.py
 removed.txt

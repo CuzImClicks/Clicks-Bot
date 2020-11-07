@@ -31,6 +31,11 @@ def get_help(name):
 
         return help_status
 
+    elif "queue_help":
+
+        return "Mit $queue fügst du einen Song/Video in die Warteschlange des Musikbots." \
+               " Dein Song wird abgespielt wenn alle songs die vorher in der queue waren abgespielt oder geskipped wurden."
+
 
 def get_promotion_text(promoter, user):
 
