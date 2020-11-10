@@ -1,4 +1,3 @@
-from configparser import ConfigParser
 import logging
 from clicks_util import json_util
 
@@ -60,3 +59,18 @@ def getCommandPrefix():
 def getStatus():
 
     return jf.read()["status"]
+
+
+def getBotAccessRole():
+
+    return jf.read()["Bot Access Role"]
+
+
+def getBotAdminRole():
+
+    return jf.read()["Bot Admin Role"]
+
+
+def getDefaultRole():
+
+    return jf.read()["Default Role"]

@@ -29,11 +29,21 @@ intentions.members = True
 
 bot = commands.Bot(command_prefix=config.getCommandPrefix(), intents=intentions)
 
+files = []
+for filename_ in os.listdir(f"{path}/cogs"):
+    if filename_.endswith(".py"):
+        if not filename_ == "example_cog.py":
+            files.append(filename_[:-3])
+
+    else:
+        pass
+
 
 @bot.command(name="load")
 async def load(ctx, extension):
 
     bot.load_extension(f"cogs.{extension}")
+    lg.info(f"Realoading extension: {extension}")
 
 
 @bot.command(name="reload")
@@ -41,14 +51,10 @@ async def reload(ctx, extension):
 
     if str(extension) == "all":
 
-        for filename_ in os.listdir(f"{path}/cogs"):
-            if filename_.endswith(".py"):
-                if not filename_ == "example_cog.py":
-                    bot.reload_extension(f"cogs.{filename_[:-3]}")
-                    lg.info(f"Loaded Extension: {filename_}")
+        for file in files:
 
-            else:
-                pass
+            bot.reload_extension(f"cogs.{file}")
+            lg.info(f"Reloaded the extension: {file}")
 
     else:
 

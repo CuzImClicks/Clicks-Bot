@@ -31,6 +31,12 @@ class CommandEvents(commands.Cog):
             await ctx.send(error_msg, delete_after=5)
             await logger.log_error(error_msg)
 
+        elif isinstance(error, commands.errors.CommandNotFound):
+            await ctx.send(f"Command not found", delete_after=5)
+            import asyncio
+            await asyncio.sleep(5)
+            await ctx.message.delete()
+
         else:
             await logger.log_error(error)
 
@@ -39,6 +45,9 @@ class CommandEvents(commands.Cog):
         try:
             await ctx.message.delete()
             lg.info(f"Command complete")
+            import asyncio
+            await asyncio.sleep(5)
+            await ctx.message.delete()
         except discord.errors.NotFound as e:
             pass
 

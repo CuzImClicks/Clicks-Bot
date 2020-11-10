@@ -2,6 +2,7 @@ import logging
 import discord
 from discord.ext import commands
 from util import config
+import datetime
 
 path = "D:/GitHub Repos/Clicks-Bot"
 
@@ -58,8 +59,19 @@ class MainEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
 
-        lg.info(member)
-        member.add_roles("Member")
+        lg.info(f"{member} joined the {member.guild}")
+        await member.add_roles("Member")
+
+        embed = discord.Embed(colour=1e6170, description=f"Ein wildes {member.name} erscheint!")
+        embed.set_thumbnail(url=str(member.avatar_url))
+        embed.setfoorter(text=str(member.guild), icon_url=str(member.guild.icon_url))
+        embed.set_timestamp(datetime.datetime.utcnow())
+
+        channel = self.bot.get_channel(764117625331908649)
+
+        await channel.send(embed=embed)
+
+
 
         # await member.create_dm()
         # await member.send("Wilkommen")

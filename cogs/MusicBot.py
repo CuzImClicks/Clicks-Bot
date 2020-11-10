@@ -9,6 +9,7 @@ from random import choice
 from util import strings
 from util import logger
 from util.logger import *
+from util import config
 
 
 lg = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ class MusicBot(commands.Cog):
         self.bot = bot
 
     @commands.command(name="join", help="Mit $join joint der Musikbot deinem Sprachchannel.")
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def join(self, ctx):
 
         channel = ctx.author.voice.channel
@@ -72,19 +73,23 @@ class MusicBot(commands.Cog):
     @commands.command(name="play", help="Mit $play startest du die Wiedergabe der Musik in deinem Channel."
                                    " Dies funktioniert nur wenn du einem Sprachchannel bist und nur wenn bereits Songs"
                                    " in der Queue sind. Gebe $queue ohne Argumente ein um zu sehen ob songs in der Queue sind.")
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def play(self, ctx):
 
         global queue
         server = ctx.message.author.guild
 
         voice_channel = server.voice_client
+        try:
+            async with ctx.typing():
+                player = await YTDLSource.from_url(str(queue[0]), loop=self.bot.loop)
 
-        async with ctx.typing():
-            player = await YTDLSource.from_url(str(queue[0]), loop=self.bot.loop)
+                voice_channel.play(player, after=lambda e: lg.error(e) if e else None)
 
-            voice_channel.play(player, after=lambda e: lg.error(e) if e else None)
+        except IndexError as e:
 
+            lg.error(f"No songs left in queue!")
+            await ctx.send(f"No songs left in queue!")
 
         await ctx.send(f"Now playing: {player.title}", delete_after=5)
         await log_send(ctx, f"Now playing: {player.title}")
@@ -93,7 +98,7 @@ class MusicBot(commands.Cog):
         lg.info(f"Removed song {queue[0]} from queue")
 
     @commands.command(name="among_us")
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def among_us(self, ctx):
 
         interstellar_no_time_for_caution = "https://www.youtube.com/watch?v=m3zvVGJrTP8"
@@ -117,11 +122,11 @@ class MusicBot(commands.Cog):
 
         await ctx.send("Queued the Among Us songs", delete_after=5)
         await log_send(ctx, "Queued the Among Us songs")
-
-        await self.play(ctx)
+        for i in range(0, len(queue)):
+            await self.play(ctx)
 
     @commands.command(name="die")
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def die(self, ctx):
 
         global queue
@@ -144,7 +149,7 @@ class MusicBot(commands.Cog):
         await logger.log_send(ctx, choice(responses))
 
     @commands.command(name="queue", help=strings.get_help("queue_help"))
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def queue_func(self, ctx, *args):
 
         global queue
@@ -165,7 +170,7 @@ class MusicBot(commands.Cog):
                 await log_send(ctx, queue[i])
 
     @commands.command(name="remove")
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def remove(self, ctx, number):
 
         global queue
@@ -181,14 +186,14 @@ class MusicBot(commands.Cog):
             await logger.log_send(ctx, f"The Queue is either empty or the number is too high")
 
     @commands.command(name="rick")
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def rick(self, ctx):
 
         queue.insert(0, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
         await self.play(ctx)
 
     @commands.command(name="skipall")
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def skipall(self, ctx):
 
         global queue
@@ -206,7 +211,7 @@ class MusicBot(commands.Cog):
     @commands.command(name="skip",
                  help="Mit $skip überspringst du den aktuell spielenden Song und der Bot spielt automatisch "
                       "den nächsten Song in der Queue ab.")
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def skip(self, ctx):
 
         global queue
@@ -221,7 +226,7 @@ class MusicBot(commands.Cog):
         await self.play(ctx)
 
     @commands.command(name="pause")
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def pause(self, ctx):
 
         server = ctx.message.author.guild
@@ -233,7 +238,7 @@ class MusicBot(commands.Cog):
         await logger.log_send(ctx, f"Paused song currently playing!")
 
     @commands.command(name="resume")
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def resume(self, ctx):
 
         server = ctx.message.author.guild
@@ -246,13 +251,13 @@ class MusicBot(commands.Cog):
         await logger.log_send(ctx, f"Resumed song currently playing!")
 
     @commands.command(name="volume")
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def volume(self, ctx):
 
         pass
 
     @commands.command(name="leave")
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def leave(self, ctx):
 
         if not ctx.message.author.voice:
