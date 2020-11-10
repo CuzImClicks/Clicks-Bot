@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 
+from multiprocessing import Process, Lock
 import youtube_dl
 import logging
 from random import choice

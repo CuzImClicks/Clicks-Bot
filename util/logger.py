@@ -9,33 +9,10 @@ fl = logging.FileHandler(f"{path}\logs\log.log")
 fl.setLevel(logging.INFO)
 
 
-async def file_logger(level):
+async def get_file_logger():
 
-    if level == "DEBUG":
+    return fl
 
-        fl.setLevel(logging.DEBUG)
-        return fl
-
-    elif "ERROR":
-
-        fl.setLevel(logging.ERROR)
-        return fl
-
-    elif "INFO":
-
-        fl.setLevel(logging.INFO)
-        return fl
-
-    elif "WARNING":
-
-        fl.setLevel(logging.WARNING)
-        return fl
-
-    lg.info(f"Set file logger level to {level}")
-
-    async def write(data):
-
-        fl.emit(data)
 
 async def log_typing(channel, user, when):
 

@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 from util import config
 import datetime
+from multiprocessing import Process, Lock
 
 path = "D:/GitHub Repos/Clicks-Bot"
 
@@ -71,26 +72,13 @@ class MainEvents(commands.Cog):
 
         await channel.send(embed=embed)
 
-
-
         # await member.create_dm()
         # await member.send("Wilkommen")
 
-'''    @commands.Cog.listener()
+    @commands.Cog.listener()
     async def on_message(self, message):
 
         lg_chat.info(f"[{message.author}] in {message.channel} - {message.content}")
-
-        if message.author == self.bot.user:
-            pass
-
-        elif not getPreviousMessageID() == message.id:
-
-            lg.info(f"Previous Message ID: {getPreviousMessageID()}")
-            lg.info(f"Current Message ID: {message.id}")
-            setPreviousMessageID(message.id)
-            await self.bot.process_commands(message)
-'''
 
 
 def setup(bot):

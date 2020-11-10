@@ -6,8 +6,13 @@ from util import MessageHandler
 from util import config
 from util.logger import *
 from util import embed
+import logging
 
 lg = logging.getLogger(__name__)
+import logging
+fl = logging.FileHandler(f"{path}\logs\log.log")
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 
 class Commands(commands.Cog):

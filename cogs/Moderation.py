@@ -7,6 +7,11 @@ from cogs import MusicBot
 from util.logger import *
 
 lg = logging.getLogger(__name__)
+from util.logger import path
+import logging
+fl = logging.FileHandler(f"{path}\logs\log.log")
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 #TODO: rework the permissions maybe add a role for the music bot
 #TODO: test all the commands

@@ -5,6 +5,7 @@ from discord.ext import commands
 from util.logger import *
 import os
 
+
 #TODO: revert path
 #path = os.getcwd()
 path = "D:/GitHub Repos/Clicks-Bot"

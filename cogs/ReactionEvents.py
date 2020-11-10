@@ -2,8 +2,14 @@ import logging
 import discord
 from discord.ext import commands
 from util.logger import *
+from util.logger import path
 
 lg = logging.getLogger(__name__)
+from util.logger import path
+import logging
+fl = logging.FileHandler(f"{path}\logs\log.log")
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 
 class ReactionEvents(commands.Cog):

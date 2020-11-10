@@ -11,7 +11,11 @@ lg = logging.getLogger(__name__)
 lg_chat = logging.getLogger("CHAT")
 #TODO: revert path
 #path = os.getcwd()
-path = "D:/GitHub Repos/Clicks-Bot"
+from util.logger import path
+import logging
+fl = logging.FileHandler(f"{path}\logs\log.log")
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 
 class MessageEvents(commands.Cog):
