@@ -2,14 +2,15 @@ import discord
 import logging
 from util import logger, config
 from discord.ext import commands
-
 from util.logger import *
-
 import os
+
 #TODO: revert path
 #path = os.getcwd()
 path = "D:/GitHub Repos/Clicks-Bot"
 #config.getLoggingLevel()
+
+
 logging.basicConfig(level=config.getLoggingLevel(), format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
 lg = logging.getLogger(__name__)
@@ -21,6 +22,7 @@ fl.setLevel(config.getFileLoggingLevel())
 fl.setFormatter(fmt)
 
 lg.addHandler(fl)
+
 
 intentions = discord.Intents.default()
 intentions.members = True
@@ -37,6 +39,7 @@ async def load(ctx, extension):
 @bot.command(name="reload")
 async def reload(ctx, extension):
 
+    lg.info(f"Realoading extension: {extension}")
     bot.reload_extension(f"cogs.{extension}")
     lg.info(f"Reloaded the extension: {extension}")
 
@@ -52,6 +55,7 @@ try:
         if filename.endswith(".py"):
             if not filename == "example_cog.py":
                 bot.load_extension(f"cogs.{filename[:-3]}")
+                lg.info(f"Loaded Extension: {filename}")
 
         else:
             pass

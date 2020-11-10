@@ -13,12 +13,7 @@ lg_chat = logging.getLogger("CHAT")
 #path = os.getcwd()
 path = "D:/GitHub Repos/Clicks-Bot"
 
-fl_chat = logging.FileHandler(f"{path}\logs\chat.log")
-fl_chat.setLevel(config.getFileLoggingLevel())
-fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
-fl_chat.setFormatter(fmt)
 
-lg_chat.addHandler(fl_chat)
 
 
 class MessageEvents(commands.Cog):
@@ -59,15 +54,6 @@ class MessageEvents(commands.Cog):
 
         await log_typing(channel, user, when)
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-
-        if message.author == self.bot.user:
-            return
-
-        else:
-            lg_chat.info(f"[{message.author}] in {message.channel} - {message.content}")
-            await self.bot.process_commands(message)
 
 
 def setup(bot):

@@ -16,10 +16,10 @@ class CommandEvents(commands.Cog):
 
         self.bot = client
 
-    async def delete_cmd(self, ctx):
+    '''    async def delete_cmd(self, ctx):
 
         time.sleep(5)
-        await ctx.message.delete()
+        await ctx.message.delete()'''
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -37,7 +37,7 @@ class CommandEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):
         try:
-            await self.delete_cmd(ctx)
+            await ctx.message.delete()
             lg.info(f"Command complete")
         except discord.errors.NotFound as e:
             pass

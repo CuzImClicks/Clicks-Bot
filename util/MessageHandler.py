@@ -1,7 +1,8 @@
 import logging
-import os
 from util import config
-from ClicksBot import bot
+from util.embed import send_embed
+from util.logger import *
+
 #TODO: revert path
 #path = os.getcwd()
 path = "D:/GitHub Repos/Clicks-Bot"
@@ -13,6 +14,14 @@ fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s
 fl.setFormatter(fmt)
 
 lg.addHandler(fl)
+
+#einen neuen send befehl der das senden leichter macht
+
+
+async def send(ctx, title, description, content):
+
+    await send_embed(ctx=ctx, infos=(title, description), values=(content,), inline=False)
+    await log_send(ctx, content)
 
 
 async def log(msg):
