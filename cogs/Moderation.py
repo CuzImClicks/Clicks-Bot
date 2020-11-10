@@ -69,8 +69,11 @@ class Moderation(commands.Cog):
 
         try:
             for user in ctx.author.voice.channel.members:
-                await user.edit(mute=False)
-                lg.info(f"Unmuted user: {user.nick}")
+                try:
+                    await user.edit(mute=False)
+                    lg.info(f"Unmuted user: {user.nick}")
+                except discord.errors.NotFound as e:
+                    lg.error(f"User {user.nick} is not connected to the voice chat anymore")
 
             await ctx.send(f"Unmuted all users in '{ctx.author.voice.channel.name}'", delete_after=5)
 

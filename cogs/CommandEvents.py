@@ -47,9 +47,16 @@ class CommandEvents(commands.Cog):
             lg.info(f"Command complete")
             import asyncio
             await asyncio.sleep(5)
-            await ctx.message.delete()
+            try:
+                await ctx.message.delete()
+
+            except:
+                pass
+
         except discord.errors.NotFound as e:
             pass
+
+
 
 
 def setup(bot):
