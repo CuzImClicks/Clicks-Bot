@@ -85,7 +85,7 @@ class MusicBot(commands.Cog):
 
             voice_channel.play(player, after=lambda e: lg.error(e) if e else None)
 
-            await (ctx)
+
         await ctx.send(f"Now playing: {player.title}", delete_after=5)
         await log_send(ctx, f"Now playing: {player.title}")
 
@@ -241,7 +241,7 @@ class MusicBot(commands.Cog):
 
         voice_channel.resume()
         lg.info(f"Resumed the song currently playing!")
-        await (ctx)
+
         await ctx.send(f"Resumed song currently playing!", delete_after=5)
         await logger.log_send(ctx, f"Resumed song currently playing!")
 

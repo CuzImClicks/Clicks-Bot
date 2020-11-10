@@ -14,12 +14,25 @@ fl_chat.setFormatter(fmt)
 
 lg_chat.addHandler(fl_chat)
 
+previous_message_id = ""
+
+
+def getPreviousMessageID():
+    return previous_message_id
+
+
+def setPreviousMessageID(message_id):
+    global previous_message_id
+    previous_message_id = str(message_id)
+    lg.info(f"Set Message ID to: {message_id}")
+
 
 class MainEvents(commands.Cog):
 
     def __init__(self, bot):
 
         self.bot = bot
+        self.previous_message_id = ""
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -46,23 +59,26 @@ class MainEvents(commands.Cog):
     async def on_member_join(self, member):
 
         lg.info(member)
+        member.add_roles("Member")
 
         # await member.create_dm()
         # await member.send("Wilkommen")
 
-    @commands.Cog.listener()
+'''    @commands.Cog.listener()
     async def on_message(self, message):
 
-        global previous_message_id
+        lg_chat.info(f"[{message.author}] in {message.channel} - {message.content}")
 
-        if message.author == self.bot.user :
+        if message.author == self.bot.user:
             pass
 
-        else:
-            if not str(previous_message_id) == str(message.id):
-                await self.bot.process_commands(message)
+        elif not getPreviousMessageID() == message.id:
 
-        lg_chat.info(f"[{message.author}] in {message.channel} - {message.content}")
+            lg.info(f"Previous Message ID: {getPreviousMessageID()}")
+            lg.info(f"Current Message ID: {message.id}")
+            setPreviousMessageID(message.id)
+            await self.bot.process_commands(message)
+'''
 
 
 def setup(bot):

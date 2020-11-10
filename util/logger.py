@@ -54,8 +54,6 @@ async def log_recv(ctx):
 
 async def log(msg, ctx="", raw=False):
 
-
-
     if raw:
         lg.info(msg)
 

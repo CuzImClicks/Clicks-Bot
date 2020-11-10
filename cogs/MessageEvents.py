@@ -14,8 +14,6 @@ lg_chat = logging.getLogger("CHAT")
 path = "D:/GitHub Repos/Clicks-Bot"
 
 
-
-
 class MessageEvents(commands.Cog):
 
     def __init__(self, bot):
@@ -53,7 +51,6 @@ class MessageEvents(commands.Cog):
     async def on_typing(self, channel, user, when):
 
         await log_typing(channel, user, when)
-
 
 
 def setup(bot):

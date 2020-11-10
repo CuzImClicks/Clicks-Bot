@@ -39,9 +39,22 @@ async def load(ctx, extension):
 @bot.command(name="reload")
 async def reload(ctx, extension):
 
-    lg.info(f"Realoading extension: {extension}")
-    bot.reload_extension(f"cogs.{extension}")
-    lg.info(f"Reloaded the extension: {extension}")
+    if str(extension) == "all":
+
+        for filename_ in os.listdir(f"{path}/cogs"):
+            if filename_.endswith(".py"):
+                if not filename_ == "example_cog.py":
+                    bot.reload_extension(f"cogs.{filename_[:-3]}")
+                    lg.info(f"Loaded Extension: {filename_}")
+
+            else:
+                pass
+
+    else:
+
+        lg.info(f"Realoading extension: {extension}")
+        bot.reload_extension(f"cogs.{extension}")
+        lg.info(f"Reloaded the extension: {extension}")
 
 
 @bot.command(name="unload")
