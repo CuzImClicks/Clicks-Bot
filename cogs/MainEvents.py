@@ -61,19 +61,20 @@ class MainEvents(commands.Cog):
     async def on_member_join(self, member):
 
         lg.info(f"{member} joined the {member.guild}")
-        await member.add_roles("Member")
+        #await member.add_roles("Member")
 
-        embed = discord.Embed(colour=1e6170, description=f"Ein wildes {member.name} erscheint!")
+        embed = discord.Embed(color=0x2b4f22, description=f"Ein wildes {member.name} erscheint!")
         embed.set_thumbnail(url=str(member.avatar_url))
-        embed.setfoorter(text=str(member.guild), icon_url=str(member.guild.icon_url))
-        embed.set_timestamp(datetime.datetime.utcnow())
+        embed.set_footer(text=f"{member.guild} - {datetime.datetime.utcnow()}", icon_url=member.guild.icon_url)
+        #embed.set_timestamp(datetime.datetime.utcnow())
 
-        channel = self.bot.get_channel(764117625331908649)
+        #channel = self.bot.get_channel(764117625331908649)
+        channel = self.bot.get_channel(771473005099876435)
 
         await channel.send(embed=embed)
 
-        # await member.create_dm()
-        # await member.send("Wilkommen")
+        await member.create_dm()
+        await member.send("Wilkommen")
 
     @commands.Cog.listener()
     async def on_message(self, message):

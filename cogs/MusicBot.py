@@ -98,7 +98,10 @@ class MusicBot(commands.Cog):
         del (queue[0])
         lg.info(f"Removed song {queue[0]} from queue")
 
-    @commands.command(name="among_us")
+    @commands.command(name="among_us", help="Dieser Befehl setzt alle Lieder die als Among Us Lied gespeichert wurden"
+                                            " in zufälliger Reihenfolge in die Warteschleife. Mit .skipall"
+                                            "werden alle Songs die der Bot und die Queue hinzugefügt hat übersprungen. "
+                                            )
     @commands.has_role(config.getBotAdminRole())
     async def among_us(self, ctx):
 
@@ -193,7 +196,8 @@ class MusicBot(commands.Cog):
         queue.insert(0, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
         await self.play(ctx)
 
-    @commands.command(name="skipall")
+    @commands.command(name="skipall", help="Dieser Befehl löscht die gesamte Song-Warteschleife und hört auf Musik "
+                                           "abzuspielen. Nun kannst du neue Songs in die Queue stellen.")
     @commands.has_role(config.getBotAdminRole())
     async def skipall(self, ctx):
 
@@ -226,7 +230,7 @@ class MusicBot(commands.Cog):
         voice_channel.pause()
         await self.play(ctx)
 
-    @commands.command(name="pause")
+    @commands.command(name="pause", help="Pausiert den aktuell spielenden Song.")
     @commands.has_role(config.getBotAdminRole())
     async def pause(self, ctx):
 
@@ -235,10 +239,10 @@ class MusicBot(commands.Cog):
 
         voice_channel.pause()
         lg.info(f"Paused the song currently playing!")
-        await ctx.send(f"Paused song currently playing!", delete_after=5)
+        await ctx.send(f"Der aktuell spielende Song wurde pausiert. Mit .resume spielt der Song weiter.", delete_after=5)
         await logger.log_send(ctx, f"Paused song currently playing!")
 
-    @commands.command(name="resume")
+    @commands.command(name="resume", help="Der pausierte Song wird weiter abgespielt.")
     @commands.has_role(config.getBotAdminRole())
     async def resume(self, ctx):
 

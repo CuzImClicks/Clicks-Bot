@@ -39,12 +39,23 @@ for filename_ in os.listdir(f"{path}/cogs"):
     else:
         pass
 
+#load, unload, reload files and extension while the bot is running
+
 
 @bot.command(name="load")
 async def load(ctx, extension):
 
-    bot.load_extension(f"cogs.{extension}")
-    lg.info(f"Realoading extension: {extension}")
+    if str(extension) == "all":
+
+        for file in files:
+
+            bot.load_extension(file)
+            lg.info(f"Loaded the extension: {file[:-3]}")
+
+
+    else:
+        bot.load_extension(f"cogs.{extension}")
+        lg.info(f"Realoading extension: {extension[:-3]}")
 
 
 @bot.command(name="reload")
@@ -67,8 +78,17 @@ async def reload(ctx, extension):
 @bot.command(name="unload")
 async def unload(ctx, extension):
 
-    bot.unload_extension(f"cogs.{extension}")
+    if str(extension) == "all":
 
+        for file in files:
+
+            bot.unload_extension(f"cogs.{file}")
+            lg.info(f"Unloaded the extension: {file[:-3]}")
+
+    else:
+
+        bot.unload_extension(f"cogs.{extension}")
+        lg.info(f"Unloaded the extension: {extension[:-3]}")
 
 try:
     for filename in os.listdir(f"{path}/cogs"):

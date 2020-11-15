@@ -5,6 +5,7 @@ from discord.ext import commands
 from util import strings
 from cogs import MusicBot
 from util.logger import *
+from util import config
 
 lg = logging.getLogger(__name__)
 from util.logger import path
@@ -48,6 +49,16 @@ class Moderation(commands.Cog):
         lg.info(f"Unmuted {user.name}")
         await user.edit(mute=False)
 
+    @commands.command(name="kick")
+    @commands.has_role("Dev")
+    async def kick(self, ctx, target):
+
+        user = discord.utils.get(ctx.author.guild.members, name=str(target))
+
+        await ctx.send(f"Kicked user {user.name} from the server")
+
+        await self.bot.kick(user)
+
     @commands.command(name="muteall", help=strings.get_help("help_muteall"))
     @commands.has_role("Bot Access")
     async def muteall(self, ctx):
@@ -87,18 +98,26 @@ class Moderation(commands.Cog):
             lg.error(e)
 
     @commands.command(name="status", help="Changes the Status of the bot")
-    @commands.has_role("Developer Access")
+    @commands.has_role(config.getBotAdminRole())
     async def status(self, ctx, *args):
 
-        lg.info(args)
+        lg.info(f"Changing the status to {str(args[0])}")
 
-        await self.bot.change_presence(
-            activity=discord.Activity(type=discord.ActivityType.watching, name="{}".format(" ".join(args))))
-        await ctx.send("Changing status to {}".format(" ".join(args)), delete_after=5)
+        if str(args[0]) == "servers":
 
-    @commands.command(name="delete_history")
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=f"Online on {len(self.bot.guilds)} servers"))
+            lg.info(f"Changed the status to: Online on {len(self.bot.guilds)} servers")
+            await ctx.send(f"Changed status to: Online on {len(self.bot.guilds)} servers", delete_after=5)
+
+        else:
+
+            await self.bot.change_presence(
+                activity=discord.Activity(type=discord.ActivityType.watching, name="{}".format(" ".join(args))))
+            await ctx.send("Changing status to {}".format(" ".join(args)), delete_after=5)
+
+    @commands.command(name="clear")
     @commands.has_role("Dev")
-    async def delete_history(self, ctx):
+    async def clear(self, ctx):
 
         channel = ctx.message.channel
 
@@ -113,7 +132,7 @@ class Moderation(commands.Cog):
 
         lg.info(f"Got User {user.name} as target for promotion")
 
-        role = ctx.author.guild.roles[15]
+        role = ctx.author.guild.roles[12]
 
         await user.add_roles(role)
         lg.info(f"Added '{role.name}' to '{user.name}'")

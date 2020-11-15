@@ -1,7 +1,10 @@
 {
-  "token": "NzcxNDY5NDA1NTM1MjA3NDY1.X5sk3w.auTO8iwypwDJnIS2F3i8ukR8dm4",
+  "token": "NzcxNDY5NDA1NTM1MjA3NDY1.X5sk3w.pPvfiR4nkPBWspu3JMYs2FX-Z48",
   "command_prefix": ".",
   "level": "INFO",
   "file_level": "INFO",
-  "status": "dich an"
+  "status": "dich an",
+  "Bot Access Role": "Bot Access",
+  "Bot Admin Role": "Bot Access",
+  "Default Role": "Member"
 }
