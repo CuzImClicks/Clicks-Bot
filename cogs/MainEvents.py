@@ -74,12 +74,17 @@ class MainEvents(commands.Cog):
         await channel.send(embed=embed)
 
         await member.create_dm()
-        await member.send("Wilkommen")
+        #await member.send("Wilkommen")
 
     @commands.Cog.listener()
     async def on_message(self, message):
 
-        lg_chat.info(f"[{message.author}] in {message.channel} - {message.content}")
+        try:
+            lg_chat.info(f"[{message.author}] in {message.channel} - {message.content}")
+
+        except Exception as e:
+
+            pass
 
 
 def setup(bot):

@@ -3,7 +3,6 @@ import discord
 from discord.ext import commands
 
 from util import strings
-from cogs import MusicBot
 from util.logger import *
 from util import config
 

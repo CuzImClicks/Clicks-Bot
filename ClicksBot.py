@@ -1,8 +1,7 @@
 import discord
 import logging
-from util import logger, config
+from util import config
 from discord.ext import commands
-from util.logger import *
 import os
 
 
@@ -12,7 +11,7 @@ path = "D:/GitHub Repos/Clicks-Bot"
 #config.getLoggingLevel()
 
 
-logging.basicConfig(level=config.getLoggingLevel(), format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
+logging.basicConfig(level=logging.INFO, format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
 lg = logging.getLogger(__name__)
 
@@ -52,7 +51,6 @@ async def load(ctx, extension):
             bot.load_extension(file)
             lg.info(f"Loaded the extension: {file[:-3]}")
 
-
     else:
         bot.load_extension(f"cogs.{extension}")
         lg.info(f"Realoading extension: {extension[:-3]}")
@@ -62,6 +60,8 @@ async def load(ctx, extension):
 async def reload(ctx, extension):
 
     if str(extension) == "all":
+
+        await ctx.send(f"Reloaded all Extensions", delete_after=5)
 
         for file in files:
 

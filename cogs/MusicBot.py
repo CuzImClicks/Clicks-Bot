@@ -75,7 +75,7 @@ class MusicBot(commands.Cog):
                                    " Dies funktioniert nur wenn du einem Sprachchannel bist und nur wenn bereits Songs"
                                    " in der Queue sind. Gebe $queue ohne Argumente ein um zu sehen ob songs in der Queue sind.")
     @commands.has_role(config.getBotAdminRole())
-    async def play(self, ctx):
+    async def play(self, ctx, *args):
 
         global queue
         server = ctx.message.author.guild
@@ -94,9 +94,14 @@ class MusicBot(commands.Cog):
 
         await ctx.send(f"Now playing: {player.title}", delete_after=5)
         await log_send(ctx, f"Now playing: {player.title}")
+        try:
+            if not args[0] == "loop":
+                del (queue[0])
+                lg.info(f"Removed song {queue[0]} from queue")
+                
+        except IndexError:
 
-        del (queue[0])
-        lg.info(f"Removed song {queue[0]} from queue")
+            pass
 
     @commands.command(name="among_us", help="Dieser Befehl setzt alle Lieder die als Among Us Lied gespeichert wurden"
                                             " in zufälliger Reihenfolge in die Warteschleife. Mit .skipall"
@@ -143,14 +148,21 @@ class MusicBot(commands.Cog):
 
             voice_channel.play(player, after=lambda e: lg.error(e) if e else None)
 
-        await ctx.send(f"Now playing: {player.title}")
-
-        del (queue[0, 1])
+        del (queue[0, len(queue)])
 
         responses = ["Clicks Bot going dark ... ... ...", ]
 
         await ctx.send(choice(responses))
         await logger.log_send(ctx, choice(responses))
+
+    @commands.command(name="loop", help="Continues to play the same song")
+    @commands.has_role(config.getBotAdminRole())
+    async def loop(self, ctx, *args):
+
+        while True:
+
+            await self.play(ctx, "loop")
+            lg.info(f"Looping song")
 
     @commands.command(name="queue", help=strings.get_help("queue_help"))
     @commands.has_role(config.getBotAdminRole())
@@ -166,7 +178,13 @@ class MusicBot(commands.Cog):
             lg.info(f"Added {url} to queue")
             await ctx.send(f"Added {url} to queue", delete_after=5)
             await logger.log_send(ctx, f"Added {url} to queue")
-            await self.play(ctx)
+
+            lg.info(args)
+            if not args[0] == "loop":
+                await self.play(ctx)
+
+            else:
+                await self.loop()
 
         else:
             for i in range(0, len(queue)):

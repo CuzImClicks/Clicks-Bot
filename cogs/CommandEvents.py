@@ -40,7 +40,10 @@ class CommandEvents(commands.Cog):
             await ctx.send(f"Command not found", delete_after=5)
             import asyncio
             await asyncio.sleep(5)
-            await ctx.message.delete()
+            try:
+                await ctx.message.delete()
+            except discord.errors.NotFound:
+                pass
 
         else:
             await logger.log_error(error)

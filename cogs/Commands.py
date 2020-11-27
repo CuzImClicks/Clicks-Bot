@@ -7,9 +7,10 @@ from util import config
 from util.logger import *
 from util import embed
 import logging
+from discord import Color
 
 lg = logging.getLogger(__name__)
-import logging
+
 fl = logging.FileHandler(f"{path}\logs\log.log")
 fl.setLevel(logging.INFO)
 lg.addHandler(fl)
@@ -44,6 +45,55 @@ class Commands(commands.Cog):
                                names=("Idee und Coding", "Textgestaltung", "Server Owner"), values=(
             "Henrik | Clicks", "Kai | K_Stein",
             "Luis | DasVakuum"), inline=(False, False, False))
+
+    @commands.command(name="count", help="Zählt hoch bis zu der eingegebenen Zahl")
+    async def count(self, ctx, target):
+
+        target = int(target)
+        x = 0
+
+        while x != target:
+
+            x += 1
+            await ctx.send(x)
+
+    @commands.command(name="setup")
+    async def setup(self, ctx):
+
+        guild = ctx.guild
+        await ctx.send(f"Setup!")
+        await guild.create_role(name="Bot Access", color=Color.orange())
+        await guild.create_role(name="Dev", color=Color.purple())
+        await guild.create_role(name="Bot Admin Access", color=Color.dark_red())
+
+        for role in ctx.guild.roles:
+
+            if role.name == "Clicks Bot":
+
+                bot_role = int(role.position)
+                lg.info(f"{bot_role} | {type(bot_role)}")
+                break
+
+    @commands.command(name="delete_roles")
+    async def delete_roles(self, ctx):
+        try:
+            for role in ctx.guild.roles:
+
+                if role.name == "Dev":
+
+                    await role.delete()
+
+                elif role.name == "Bot Access":
+
+                    await role.delete()
+
+                elif role.name == "Bot Admin Access":
+
+                    await role.delete()
+
+        except discord.errors.Forbidden:
+
+            pass
 
 
 def setup(bot):
