@@ -66,7 +66,11 @@ class MusicBot(commands.Cog):
 
             await logger.log_send(ctx,
                                   "If you want to add songs to the queue ues $queue, then if you want to play it use $play")
-            await channel.connect()
+            try:
+                await channel.connect()
+
+            except discord.ClientException:
+                await ctx.send(f"Already connected to your voice channel")
 
         await ctx.send("If you want to add songs to the queue ues $queue, then if you want to play it use $play")
         await log_send(ctx, "If you want to add songs to the queue ues $queue, then if you want to play it use $play")
@@ -81,27 +85,29 @@ class MusicBot(commands.Cog):
         server = ctx.message.author.guild
 
         voice_channel = server.voice_client
+        playing = False
+
         try:
             async with ctx.typing():
                 player = await YTDLSource.from_url(str(queue[0]), loop=self.bot.loop)
-
+                self.currently_playing = str(queue[0])
                 voice_channel.play(player, after=lambda e: lg.error(e) if e else None)
+                playing = True
 
         except IndexError as e:
 
             lg.error(f"No songs left in queue!")
             await ctx.send(f"No songs left in queue!")
 
-        await ctx.send(f"Now playing: {player.title}", delete_after=5)
-        await log_send(ctx, f"Now playing: {player.title}")
-        try:
-            if not args[0] == "loop":
-                del (queue[0])
-                lg.info(f"Removed song {queue[0]} from queue")
-                
-        except IndexError:
+        if not args:
+            return
 
-            pass
+        if args[0] == "loop":
+            await ctx.send(f"Now playing: {player.title}", delete_after=5)
+            await log_send(ctx, f"Now playing: {player.title}")
+        else:
+            del(queue[0])
+            lg.info(f"Removed song {queue[0]} from queue")
 
     @commands.command(name="among_us", help="Dieser Befehl setzt alle Lieder die als Among Us Lied gespeichert wurden"
                                             " in zufälliger Reihenfolge in die Warteschleife. Mit .skipall"
@@ -140,15 +146,11 @@ class MusicBot(commands.Cog):
 
         global queue
         server = ctx.message.author.guild
-
         voice_channel = server.voice_client
 
-        async with ctx.typing():
-            player = await YTDLSource.from_url(None, loop=self.bot.loop)
-
-            voice_channel.play(player, after=lambda e: lg.error(e) if e else None)
-
-        del (queue[0, len(queue)])
+        voice_channel.pause()
+        queue.clear()
+        lg.info(queue)
 
         responses = ["Clicks Bot going dark ... ... ...", ]
 
@@ -159,20 +161,40 @@ class MusicBot(commands.Cog):
     @commands.has_role(config.getBotAdminRole())
     async def loop(self, ctx, *args):
 
-        while True:
+        if not self.loop:
+            loop = True
+            global queue
+            queue.append(self.currently_playing)
 
-            await self.play(ctx, "loop")
-            lg.info(f"Looping song")
+        else:
+            loop = False
+            queue.clear()
+            await self.pause()
+
+        lg.info(f"Looping song")
+        await ctx.send("Looping song")
 
     @commands.command(name="queue", help=strings.get_help("queue_help"))
     @commands.has_role(config.getBotAdminRole())
     async def queue_func(self, ctx, *args):
 
         global queue
+        if args:
+            url = args[0]
 
-        url = args
+        else:
+            url = None
 
-        if not url == ():
+        if url is None:
+            if len(queue) == 0:
+                await ctx.send("There are no songs in the queue")
+
+            for i in range(0, len(queue)):
+                await ctx.send("This is the full queue right now:")
+                await ctx.send(queue[i], delete_after=5)
+                await log_send(ctx, queue[i])
+
+        else:
 
             queue.append(url)
             lg.info(f"Added {url} to queue")
@@ -182,14 +204,11 @@ class MusicBot(commands.Cog):
             lg.info(args)
             if not args[0] == "loop":
                 await self.play(ctx)
-
+                self.loop = False
             else:
-                await self.loop()
+                await self.loop(ctx)
 
-        else:
-            for i in range(0, len(queue)):
-                await ctx.send(queue[i], delete_after=5)
-                await log_send(ctx, queue[i])
+
 
     @commands.command(name="remove")
     @commands.has_role(config.getBotAdminRole())

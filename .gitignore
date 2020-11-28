@@ -14,3 +14,4 @@ util/config.json
 logs/log.log
 util/config.json
 *.log
+util/config.json
