@@ -41,7 +41,7 @@ for filename_ in os.listdir(f"{path}/cogs"):
 #load, unload, reload files and extension while the bot is running
 
 
-@bot.command(name="load")
+@bot.command(name="load", aliases=["l"])
 async def load(ctx, extension):
 
     if str(extension) == "all":
@@ -56,10 +56,10 @@ async def load(ctx, extension):
         lg.info(f"Realoading extension: {extension[:-3]}")
 
 
-@bot.command(name="reload")
+@bot.command(name="reload", aliases=["rl"])
 async def reload(ctx, extension):
 
-    if str(extension) == "all":
+    if str(extension) == "all" or "":
 
         await ctx.send(f"Reloaded all Extensions", delete_after=5)
 
@@ -75,7 +75,7 @@ async def reload(ctx, extension):
         lg.info(f"Reloaded the extension: {extension}")
 
 
-@bot.command(name="unload")
+@bot.command(name="unload", aliases=["ul"])
 async def unload(ctx, extension):
 
     if str(extension) == "all":

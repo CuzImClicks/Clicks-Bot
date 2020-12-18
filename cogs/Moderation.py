@@ -58,7 +58,7 @@ class Moderation(commands.Cog):
 
         await self.bot.kick(user)
 
-    @commands.command(name="muteall", help=strings.get_help("help_muteall"))
+    @commands.command(name="muteall", help=strings.get_help("help_muteall"), aliases=["ma"])
     @commands.has_role("Bot Access")
     async def muteall(self, ctx):
 
@@ -78,7 +78,7 @@ class Moderation(commands.Cog):
             await ctx.send("Du bist in keinem Voice Channel", delete_after=5)
             lg.error(e)
 
-    @commands.command(name="unmuteall", help=strings.get_help("help_unmuteall"))
+    @commands.command(name="unmuteall", help=strings.get_help("help_unmuteall"), aliases=["uma"])
     @commands.has_role("Bot Access")
     async def unmuteall(self, ctx):
 
@@ -92,6 +92,30 @@ class Moderation(commands.Cog):
 
             await ctx.send(f"Unmuted all users in '{ctx.author.voice.channel.name}'", delete_after=5)
 
+        except Exception as e:
+            await ctx.send("Du bist in keinem Voice Channel", delete_after=5)
+            lg.error(e)
+
+    @commands.command(name="lock", help="Locks the channel user limit to the current amount of users inside")
+    @commands.has_role(config.getBotAdminRole())
+    async def lock(self, ctx):
+        try:
+            await ctx.author.voice.channel.edit(user_limit=len(ctx.author.voice.channel.members))
+            lg.info(f"Locked the channel {ctx.author.voice.channel.name} to a maximum of {len(ctx.author.voice.channel.members)}")
+            await ctx.send(
+                f"Der Channel {ctx.author.voice.channel.name} wurde auf {len(ctx.author.voice.channel.members)} Benutzer beschränkt", delete_after=5)
+        except Exception as e:
+            await ctx.send("Du bist in keinem Voice Channel", delete_after=5)
+            lg.error(e)
+
+    @commands.command(name="unlock", help="Sets the user limit of your current channel to infinite")
+    @commands.has_role(config.getBotAdminRole())
+    async def unlock(self, ctx):
+        try:
+            await ctx.author.voice.channel.edit(user_limit=0)
+            lg.info(f"Locked the channel {ctx.author.voice.channel.name} to a maximum of 0")
+            await ctx.send(
+                f"Der Channel {ctx.author.voice.channel.name} wurde unlocked", delete_after=5)
         except Exception as e:
             await ctx.send("Du bist in keinem Voice Channel", delete_after=5)
             lg.error(e)
