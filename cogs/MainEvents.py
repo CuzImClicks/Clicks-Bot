@@ -1,6 +1,7 @@
 import logging
 import discord
 from discord.ext import commands
+from discord.utils import get
 from util import config
 import datetime
 from multiprocessing import Process, Lock
@@ -17,16 +18,6 @@ fl_chat.setFormatter(fmt)
 lg_chat.addHandler(fl_chat)
 
 previous_message_id = ""
-
-
-def getPreviousMessageID():
-    return previous_message_id
-
-
-def setPreviousMessageID(message_id):
-    global previous_message_id
-    previous_message_id = str(message_id)
-    lg.info(f"Set Message ID to: {message_id}")
 
 
 class MainEvents(commands.Cog):
@@ -61,20 +52,17 @@ class MainEvents(commands.Cog):
     async def on_member_join(self, member):
 
         lg.info(f"{member} joined the {member.guild}")
-        #await member.add_roles("Member")
+        if member.guild == "RezURekted":
+            await member.add_roles("Member")
 
-        embed = discord.Embed(color=0x2b4f22, description=f"Ein wildes {member.name} erscheint!")
-        embed.set_thumbnail(url=str(member.avatar_url))
-        embed.set_footer(text=f"{member.guild} - {datetime.datetime.utcnow()}", icon_url=member.guild.icon_url)
-        #embed.set_timestamp(datetime.datetime.utcnow())
+            embed = discord.Embed(color=0x2b4f22, description=f"Ein wildes {member.name} erscheint!")
+            embed.set_thumbnail(url=str(member.avatar_url))
+            embed.set_footer(text=f"{member.guild} - {datetime.datetime.utcnow()}", icon_url=member.guild.icon_url)
+            channel = self.bot.get_channel(get(member.guild.channels, "lobby"))
 
-        #channel = self.bot.get_channel(764117625331908649)
-        channel = self.bot.get_channel(771473005099876435)
+            await channel.send(embed=embed)
 
-        await channel.send(embed=embed)
-
-        await member.create_dm()
-        #await member.send("Wilkommen")
+            await member.create_dm()
 
     @commands.Cog.listener()
     async def on_message(self, message):
