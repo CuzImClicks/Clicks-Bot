@@ -20,6 +20,9 @@ ytdl = youtube_dl.YoutubeDL(strings.get_ytdl_format_options())
 queue = []
 youtube_dl.utils.bug_reports_message = lambda msg: lg.error(msg)
 
+global last_song, loop
+last_song = ""
+loop = False
 
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5):
@@ -49,7 +52,7 @@ class MusicBot(commands.Cog):
 
         self.bot = bot
 
-    @commands.command(name="join", help="Mit $join joint der Musikbot deinem Sprachchannel.")
+    @commands.command(name="join", help="Mit .join joint der Musikbot deinem Sprachchannel.")
     @commands.has_role(config.getBotAdminRole())
     async def join(self, ctx):
 
@@ -65,21 +68,21 @@ class MusicBot(commands.Cog):
             channel = ctx.message.author.voice.channel
 
             await logger.log_send(ctx,
-                                  "If you want to add songs to the queue ues $queue, then if you want to play it use $play")
+                                  "If you want to add songs to the queue ues .queue, then if you want to play it use $play")
             try:
                 await channel.connect()
 
             except discord.ClientException:
                 await ctx.send(f"Already connected to your voice channel")
 
-        await ctx.send("If you want to add songs to the queue ues $queue, then if you want to play it use $play")
-        await log_send(ctx, "If you want to add songs to the queue ues $queue, then if you want to play it use $play")
+        await ctx.send("If you want to add songs to the queue ues .queue, then if you want to play it use .play")
+        await log_send(ctx, "If you want to add songs to the queue ues $queue, then if you want to play it use .play")
 
-    @commands.command(name="play", help="Mit $play startest du die Wiedergabe der Musik in deinem Channel."
+    @commands.command(name="play", help="Mit .play startest du die Wiedergabe der Musik in deinem Channel."
                                    " Dies funktioniert nur wenn du einem Sprachchannel bist und nur wenn bereits Songs"
-                                   " in der Queue sind. Gebe $queue ohne Argumente ein um zu sehen ob songs in der Queue sind.")
+                                   " in der Queue sind. Gebe .queue ohne Argumente ein um zu sehen ob songs in der Queue sind.")
     @commands.has_role(config.getBotAdminRole())
-    async def play(self, ctx, *args):
+    async def play(self, ctx):
 
         global queue
         server = ctx.message.author.guild
@@ -90,24 +93,22 @@ class MusicBot(commands.Cog):
         try:
             async with ctx.typing():
                 player = await YTDLSource.from_url(str(queue[0]), loop=self.bot.loop)
-                self.currently_playing = str(queue[0])
                 voice_channel.play(player, after=lambda e: lg.error(e) if e else None)
                 playing = True
+                global last_song 
+                last_song = str(queue[0])
+                if not loop:
+                    lg.info(f"Removed song {queue[0]} from the queue ")
+                    del(queue[0])
 
         except IndexError as e:
 
             lg.error(f"No songs left in queue!")
             await ctx.send(f"No songs left in queue!")
 
-        if not args:
-            return
 
-        if args[0] == "loop":
-            await ctx.send(f"Now playing: {player.title}", delete_after=5)
-            await log_send(ctx, f"Now playing: {player.title}")
-        else:
-            del(queue[0])
-            lg.info(f"Removed song {queue[0]} from queue")
+        await ctx.send(f"Now playing: {player.title}", delete_after=4)
+        await log_send(ctx, f"Now playing: {player.title}")
 
     @commands.command(name="among_us", help="Dieser Befehl setzt alle Lieder die als Among Us Lied gespeichert wurden"
                                             " in zufälliger Reihenfolge in die Warteschleife. Mit .skipall"
@@ -150,7 +151,7 @@ class MusicBot(commands.Cog):
 
         voice_channel.pause()
         queue.clear()
-        lg.info(queue)
+        lg.info(f"Cleared the queue!")
 
         responses = ["Clicks Bot going dark ... ... ...", ]
 
@@ -160,17 +161,9 @@ class MusicBot(commands.Cog):
     @commands.command(name="loop", help="Continues to play the same song")
     @commands.has_role(config.getBotAdminRole())
     async def loop(self, ctx, *args):
-
-        if not self.loop:
-            loop = True
-            global queue
-            queue.append(self.currently_playing)
-
-        else:
-            loop = False
-            queue.clear()
-            await self.pause()
-
+        global queue, loop
+        loop = True
+        queue.append(last_song)
         lg.info(f"Looping song")
         await ctx.send("Looping song")
 
@@ -189,10 +182,11 @@ class MusicBot(commands.Cog):
             if len(queue) == 0:
                 await ctx.send("There are no songs in the queue")
 
-            for i in range(0, len(queue)):
-                await ctx.send("This is the full queue right now:")
-                await ctx.send(queue[i], delete_after=5)
-                await log_send(ctx, queue[i])
+            else:
+                for i in range(0, len(queue)):
+                    await ctx.send("This is the full queue right now:")
+                    await ctx.send(queue[i], delete_after=5)
+                    await log_send(ctx, queue[i])
 
         else:
 
@@ -202,12 +196,6 @@ class MusicBot(commands.Cog):
             await logger.log_send(ctx, f"Added {url} to queue")
 
             lg.info(args)
-            if not args[0] == "loop":
-                await self.play(ctx)
-                self.loop = False
-            else:
-                await self.loop(ctx)
-
 
 
     @commands.command(name="remove")
@@ -262,10 +250,14 @@ class MusicBot(commands.Cog):
         voice_channel = server.voice_client
 
         await ctx.send(f"Skipped the song!", delete_after=5)
-        await log_send(ctx, f"Skipped the song!")
+        if len(queue) > 0:
+            lg.info(f"Removed the song {queue[0]} from the queue")
+            del(queue[0])
+            await self.play(ctx)
 
-        voice_channel.pause()
-        await self.play(ctx)
+        else:
+            await ctx.send(f"There are no more songs in the queue")
+            voice_channel.pause()
 
     @commands.command(name="pause", help="Pausiert den aktuell spielenden Song.")
     @commands.has_role(config.getBotAdminRole())
@@ -305,16 +297,13 @@ class MusicBot(commands.Cog):
         if not ctx.message.author.voice:
 
             await ctx.send("You are not connected to a voice channel!", delete_after=5)
-            await logger.log_send(ctx, "You are not connected to a voice channel!")
-
             return
 
         else:
 
             voice_client = ctx.message.guild.voice_client
             await voice_client.disconnect()
-            await lg.info(f"Disconnected from channel {ctx.message.author.voice.channel}")
-            await logger.log_send(ctx, f"Disconnected from channel {ctx.message.author.voice.channel}")
+            lg.info(f"Disconnected from channel {ctx.message.author.voice.channel}")
 
 
 def setup(bot):

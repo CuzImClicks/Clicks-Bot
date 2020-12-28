@@ -5,9 +5,9 @@ from discord.ext import commands
 import os
 
 
-#TODO: revert path
-#path = os.getcwd()
-path = "D:/GitHub Repos/Clicks-Bot"
+#TODO: hard coded path
+path = os.getcwd()
+#path = "/home/pi/Downloads/Clicks-Bot"
 #config.getLoggingLevel()
 
 
@@ -18,7 +18,7 @@ lg = logging.getLogger(__name__)
 fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
 fl = logging.FileHandler(f"{path}/logs/log.log")
-fl.setLevel(config.getFileLoggingLevel())
+fl.setLevel(logging.INFO)
 fl.setFormatter(fmt)
 
 lg.addHandler(fl)

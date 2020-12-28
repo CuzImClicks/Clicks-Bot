@@ -13,7 +13,7 @@ class json_file:
         
         self.name = name
         self.path = path
-        self.full_path = f"{self.path}\{self.name}"
+        self.full_path = f"{self.path}/{self.name}"
 
     def write(self, data):
         

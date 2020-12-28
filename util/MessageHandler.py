@@ -4,11 +4,11 @@ from util.embed import send_embed
 from util.logger import *
 
 #TODO: revert path
-#path = os.getcwd()
-path = "D:/GitHub Repos/Clicks-Bot"
+path = os.getcwd()
+#path = "/home/pi/Downloads/Clicks-Bot"
 
 lg = logging.getLogger(__name__)
-fl = logging.FileHandler(f"{path}\logs\chat.log")
+fl = logging.FileHandler(f"{path}/logs/chat.log")
 fl.setLevel(config.getFileLoggingLevel())
 fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 fl.setFormatter(fmt)

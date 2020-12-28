@@ -5,12 +5,13 @@ from discord.utils import get
 from util import config
 import datetime
 from multiprocessing import Process, Lock
+import os
 
-path = "D:/GitHub Repos/Clicks-Bot"
+path = os.getcwd()
 
 lg = logging.getLogger(__name__)
 lg_chat = logging.getLogger("CHAT")
-fl_chat = logging.FileHandler(f"{path}\logs\chat.log")
+fl_chat = logging.FileHandler(f"{path}/logs/chat.log")
 fl_chat.setLevel(config.getFileLoggingLevel())
 fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 fl_chat.setFormatter(fmt)
