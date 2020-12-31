@@ -8,10 +8,13 @@ from util.logger import *
 from util import embed
 import logging
 from discord import Color
+import os
+
+path = os.getcwd()
 
 lg = logging.getLogger(__name__)
 
-fl = logging.FileHandler(f"{path}\logs\log.log")
+fl = logging.FileHandler(f"{path}/logs/log.log")
 fl.setLevel(logging.INFO)
 lg.addHandler(fl)
 

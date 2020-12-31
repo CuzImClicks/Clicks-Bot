@@ -3,8 +3,7 @@ import os
 
 lg = logging.getLogger(__name__)
 path = os.getcwd()
-#TODO: hard coded path
-#path = "/home/pi/Downloads/Clicks-Bot"
+
 fl = logging.FileHandler(f"{path}/logs/log.log")
 fl.setLevel(logging.INFO)
 

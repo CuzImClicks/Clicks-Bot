@@ -3,8 +3,7 @@ from clicks_util import json_util
 import os
 
 path = os.getcwd()
-#path = "/home/pi/Downloads/Clicks-Bot"
-#TODO hard coded path
+
 jf = json_util.json_file("config.json", f"{path}/util")
 
 

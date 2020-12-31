@@ -30,7 +30,8 @@ class MainEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-
+        
+        total_users = 0
         for guild in self.bot.guilds:
 
             if guild.name == "GUILD":
@@ -40,14 +41,15 @@ class MainEvents(commands.Cog):
             # f'{client.user} is connected to the following guild:\n'
             # f'{guild.name}(id: {guild.id})'
             # )
-
+            
             lg.info(
                 f'{self.bot.user} is connected to the following guild:\n'
                 f'{guild.name})'
             )
-
+            total_users += len(guild.members)
+        
         await self.bot.change_presence(
-            activity=discord.Activity(type=discord.ActivityType.watching, name=config.getStatus()))
+            activity=discord.Activity(type=discord.ActivityType.watching, name=f"{total_users} Benutzer an"))
 
     @commands.Cog.listener()
     async def on_member_join(self, member):

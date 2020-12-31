@@ -5,11 +5,7 @@ from discord.ext import commands
 import os
 
 
-#TODO: hard coded path
 path = os.getcwd()
-#path = "/home/pi/Downloads/Clicks-Bot"
-#config.getLoggingLevel()
-
 
 logging.basicConfig(level=logging.INFO, format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
@@ -23,12 +19,12 @@ fl.setFormatter(fmt)
 
 lg.addHandler(fl)
 
-
+#gain the ability to access all guild members
 intentions = discord.Intents.default()
 intentions.members = True
 
 bot = commands.Bot(command_prefix=config.getCommandPrefix(), intents=intentions)
-
+#go through all files in the cogs folder and add them to the list of cogs
 files = []
 for filename_ in os.listdir(f"{path}/cogs"):
     if filename_.endswith(".py"):
