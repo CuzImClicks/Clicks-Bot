@@ -110,6 +110,12 @@ class MusicBot(commands.Cog):
         await ctx.send(f"Now playing: {player.title}", delete_after=4)
         await log_send(ctx, f"Now playing: {player.title}")
 
+    async def wait_for_end(guild: discord.Guild):
+        from discord.utils import get
+        voice = get(self.bot.voice_clients, guild=guild)
+        while voice.is_playing():
+            await asyncio.sleep(1)
+
     @commands.command(name="among_us", help="Dieser Befehl setzt alle Lieder die als Among Us Lied gespeichert wurden"
                                             " in zufälliger Reihenfolge in die Warteschleife. Mit .skipall"
                                             "werden alle Songs die der Bot und die Queue hinzugefügt hat übersprungen. "

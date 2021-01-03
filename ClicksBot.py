@@ -3,7 +3,7 @@ import logging
 from util import config
 from discord.ext import commands
 import os
-
+from clicks_util.json_util import json_file
 
 path = os.getcwd()
 
@@ -18,6 +18,10 @@ fl.setLevel(logging.INFO)
 fl.setFormatter(fmt)
 
 lg.addHandler(fl)
+
+#read the file containing all the blacklisted people
+jf = json_file("blacklist.json", path)
+blacklisted = jf.read()["blacklisted"]
 
 #gain the ability to access all guild members
 intentions = discord.Intents.default()
@@ -63,13 +67,12 @@ async def reload(ctx, extension):
 
             bot.reload_extension(f"cogs.{file}")
             lg.info(f"Reloaded the extension: {file}")
-
+            await ctx.send(f"Reloaded the extension: {file}")
     else:
 
-        lg.info(f"Realoading extension: {extension}")
         bot.reload_extension(f"cogs.{extension}")
-        lg.info(f"Reloaded the extension: {extension}")
-
+        await ctx.send(f"Reloaded the extension: {extension}")
+        lg.info(f"Reloaded the extension: {file}")
 
 @bot.command(name="unload", aliases=["ul"])
 async def unload(ctx, extension):
@@ -86,6 +89,21 @@ async def unload(ctx, extension):
         bot.unload_extension(f"cogs.{extension}")
         lg.info(f"Unloaded the extension: {extension[:-3]}")
 
+@bot.event
+async def on_message(message):
+
+    if message.author.bot:
+        return
+
+    if not message.guild:
+        return await message.channel.send((
+            "You can't use commands in direct messages"
+            ))
+    if str(message.author.id) in blacklisted:
+        return
+    
+    lg.info(f"[{message.guild}] -  {message.channel}: {message.author.name}: {message.content}")
+    await bot.process_commands(message)
 try:
     for filename in os.listdir(f"{path}/cogs"):
         if filename.endswith(".py"):

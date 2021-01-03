@@ -66,7 +66,7 @@ class MainEvents(commands.Cog):
             await channel.send(embed=embed)
 
             await member.create_dm()
-
+'''
     @commands.Cog.listener()
     async def on_message(self, message):
 
@@ -76,7 +76,7 @@ class MainEvents(commands.Cog):
         except Exception as e:
 
             pass
-
+'''
 
 def setup(bot):
 

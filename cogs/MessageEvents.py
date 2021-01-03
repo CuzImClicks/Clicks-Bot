@@ -27,10 +27,10 @@ class MessageEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_message_delete(self, message):
 
-        if message.author == self.bot.user:
+        if message.author.bot:
             return
 
-        elif config.getCommandPrefix() in message.content:
+        if config.getCommandPrefix() in message.content:
             return
 
         else:
@@ -44,7 +44,7 @@ class MessageEvents(commands.Cog):
         if config.getCommandPrefix() in before.content:
             return
 
-        elif before.author == self.bot.user:
+        if self.before.author.bot or self.after.author.bot:
             return
 
         else:
