@@ -1,6 +1,7 @@
 import logging
 import discord
 from discord.ext import commands
+from datetime import datetime
 
 from util import strings
 from util.logger import *
@@ -12,9 +13,6 @@ import logging
 fl = logging.FileHandler(f"{path}\logs\log.log")
 fl.setLevel(logging.INFO)
 lg.addHandler(fl)
-
-#TODO: rework the permissions maybe add a role for the music bot
-#TODO: test all the commands
 
 
 class Moderation(commands.Cog):
@@ -29,8 +27,8 @@ class Moderation(commands.Cog):
         user = discord.utils.get(ctx.author.guild.members, name=str(target))
 
         lg.info(user.name)
-
-        await ctx.send(f"Muted {user.name}", delete_after=5)
+        muteEmbed = discord.Embed(title="Mute", description=f"Muted {user.name}", color=discord.Colour(0x000030), timestamp=datetime.now())
+        await ctx.send(embed=muteEmbed)
 
         lg.info(f"Muted {user.name}")
         await user.edit(mute=True)
@@ -42,8 +40,8 @@ class Moderation(commands.Cog):
         user = discord.utils.get(ctx.author.guild.members, name=str(target))
 
         lg.info(user)
-
-        await ctx.send(f"Unmuted {user.name}", delete_after=5)
+        unmuteEmbed = discord.Embed(title="Unmute", description=f"Unmuted {user.name}", color=discord.Colour(0x000030), timestamp=datetime.now())
+        await ctx.send(embed=unmuteEmbed)
 
         lg.info(f"Unmuted {user.name}")
         await user.edit(mute=False)
@@ -54,8 +52,8 @@ class Moderation(commands.Cog):
 
         user = discord.utils.get(ctx.author.guild.members, name=str(target))
 
-        await ctx.send(f"Kicked user {user.name} from the server")
-
+        kickEmbed = discord.Embed(title="Kick", description=f"Kicked {user.name} from the server", color=discord.Colour(0x000030), timestamp=datetime.now())
+        await ctx.send(embed=kickEmbed)
         await self.bot.kick(user)
 
     @commands.command(name="muteall", help=strings.get_help("help_muteall"), aliases=["ma"])
@@ -72,10 +70,12 @@ class Moderation(commands.Cog):
                     await user.edit(mute=True)
                     lg.info(f"Muted user: {user.nick}")
 
-            await ctx.send(f"Muted all users in {ctx.author.voice.channel.name}", delete_after=5)
+           maEmbed = discord.Embed(title="Mute All", description=f"Muted all users in {ctx.author.voice.channel.name}", color=discord.Color(0x9D1309), timestamp=datetime.now())
+            await ctx.send(embed=maEmbed)
 
         except Exception as e:
-            await ctx.send("Du bist in keinem Voice Channel", delete_after=5)
+            errorEmbed = discord.Embed(title="Command Error", description="You're not in a voice channel", color=discord.Colour(0x000030), timestamp=datetime.now())
+            await ctx.send(embed=errorEmbed)
             lg.error(e)
 
     @commands.command(name="unmuteall", help=strings.get_help("help_unmuteall"), aliases=["uma"])

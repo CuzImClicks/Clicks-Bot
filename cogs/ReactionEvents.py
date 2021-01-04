@@ -20,9 +20,9 @@ class ReactionEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-
+        #if the message id is the rules message id
         msg_id = "703236904551972905"
-
+        
         if str(payload.message_id) == msg_id:
 
             role2 = payload.member.guild.roles[12]
