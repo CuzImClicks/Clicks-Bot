@@ -4,6 +4,8 @@ A discord bot specificly programmed for a private server.
 It uses discord.py from:
 https://www.github.com/Rapptz/discord.py
 
+cogs/GitHubFetcher.py is by mass1ve-err0r -> GitHub link in file
+
 To create a webhook:
 
 1. Create a channel
