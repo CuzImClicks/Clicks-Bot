@@ -46,26 +46,16 @@ class CommandEvents(commands.Cog):
                 cmdnfEmbed.add_field(name="Raised by", value=ctx.author.name)
                 await ctx.send(embed=cmdnfEmbed)
         else:
-            await logger.log_error(error)
+            lg.error(error)
             errorEmbed = discord.Embed(title="Command Error", color=discord.Colour(0x9D1309), timestamp=time_now)
-            errorEmbed.add_field(name="Error Message", value=error)
+            errorEmbed.add_field(name="Error Message", value=str(error))
             errorEmbed.add_field(name="Raised by", value=ctx.author.name)
-
+            await ctx.send(embed=errorEmbed)
+    
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):
-        try:
-            await ctx.message.delete()
-            lg.info(f"Command complete")
-            import asyncio
-            await asyncio.sleep(5)
-            try:
-                await ctx.message.delete()
 
-            except:
-                pass
-
-        except discord.errors.NotFound as e:
-            pass
+        lg.info(f"Command complete")
 
 
 def setup(bot):

@@ -41,12 +41,6 @@ async def log(msg, ctx="", raw=False):
 
         lg.log(msg)
 
-
-async def log_error(msg):
-
-    lg.error(msg)
-
-
 async def log_warning(msg):
 
     lg.warning(msg)

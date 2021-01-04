@@ -9,6 +9,7 @@ from util import embed
 import logging
 from discord import Color
 import os
+from datetime import datetime
 
 path = os.getcwd()
 
@@ -29,16 +30,15 @@ class Commands(commands.Cog):
     @commands.has_role(config.getDefaultRole())
     async def github(self, ctx):
         #await ctx.send("Die GitHub Page des Bots ist https://github.com/CuzImClicks/Clicks-Bot", delete_after=5)
-        await MessageHandler.send(ctx, title="GitHub", description= "Die GitHub Page des Bots ist https://github.com/CuzImClicks/Clicks-Bot", content="github")
-        await log_send(ctx, "Die GitHub Page des Bots ist https://github.com/CuzImClicks/Clicks-Bot")
+        gitEmbed = discord.Embed(title="GitHub", description= "Die GitHub Page des Bots ist https://github.com/CuzImClicks/Clicks-Bot", color=discord.Colour(0x000030))
+        await ctx.send(embed=gitEmbed)
 
     @commands.command(name="ping")
     @commands.has_role(config.getBotAccessRole())
     async def ping(self, ctx):
-        msg = f"Pong! Dein Ping ist {round(self.bot.latency, 2) * 1000}ms"
+        pingEmbed = discord.Embed(title="Bot Latency", description=f"Pong! Dein Ping ist {round(self.bot.latency, 2) * 1000}ms", color=discord.Colour(0x000030), timestamp=datetime.now())
 
-        await ctx.send(msg, delete_after=5)
-        await log_send(ctx, msg)
+        await ctx.send(embed=pingEmbed)
 
     @commands.command(name="credits", help="Gibt dir eine Übersicht von wem der Bot erstellt und geschrieben wurde.")
     @commands.has_role(config.getBotAccessRole())
@@ -64,7 +64,7 @@ class Commands(commands.Cog):
     async def setup(self, ctx):
 
         guild = ctx.guild
-        await ctx.send(f"Setup!")
+        await ctx.send(embed=discord.Embed(title="Server Setup", description="Setting up the server roles", color=discord.Colour(0x000030), timestamp=datetime.now()))
         await guild.create_role(name="Bot Access", color=Color.orange())
         await guild.create_role(name="Dev", color=Color.purple())
         await guild.create_role(name="Bot Admin Access", color=Color.dark_red())
@@ -78,7 +78,11 @@ class Commands(commands.Cog):
                 break
 
     @commands.command(name="delete_roles")
+    @commands.has_role(config.getBotAdminRole())
     async def delete_roles(self, ctx):
+        '''Delete double roles created by the bot
+        This is a command created for testing purposes
+        '''
         try:
             for role in ctx.guild.roles:
 
