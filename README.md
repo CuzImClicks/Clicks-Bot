@@ -14,3 +14,16 @@ To create a webhook:
 6. Paste the url and add /github to it
 7. Select json
 
+TODO:
+- Fix the loop function
+- Create more moderation tools
+- More documentation in the files
+- on_member_remove event with logger
+- help command
+	- bot.remove_command("help")
+- version update
+	- using the last github commit
+- Error Embed feedback
+	- @<command_name>.error
+
+

@@ -4,6 +4,7 @@ from discord.ext import commands
 import logging
 from util import logger
 from util.logger import path
+from datetime import datetime
 
 lg = logging.getLogger(__name__)
 import logging
@@ -29,24 +30,26 @@ class CommandEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
 
+        time_now = datetime.now()
         if isinstance(error, commands.errors.CheckFailure):
 
             error_msg = "Du hast nicht genügend Rechte für diesen Befehl!"
-
-            await ctx.send(error_msg, delete_after=5)
+            errorEmbed = discord.Embed(title="Command Error", color = discord.Colour(0x9D1309), timestamp=time_now)
+            errorEmbed.add_field(name="Error Message", value=error_msg)
+            errorEmbed.add_field(name="Raised by", value=ctx.author.name)
+            await ctx.send(embed=errorEmbed)
             await logger.log_error(error_msg)
 
         elif isinstance(error, commands.errors.CommandNotFound):
-            await ctx.send(f"Command not found", delete_after=5)
-            import asyncio
-            await asyncio.sleep(5)
-            try:
-                await ctx.message.delete()
-            except discord.errors.NotFound:
-                pass
-
+                cmdnfEmbed = discord.Embed(title="Command Error", color= discord.Colour(0x9D1309), timestamp=time_now)
+                cmdnfEmbed.add_field(name="Error Message", value=f"Command not found")
+                cmdnfEmbed.add_field(name="Raised by", value=ctx.author.name)
+                await ctx.send(embed=cmdnfEmbed)
         else:
             await logger.log_error(error)
+            errorEmbed = discord.Embed(title="Command Error", color=discord.Colour(0x9D1309), timestamp=time_now)
+            errorEmbed.add_field(name="Error Message", value=error)
+            errorEmbed.add_field(name="Raised by", value=ctx.author.name)
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):

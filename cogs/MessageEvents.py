@@ -44,7 +44,7 @@ class MessageEvents(commands.Cog):
         if config.getCommandPrefix() in before.content:
             return
 
-        if self.before.author.bot or self.after.author.bot:
+        if before.author.bot or after.author.bot:
             return
 
         else:

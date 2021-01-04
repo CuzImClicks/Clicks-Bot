@@ -43,7 +43,7 @@ for filename_ in os.listdir(f"{path}/cogs"):
 
 @bot.command(name="load", aliases=["l"])
 async def load(ctx, extension):
-
+    '''Load extension'''
     if str(extension) == "all":
 
         for file in files:
@@ -58,7 +58,7 @@ async def load(ctx, extension):
 
 @bot.command(name="reload", aliases=["rl"])
 async def reload(ctx, extension):
-
+    '''Reload extension'''
     if str(extension) == "all" or "":
 
         await ctx.send(f"Reloaded all Extensions", delete_after=5)
@@ -75,8 +75,9 @@ async def reload(ctx, extension):
         lg.info(f"Reloaded the extension: {file}")
 
 @bot.command(name="unload", aliases=["ul"])
+@bot.has_role("Dev")
 async def unload(ctx, extension):
-
+    '''Unload extensions'''
     if str(extension) == "all":
 
         for file in files:
@@ -91,7 +92,7 @@ async def unload(ctx, extension):
 
 @bot.event
 async def on_message(message):
-
+    '''Message Even'''
     if message.author.bot:
         return
 
@@ -100,10 +101,13 @@ async def on_message(message):
             "You can't use commands in direct messages"
             ))
     if str(message.author.id) in blacklisted:
+        #Blacklisted people can't send messages on servers that the bot is runnning on
+        lg.info(f"Blacklisted user {message.author.name} tried to send '{message.content}' in the channel {message.channel}")
         return
     
     lg.info(f"[{message.guild}] -  {message.channel}: {message.author.name}: {message.content}")
     await bot.process_commands(message)
+
 try:
     for filename in os.listdir(f"{path}/cogs"):
         if filename.endswith(".py"):
@@ -113,6 +117,7 @@ try:
 
         else:
             pass
+
 except KeyboardInterrupt as e:
 
     pass
