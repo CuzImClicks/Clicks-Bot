@@ -10,8 +10,9 @@ path = os.getcwd()
 
 logging.basicConfig(level=logging.INFO, format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
-lg = logging.getLogger(__name__)
-
+lg = logging.getLogger("Clicks-Bot")
+lg_pl = logging.getLogger("Extension Loader")
+logging.getLogger("discord.gateway").disabled = True
 fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
 fl = logging.FileHandler(f"{path}/logs/log.log")
@@ -55,12 +56,12 @@ async def load(ctx, extension):
         for file in files:
             
             bot.load_extension(file)
-            lg.info(f"Loaded the extension: {file[:-3]}")
+            lg_pl.info(f"Loaded the extension: {file[:-3]}")
                 
 
     else:
         bot.load_extension(f"cogs.{extension}")
-        lg.info(f"Realoading extension: {extension[:-3]}")
+        lg_pl.info(f"Realoading extension: {extension[:-3]}")
 
 @bot.command(name="reload", aliases=["rl"])
 @commands.has_role("Dev")
@@ -77,13 +78,13 @@ async def reload(ctx, extension):
         for file in files:
 
             bot.reload_extension(f"cogs.{file}")
-            lg.info(f"Reloaded the extension: {file}")
+            lg_pl.info(f"Reloaded the extension: {file}")
             
     else:
         
         bot.reload_extension(f"cogs.{extension}")
         await ctx.send(embed=discord.Embed(title="Reloading Extensions", description=f"Reloading extension '{extension}'", color=discord.Colour(0x0BAF07)))
-        lg.info(f"Reloaded the extension: {file}")
+        lg_pl.info(f"Reloaded the extension: {file}")
 
 @bot.command(name="unload", aliases=["ul"])
 @commands.has_role("Dev")
@@ -99,13 +100,13 @@ async def unload(ctx, extension):
         for file in files:
 
             bot.unload_extension(f"cogs.{file}")
-            lg.info(f"Unloaded the extension: {file[:-3]}")
+            lg_pl.info(f"Unloaded the extension: {file[:-3]}")
 
     else:
         extEmbed = discord.Embed(title="Unloading Extension", description=f"Unloading extension '{extension}'", color=discord.Colour(0x0BA07), timestamp=datetime.now())
         await ctx.send(embed=extEmbed)
         bot.unload_extension(f"cogs.{extension}")
-        lg.info(f"Unloaded the extension: {extension[:-3]}")
+        lg_pl.info(f"Unloaded the extension: {extension[:-3]}")
 
 @bot.event
 async def on_message(message):
@@ -119,10 +120,10 @@ async def on_message(message):
             ))
     if str(message.author.id) in blacklisted:
         #Blacklisted people can't send messages on servers that the bot is runnning on
-        lg.info(f"Blacklisted user {message.author.name} tried to send '{message.content}' in the channel {message.channel}")
+        lg_pl.info(f"Blacklisted user {message.author.name} tried to send '{message.content}' in the channel {message.channel}")
         return
     
-    lg.info(f"[{message.guild}] -  {message.channel}: {message.author.name}: {message.content}")
+    lg_pl.info(f"[{message.guild}] -  {message.channel}: {message.author.name}: {message.content}")
     await bot.process_commands(message)
 
 try:
@@ -130,7 +131,7 @@ try:
         if filename.endswith(".py"):
             if not filename == "example_cog.py":
                 bot.load_extension(f"cogs.{filename[:-3]}")
-                lg.info(f"Loaded Extension: {filename}")
+                lg_pl.info(f"Loaded Extension: {filename}")
 
         else:
             pass

@@ -42,10 +42,7 @@ class MainEvents(commands.Cog):
             # f'{guild.name}(id: {guild.id})'
             # )
             
-            lg.info(
-                f'{self.bot.user} is connected to the following guild:\n'
-                f'{guild.name})'
-            )
+            lg.info(f'{self.bot.user} is connected to the following guild: {guild.name}')
             total_users += len(guild.members)
         
         await self.bot.change_presence(

@@ -70,7 +70,7 @@ class Moderation(commands.Cog):
                     await user.edit(mute=True)
                     lg.info(f"Muted user: {user.nick}")
 
-           maEmbed = discord.Embed(title="Mute All", description=f"Muted all users in {ctx.author.voice.channel.name}", color=discord.Color(0x9D1309), timestamp=datetime.now())
+            maEmbed = discord.Embed(title="Mute All", description=f"Muted all users in {ctx.author.voice.channel.name}", color=discord.Color(0x9D1309), timestamp=datetime.now())
             await ctx.send(embed=maEmbed)
 
         except Exception as e:

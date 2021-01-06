@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
-
+from datetime import datetime
 from multiprocessing import Process, Lock
 import youtube_dl
 import logging
@@ -59,24 +59,23 @@ class MusicBot(commands.Cog):
         channel = ctx.author.voice.channel
 
         if not ctx.message.author.voice:
-
-            await ctx.send("You are not connected to a voice channel!")
+            errorEmbed = discord.Embed(title="Command Error", description="You are not connected to a voice channel", color=discord.Colour(0x9D1309), timestamp=datetime.now())
+            await ctx.send(embed=errorEmbed)
             return
 
         else:
 
             channel = ctx.message.author.voice.channel
 
-            await logger.log_send(ctx,
-                                  "If you want to add songs to the queue ues .queue, then if you want to play it use $play")
             try:
                 await channel.connect()
 
             except discord.ClientException:
-                await ctx.send(f"Already connected to your voice channel")
+                errorEmbed = discord.Embed(title="Command Error", description="Already connected to your voice channel", color=discord.Colour(0x9D1309), timestamp=datetime.now())
+                await ctx.send(embed=errorEmbed)
 
-        await ctx.send("If you want to add songs to the queue ues .queue, then if you want to play it use .play")
-        await log_send(ctx, "If you want to add songs to the queue ues $queue, then if you want to play it use .play")
+        infoEmbed = discord.Embed(title="Join", description="If you want to add songs to the queue use .queue, then if you want to play use .play", color=discord.Colour(0x000030), timestamp=datetime.now())
+        await ctx.send(embed=infoEmbed)
 
     @commands.command(name="play", help="Mit .play startest du die Wiedergabe der Musik in deinem Channel."
                                    " Dies funktioniert nur wenn du einem Sprachchannel bist und nur wenn bereits Songs"
@@ -101,14 +100,14 @@ class MusicBot(commands.Cog):
                     lg.info(f"Removed song {queue[0]} from the queue ")
                     del(queue[0])
 
+                infoEmbed = discord.Embed(title="Play", description=f"Now playing {player.title}", color=discord.Colour(0x000030), timestamp=datetime.now())
+                await ctx.send(embed=infoEmbed)
+                        
         except IndexError as e:
 
             lg.error(f"No songs left in queue!")
-            await ctx.send(f"No songs left in queue!")
-
-
-        await ctx.send(f"Now playing: {player.title}", delete_after=4)
-        await log_send(ctx, f"Now playing: {player.title}")
+            errorEmbed = discord.Embed(title="Command Error", description="No songs left in the queue", color=discord.Colour(0x9D1309), timestamp=datetime.now())
+            await ctx.send(embed=errorEmbed)
 
     async def wait_for_end(guild: discord.Guild):
         from discord.utils import get
@@ -142,8 +141,9 @@ class MusicBot(commands.Cog):
             queue.append(song)
             del (list[list.index(song)])
 
-        await ctx.send("Queued the Among Us songs", delete_after=5)
-        await log_send(ctx, "Queued the Among Us songs")
+        infoEmbed = discord.Embed(title="Among Us", description="Queued the Among Us songs", color=discord.Colour(0x000030), timestamp=datetime.now())
+        await ctx.send(embed=infoEmbed)
+
         for i in range(0, len(queue)):
             await self.play(ctx)
 
@@ -161,8 +161,8 @@ class MusicBot(commands.Cog):
 
         responses = ["Clicks Bot going dark ... ... ...", ]
 
-        await ctx.send(choice(responses))
-        await logger.log_send(ctx, choice(responses))
+        infoEmbed = discord.Embed(title="Shutdown", description=choice(responses), color=discord.Colour(0x000030), timestamp=datetime.now())
+        await ctx.send(choice(embed=infoEmbed))
 
     @commands.command(name="loop", help="Continues to play the same song")
     @commands.has_role(config.getBotAdminRole())
@@ -170,8 +170,8 @@ class MusicBot(commands.Cog):
         global queue, loop
         loop = True
         queue.append(last_song)
-        lg.info(f"Looping song")
-        await ctx.send("Looping song")
+        infoEmbed = discord.Embed(title="Loop", description="Looping song", color=discord.Colour(0x000030), timestamp=datetime.now())
+        await ctx.send(embed=infoEmbed)
 
     @commands.command(name="queue", help=strings.get_help("queue_help"))
     @commands.has_role(config.getBotAdminRole())
@@ -186,7 +186,8 @@ class MusicBot(commands.Cog):
 
         if url is None:
             if len(queue) == 0:
-                await ctx.send("There are no songs in the queue")
+                errorEmbed = discord.Embed(title="Command Error", description="There are no songs in the queue", color=discord.Colour(0x9D1309), timestamp=datetime.now())
+                await ctx.send(embed=errorEmbed)
 
             else:
                 for i in range(0, len(queue)):
@@ -198,9 +199,8 @@ class MusicBot(commands.Cog):
 
             queue.append(url)
             lg.info(f"Added {url} to queue")
-            await ctx.send(f"Added {url} to queue", delete_after=5)
-            await logger.log_send(ctx, f"Added {url} to queue")
-
+            infoError = discord.Embed(title="Queue", description=f"Added {url} to the queue", color=discord.Colour(0x000030), timestamp=datetime.now())
+            await ctx.send(embed=infoEmbed)
             lg.info(args)
 
 
@@ -211,14 +211,17 @@ class MusicBot(commands.Cog):
         global queue
 
         try:
+            if number > len(queue):
+                errorEmbed = discord.Embed(title="Command Error", description="The queue isn't that long", color=discord.Colour(0x9D1309), timestamp=datetime.now())
+                await ctx.send(embed=errorEmbed)
             del (queue[int(number)])
             lg.info(f"Deleted {queue[int(number)]} from queue")
-            await ctx.send("The song was added to the Queue", delete_after=5)
-            await logger.log_send(ctx, "The song was added to the Queue")
+            infoEmbed = discord.Embed(title="Remove", description="The song was removed from the queue", color=discord.Colour(0x000030), timestamp=datetime.now())
+            await ctx.send(embed=infoEmbed)
 
         except:
-            await ctx.send(f"The Queue is either empty or the number is too high", delete_after=5)
-            await logger.log_send(ctx, f"The Queue is either empty or the number is too high")
+            errorEmbed = discord.Embed(title="Command Error", description="The queue is empty", color=discord.Colour(0x9D1309), timestamp=datetime.now())
+            await ctx.send(embed=errorEmbed)
 
     @commands.command(name="rick")
     @commands.has_role(config.getBotAdminRole())
