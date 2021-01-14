@@ -2,38 +2,72 @@ import requests
 import json
 import logging
 import aiohttp
-from discord.ext import commands
+import aiofiles
+from discord.ext import commands, tasks
 from util.logger import path
 from util import config
 import asyncio
 import discord
 from datetime import datetime
+import os
+from clicks_util.json_util import json_file
 
 key = "29c790dd-9d29-4b73-bf1e-c7fa88cff4c8"
 lg = logging.getLogger(__name__)
+path = os.getcwd()
 
 
 class HypixelAPI_Handler(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.online.start()
 
-    @commands.Cog.listener(name="online")
-    async def online(self, ctx, playername):
-        async with aiohttp.clientsession() as session:
-            data = json.load("players.json")
-            for player in data.keys():
-                playername = player["name"]
-                status = player["status"]
-                async with session.get(f'https://api.slothpixel.me/api/players/{playername}/status') as data:
-                    online = data[10:-35]
-                if online == 'true' and status == "False":
-                    infoEmbed = discord.Embed(title="Online", description=f"{playername} is now online", color=discord.Colour(0x000030), timestamp=datetime.now())
-                    await ctx.send(embed=infoEmbed)
-                elif online == "false" and status == "True":
-                    infoEmbed = discord.Embed(title="Offline", description=f"{playername} is now offline",
+    def cog_unload(self):
+        self.online.cancel()
+
+    @tasks.loop(seconds=20.0)
+    async def online(self):
+        channel = self.bot.get_channel(799291117425524756)
+        async with aiohttp.ClientSession() as session:
+            jf = json_file("players.json", f"{path}\cogs")
+            jf_data = jf.read()
+            for player in jf_data.keys():
+                lg.info(player)
+                playername = jf_data[player]["name"]
+                uuid = jf_data[player]["uuid"]
+                status = bool(jf_data[player]["status"])
+                async with session.get(f'https://api.hypixel.net/status?key={key}&uuid={uuid}') as data:
+                    content = json.loads(await data.text())
+                    online = content["session"]["online"]
+                lg.info(str(online) + " " + str(status))
+                if online == True and status == False:
+                    game = content["session"]["gameType"]
+                    jf_data_new = jf_data[player]["status"] = str(online)
+                    jf.write(jf_data_new)
+                    lg.info(True)
+                    infoEmbed = discord.Embed(title="Online", description=f"{playername} is in {game} now online",
                                               color=discord.Colour(0x000030), timestamp=datetime.now())
-                    await ctx.send(embed=infoEmbed)
+                    await channel.send(embed=infoEmbed)
+
+                elif not online and status:
+                    jf_data_new = jf_data[player]["status"] = str(online)
+                    jf.write(jf_data)
+                    lg.info(False)
+                    infoEmbed = discord.Embed(title="Offline", description=f"{playername} is in now offline",
+                                              color=discord.Colour(0x000030), timestamp=datetime.now())
+                    await channel.send(embed=infoEmbed)
+
+    @commands.command("magmaboss")
+    @commands.has_role(config.getBotAdminRole())
+    async def magmaboss(self, ctx):
+        async with aiohttp.ClientSession() as session:
+            async with session.get("http://lametric.th3shadowbroker.dev/getEstimation/magmaBoss?leadingZeros=true") as data:
+                content = json.loads(await data.text())
+                lg.info(content)
+                lg.info(type(content))
+                infoEmbed = discord.Embed(title="Magma Boss", description=f"The magma boss spawns in {str(content['frames'][0]['text'])} hours")
+                await ctx.send(embed=infoEmbed)
 
     class Player:
 
