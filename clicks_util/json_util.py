@@ -32,7 +32,7 @@ class json_file:
         with open(self.full_path, "r") as f:
             
             data = json.load(f)
-            
+            f.close()
             return data
         
         
@@ -64,6 +64,4 @@ class json_file:
         except Exception as e:
             
             print(e)
-            
-            
-            
+
