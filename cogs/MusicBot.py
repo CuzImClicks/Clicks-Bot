@@ -161,7 +161,7 @@ class MusicBot(commands.Cog):
 
         responses = ["Clicks Bot going dark ... ... ...", ]
 
-        infoEmbed = discord.Embed(title="Shutdown", description=choice(responses), color=discord.Colour(0x000030), timestamp=datetime.now())
+        infoEmbed = discord.Embed(title="Shutdown", description=responses[0], color=discord.Colour(0x000030), timestamp=datetime.now())
         await ctx.send(choice(embed=infoEmbed))
 
     @commands.command(name="loop", help="Continues to play the same song")
