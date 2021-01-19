@@ -41,6 +41,8 @@ for filename_ in os.listdir(f"{path}/cogs"):
     else:
         pass
 
+bot.remove_command("help")
+
 #load, unload, reload files and extension while the bot is running
 
 
