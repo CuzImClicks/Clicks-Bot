@@ -112,6 +112,22 @@ class Commands(commands.Cog):
 
         await ctx.send(args)
 
+    @commands.command(name="help", help="Shows this list")
+    @commands.has_any_role()
+    async def help_command(self, ctx, *args):
+        helpEmbed = discord.Embed(title="Help", description="A list of all available commands")
+
+        if args:
+            cmd = self.bot.commands.index(args)
+            helpEmbed.add_field(name=self.bot.commands[cmd][0], value=self.bot.commands[cmd][0])
+            await ctx.send(embed=helpEmbed)
+            return
+
+        for command in self.bot.commands:
+            helpEmbed.add_field(name=command[0], value=command[1])
+
+        await ctx.send(embed=helpEmbed)
+
 
 def setup(bot):
 
