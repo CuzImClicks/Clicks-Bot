@@ -67,7 +67,7 @@ class HypixelAPI_Handler(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with session.get("http://lametric.th3shadowbroker.dev/getEstimation/magmaBoss?leadingZeros=true") as data:
                 content = json.loads(await data.text())
-<<<<<<< HEAD
+
                 infoEmbed = discord.Embed(title="Magma Boss", description=f"The magma boss spawns in {str(content['frames'][0]['text'])} hours")
                 await ctx.send(embed=infoEmbed)
 
@@ -92,13 +92,6 @@ class HypixelAPI_Handler(commands.Cog):
                 infoEmbed.add_field(name="Sell", value=f"Last sold for {str(round(content['products'][item]['quick_status']['buyPrice'], 2))} coins")
                 await ctx.send(embed=infoEmbed)
 
-=======
-                lg.info(content)
-                lg.info(type(content))
-                infoEmbed = discord.Embed(title="Magma Boss", description=f"The magma boss spawns in {str(content['frames'][0]['text'])} hours")
-                await ctx.send(embed=infoEmbed)
-
->>>>>>> 12b3637d0652250182b5bf4dae4a068af90ed5fc
     class Player:
 
         def __init__(self, name, uuid):
