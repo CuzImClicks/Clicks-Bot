@@ -102,6 +102,16 @@ class Commands(commands.Cog):
 
             pass
 
+    @commands.command(name="shout")
+    @commands.has_role(config.getBotAdminRole())
+    async def shout(self, ctx, *args):
+        if not args:
+            errorEmbed = discord.Embed(title="Shout Error", description="Missing text", colour=discord.Colour(0x9D1309))
+            await ctx.send(embed=errorEmbed)
+            return
+
+        await ctx.send(args)
+
 
 def setup(bot):
 
