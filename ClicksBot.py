@@ -47,30 +47,29 @@ for filename_ in os.listdir(f"{path}/cogs"):
 @commands.has_role("Dev")
 async def load(ctx, extension):
     '''Load extension'''
-    if not str(extension)+".py" in os.listdir(f"{path}/cogs"):
-        raise commands.errors.ExtensionNotFound(extension)
-        return
 
     if str(extension) == "all":
 
         for file in files:
-            
             bot.load_extension(file)
             lg_pl.info(f"Loaded the extension: {file[:-3]}")
-                
 
     else:
+        if not str(extension) + ".py" in os.listdir(f"{path}/cogs"):
+            raise commands.errors.ExtensionNotFound(extension)
+            return
+        await ctx.send(
+            embed=discord.Embed(title="Reloading Extensions", description=f"Reloading extension '{extension}'",
+                                color=discord.Colour(0x0BAF07)))
         bot.load_extension(f"cogs.{extension}")
-        lg_pl.info(f"Realoading extension: {extension[:-3]}")
+        lg_pl.info(f"Loading extension: {extension}")
+
 
 @bot.command(name="reload", aliases=["rl"])
 @commands.has_role("Dev")
 async def reload(ctx, extension):
     '''Reload extension'''
-    if not str(extension)+".py" in os.listdir(f"{path}/cogs"):
-        raise commands.errors.ExtensionNotFound(extension)
-        return
-    
+
     if str(extension) == "all" or "":
 
         extEmbed = discord.Embed(title="Reload Extensions", description="Reloading all extentions",color=discord.Colour(0x0BAF07), timestamp=datetime.now())
@@ -81,19 +80,19 @@ async def reload(ctx, extension):
             lg_pl.info(f"Reloaded the extension: {file}")
             
     else:
-        
+        if not str(extension) + ".py" in os.listdir(f"{path}/cogs"):
+            raise commands.errors.ExtensionNotFound(extension)
+            return
         bot.reload_extension(f"cogs.{extension}")
         await ctx.send(embed=discord.Embed(title="Reloading Extensions", description=f"Reloading extension '{extension}'", color=discord.Colour(0x0BAF07)))
-        lg_pl.info(f"Reloaded the extension: {file}")
+        lg_pl.info(f"Reloaded the extension: {extension}")
+
 
 @bot.command(name="unload", aliases=["ul"])
 @commands.has_role("Dev")
 async def unload(ctx, extension):
     '''Unload extensions'''
-    if not str(extension)+".py" in os.listdir(f"{path}/cogs"):
-        raise commands.errors.ExtensionsNotFound(extension)
-        return
-    
+
     if str(extension) == "all":
         extEmbed = discord.Embed(title="Unloading Extensions", descriptions="Unloading all extensions", color=discord.Colour(0x0BA07), timestamp=datetime.now())
         await ctx.send(embed=extEmbed)
@@ -103,6 +102,9 @@ async def unload(ctx, extension):
             lg_pl.info(f"Unloaded the extension: {file[:-3]}")
 
     else:
+        if not str(extension) + ".py" in os.listdir(f"{path}/cogs"):
+            raise commands.errors.ExtensionsNotFound(extension)
+            return
         extEmbed = discord.Embed(title="Unloading Extension", description=f"Unloading extension '{extension}'", color=discord.Colour(0x0BA07), timestamp=datetime.now())
         await ctx.send(embed=extEmbed)
         bot.unload_extension(f"cogs.{extension}")
