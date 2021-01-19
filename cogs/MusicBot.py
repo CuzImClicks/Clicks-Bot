@@ -109,7 +109,7 @@ class MusicBot(commands.Cog):
             errorEmbed = discord.Embed(title="Command Error", description="No songs left in the queue", color=discord.Colour(0x9D1309), timestamp=datetime.now())
             await ctx.send(embed=errorEmbed)
 
-    async def wait_for_end(guild: discord.Guild):
+    async def wait_for_end(self, guild: discord.Guild):
         from discord.utils import get
         voice = get(self.bot.voice_clients, guild=guild)
         while voice.is_playing():
@@ -199,7 +199,7 @@ class MusicBot(commands.Cog):
 
             queue.append(url)
             lg.info(f"Added {url} to queue")
-            infoError = discord.Embed(title="Queue", description=f"Added {url} to the queue", color=discord.Colour(0x000030), timestamp=datetime.now())
+            infoEmbed = discord.Embed(title="Queue", description=f"Added {url} to the queue", color=discord.Colour(0x000030), timestamp=datetime.now())
             await ctx.send(embed=infoEmbed)
             lg.info(args)
 
