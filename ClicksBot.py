@@ -12,6 +12,7 @@ logging.basicConfig(level=logging.INFO, format="\u001b[37m[%(asctime)s] - %(name
 
 lg = logging.getLogger("Clicks-Bot")
 lg_pl = logging.getLogger("Extension Loader")
+lg_chat = logging.getLogger("Chat")
 logging.getLogger("discord.gateway").disabled = True
 fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
@@ -125,7 +126,7 @@ async def on_message(message):
         lg_pl.info(f"Blacklisted user {message.author.name} tried to send '{message.content}' in the channel {message.channel}")
         return
     
-    lg_pl.info(f"[{message.guild}] -  {message.channel}: {message.author.name}: {message.content}")
+    lg_chat.info(f"[{message.guild}] -  {message.channel}: {message.author.name}: {message.content}")
     await bot.process_commands(message)
 
 try:
