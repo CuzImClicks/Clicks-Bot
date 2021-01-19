@@ -26,37 +26,40 @@ class HypixelAPI_Handler(commands.Cog):
     def cog_unload(self):
         self.online.cancel()
 
+    @property
+    def player_channel(self):
+        return self.bot.get_channel(799291117425524756)
+
     @tasks.loop(seconds=20.0)
     async def online(self):
-        channel = self.bot.get_channel(799291117425524756)
+
+        channel = self.player_channel
+        if not channel:
+            await asyncio.sleep(5)
+            channel = self.player_channel
         async with aiohttp.ClientSession() as session:
             jf = json_file("players.json", f"{path}\cogs")
             jf_data = jf.read()
             for player in jf_data.keys():
-                lg.info(player)
                 playername = jf_data[player]["name"]
                 uuid = jf_data[player]["uuid"]
                 status = bool(jf_data[player]["status"])
                 async with session.get(f'https://api.hypixel.net/status?key={key}&uuid={uuid}') as data:
                     content = json.loads(await data.text())
                     online = content["session"]["online"]
-                lg.info(str(online) + " " + str(status))
                 if online == True and status == False:
                     game = content["session"]["gameType"]
-                    jf_data_new = jf_data[player]["status"] = str(online)
-                    jf.write(jf_data_new)
-                    lg.info(True)
                     infoEmbed = discord.Embed(title="Online", description=f"{playername} is in {game} now online",
                                               color=discord.Colour(0x000030), timestamp=datetime.now())
                     await channel.send(embed=infoEmbed)
 
                 elif not online and status:
-                    jf_data_new = jf_data[player]["status"] = str(online)
-                    jf.write(jf_data)
-                    lg.info(False)
                     infoEmbed = discord.Embed(title="Offline", description=f"{playername} is in now offline",
                                               color=discord.Colour(0x000030), timestamp=datetime.now())
                     await channel.send(embed=infoEmbed)
+
+                jf_data[player]["status"] = online
+                jf.write(jf_data)
 
     @commands.command("magmaboss")
     @commands.has_role(config.getBotAdminRole())
