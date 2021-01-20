@@ -77,3 +77,7 @@ def getBotAdminRole():
 def getDefaultRole():
 
     return jf.read()["Default Role"]
+
+def getKey():
+
+    return jf.read()["key"]
