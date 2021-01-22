@@ -91,7 +91,7 @@ class HypixelAPI_Handler(commands.Cog):
                 content = json.loads(await data.text())
                 value = float(str(content['frames'][0]['text']).replace(":", "."))
                 infoEmbed = discord.Embed(title="Magma Boss",
-                                          description=f"The magma boss spawns in {value} hours")
+                                          description=f"The magma boss spawns in {value} hours", timestamp=datetime.now())
                 if value <= 0.1:
                     await channel.send(embed=infoEmbed)
 
