@@ -1,6 +1,7 @@
 import logging
 from clicks_util import json_util
 import os
+import discord
 
 path = os.getcwd()
 
@@ -81,3 +82,11 @@ def getDefaultRole():
 def getKey():
 
     return jf.read()["key"]
+
+def getDiscordColour(colourname):
+
+    if colourname == "red":
+        return discord.Colour(0x9D1309)
+
+    elif colourname == "blue":
+        return discord.Colour(0x000030)
