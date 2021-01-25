@@ -83,6 +83,10 @@ def getKey():
 
     return jf.read()["key"]
 
+def getSteamKey():
+
+    return jf.read()["steam_key"]
+
 def getDiscordColour(colourname):
 
     if colourname == "red":
