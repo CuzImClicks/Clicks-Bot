@@ -11,3 +11,4 @@ logs/log.log
 remove
 *.json
 *.m4a
+*.png
