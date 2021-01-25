@@ -50,19 +50,22 @@ bot.remove_command("help")
 @commands.has_role("Dev")
 async def load(ctx, extension):
     '''Load extension'''
-
     if str(extension) == "all":
+        extEmbed = discord.Embed(title="Load Extensions", description="Loading all extensions", color=discord.Colour(0x0BAF07), timestamp=datetime.now())
 
         for file in files:
             bot.load_extension(file)
+            extEmbed.add_field(name=file, value="Load complete")
             lg_pl.info(f"Loaded the extension: {file[:-3]}")
+
+        await ctx.send(embed=extEmbed)
 
     else:
         if not str(extension) + ".py" in os.listdir(f"{path}/cogs"):
             raise commands.errors.ExtensionNotFound(extension)
             return
         await ctx.send(
-            embed=discord.Embed(title="Reloading Extensions", description=f"Reloading extension '{extension}'",
+            embed=discord.Embed(title="Loading Extensions", description=f"Loading extension '{extension}'",
                                 color=discord.Colour(0x0BAF07)))
         bot.load_extension(f"cogs.{extension}")
         lg_pl.info(f"Loading extension: {extension}")
@@ -72,22 +75,25 @@ async def load(ctx, extension):
 @commands.has_role("Dev")
 async def reload(ctx, extension):
     '''Reload extension'''
-
     if str(extension) == "all" or "":
 
-        extEmbed = discord.Embed(title="Reload Extensions", description="Reloading all extentions",color=discord.Colour(0x0BAF07), timestamp=datetime.now())
-        await ctx.send(embed=extEmbed)
+        extEmbed = discord.Embed(title="Reload Extensions", description="Reloading all extensions", color=discord.Colour(0x0BAF07), timestamp=datetime.now())
         for file in files:
 
             bot.reload_extension(f"cogs.{file}")
+            extEmbed.add_field(name=file, value="Reload complete")
             lg_pl.info(f"Reloaded the extension: {file}")
+
+        await ctx.send(embed=extEmbed)
             
     else:
         if not str(extension) + ".py" in os.listdir(f"{path}/cogs"):
             raise commands.errors.ExtensionNotFound(extension)
             return
         bot.reload_extension(f"cogs.{extension}")
-        await ctx.send(embed=discord.Embed(title="Reloading Extensions", description=f"Reloading extension '{extension}'", color=discord.Colour(0x0BAF07)))
+        await ctx.send(embed=discord.Embed(title="Reloading Extensions",
+                                           description=f"Reloading extension '{extension}'",
+                                           color=discord.Colour(0x0BAF07)))
         lg_pl.info(f"Reloaded the extension: {extension}")
 
 
@@ -95,20 +101,26 @@ async def reload(ctx, extension):
 @commands.has_role("Dev")
 async def unload(ctx, extension):
     '''Unload extensions'''
-
     if str(extension) == "all":
-        extEmbed = discord.Embed(title="Unloading Extensions", descriptions="Unloading all extensions", color=discord.Colour(0x0BA07), timestamp=datetime.now())
+        extEmbed = discord.Embed(title="Unloading Extensions",
+                                 descriptions="Unloading all extensions",
+                                 color=discord.Colour(0x0BA07),
+                                 timestamp=datetime.now())
         await ctx.send(embed=extEmbed)
         for file in files:
 
             bot.unload_extension(f"cogs.{file}")
+            extEmbed.add_field(name=file, value="Unload complete")
             lg_pl.info(f"Unloaded the extension: {file[:-3]}")
 
     else:
         if not str(extension) + ".py" in os.listdir(f"{path}/cogs"):
             raise commands.errors.ExtensionsNotFound(extension)
             return
-        extEmbed = discord.Embed(title="Unloading Extension", description=f"Unloading extension '{extension}'", color=discord.Colour(0x0BA07), timestamp=datetime.now())
+        extEmbed = discord.Embed(title="Unloading Extension",
+                                 description=f"Unloading extension '{extension}'",
+                                 color=discord.Colour(0x0BA07),
+                                 timestamp=datetime.now())
         await ctx.send(embed=extEmbed)
         bot.unload_extension(f"cogs.{extension}")
         lg_pl.info(f"Unloaded the extension: {extension[:-3]}")
@@ -124,7 +136,7 @@ async def on_message(message):
             "You can't use commands in direct messages"
             ))
     if str(message.author.id) in blacklisted:
-        #Blacklisted people can't send messages on servers that the bot is runnning on
+        #Blacklisted people can't send messages on servers that the bot is running on
         lg_pl.info(f"Blacklisted user {message.author.name} tried to send '{message.content}' in the channel {message.channel}")
         return
     
