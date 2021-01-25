@@ -13,7 +13,7 @@ def install(package):
     #subprocess.check_call([f"python{get_python_version()}", "-m", "pip", "install", package])  # linux
 
 
-packages = ["discord", "youtube-dl", "ffmpeg-python", "aiohttp", "aiofiles", "mojang", "pandas", "matplotlib"]
+packages = ["discord", "youtube-dl", "ffmpeg-python", "aiohttp", "aiofiles", "mojang", "qrcode"]
 
 for package in packages:
     install(package)
