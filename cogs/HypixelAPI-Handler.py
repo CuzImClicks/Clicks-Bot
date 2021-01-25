@@ -70,12 +70,12 @@ class HypixelAPI_Handler(commands.Cog):
                 if online == True and status == False:
                     game = content["session"]["gameType"]
                     infoEmbed = discord.Embed(title="Online", description=f"{playername} is in {game} now online",
-                                              color=discord.Colour(0x000030), timestamp=datetime.now())
+                                              color=config.getDiscordColour("blue"), timestamp=datetime.now())
                     await channel.send(embed=infoEmbed)
 
                 elif not online and status:
                     infoEmbed = discord.Embed(title="Offline", description=f"{playername} is in now offline",
-                                              color=discord.Colour(0x000030), timestamp=datetime.now())
+                                              color=config.getDiscordColour("blue"), timestamp=datetime.now())
                     await channel.send(embed=infoEmbed)
 
                 jf_data[player]["status"] = online
@@ -91,7 +91,9 @@ class HypixelAPI_Handler(commands.Cog):
                 content = json.loads(await data.text())
                 value = float(str(content['frames'][0]['text']).replace(":", "."))
                 infoEmbed = discord.Embed(title="Magma Boss",
-                                          description=f"The magma boss spawns in {value} hours", timestamp=datetime.now())
+                                          description=f"The magma boss spawns in {value} hours",
+                                          colour=config.getDiscordColour("blue"),
+                                          timestamp=datetime.now())
                 if value <= 0.1:
                     await channel.send(embed=infoEmbed)
 
@@ -103,28 +105,36 @@ class HypixelAPI_Handler(commands.Cog):
             infoEmbed = discord.Embed(title="Bazaar Help",
                                       description="Please write the english name of the item next to the command. ")
         item = args[0].upper()
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f"https://api.hypixel.net/skyblock/bazaar?key={key}&productId={item}") as data:
-                content = json.loads(await data.text())
-                jf = json_file("bazaar.json", path=f"{path}\hypixel")
-                jf.write(content)
-                if not item in content["products"]:
-                    errorEmbed = discord.Embed(title="Bazaar Error",
-                                               description=f"ItemNotFound: {item} is not a supported item",
-                                               colour=discord.Colour(0x9D1309))
-                    await ctx.send(embed=errorEmbed)
-                    lg.info(f"ItemNotFound: {item} is not a supported item")
-                    return
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"https://api.hypixel.net/skyblock/bazaar?key={key}&productId={item}") as data:
+                    content = json.loads(await data.text())
+                    jf = json_file("bazaar.json", path=f"{path}\hypixel")
+                    jf.write(content)
+                    if not item in content["products"]:
+                        errorEmbed = discord.Embed(title="Bazaar Error",
+                                                   description=f"ItemNotFound: {item} is not a supported item",
+                                                   colour=config.getDiscordColour("red"))
+                        await ctx.send(embed=errorEmbed)
+                        lg.info(f"ItemNotFound: {item} is not a supported item")
+                        return
 
-                infoEmbed = discord.Embed(title="Bazaar",
-                                          description=f"Informations about the sell and buy value of {item.lower()}")
-                infoEmbed.add_field(name="Buy",
-                                    value=f"Last bought for {str(round(content['products'][item]['quick_status']['sellPrice'], 2))} coins")
-                infoEmbed.add_field(name="Sell",
-                                    value=f"Last sold for {str(round(content['products'][item]['quick_status']['buyPrice'], 2))} coins")
-                infoEmbed.add_field(name="SkyBlock Tools", value=f"https://skyblock-tool.xyz/product.php?id={item}",
-                                    inline=False)
-                await ctx.send(embed=infoEmbed)
+                    infoEmbed = discord.Embed(title="Bazaar",
+                                              description=f"Informations about the sell and buy value of {item.lower()}")
+                    infoEmbed.add_field(name="Buy",
+                                        value=f"Last bought for {str(round(content['products'][item]['quick_status']['sellPrice'], 2))} coins")
+                    infoEmbed.add_field(name="Sell",
+                                        value=f"Last sold for {str(round(content['products'][item]['quick_status']['buyPrice'], 2))} coins")
+                    infoEmbed.add_field(name="SkyBlock Tools", value=f"https://skyblock-tool.xyz/product.php?id={item}",
+                                        inline=False)
+                    await ctx.send(embed=infoEmbed)
+
+        except:
+            errorEmbed = discord.Embed(title="Bazaar Error",
+                                       description="There was an error while connecting to the Hypixel API",
+                                       colour=config.getDiscordColour("red"),
+                                       timestamp=datetime.now())
+            await ctx.send(embed=errorEmbed)
 
     @commands.command(name="fairy_souls")
     @commands.has_role(config.getDefaultRole())
