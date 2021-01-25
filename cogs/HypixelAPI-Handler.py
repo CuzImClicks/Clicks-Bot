@@ -144,7 +144,7 @@ class HypixelAPI_Handler(commands.Cog):
         pl = Player(playername)
         skyblock = pl.SkyBlock(pl.data, pl.name, pl.uuid)
         infoEmbed = discord.Embed(title="Fairy Souls",
-                                  description=f"Showing collected fairy souls for user {playername}")
+                                  description=f"Showing collected fairy souls for user {playername}", colour=config.getDiscordColour("blue"))
         for profile in list(skyblock.profiles.keys()):
             infoEmbed.add_field(name=profile, value=f"{skyblock.profiles[profile].fairy_souls_collected} of 220")
 
