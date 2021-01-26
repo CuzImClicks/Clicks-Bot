@@ -6,6 +6,7 @@ from datetime import datetime
 from util import strings
 from util.logger import *
 from util import config
+from clicks_util.json_util import json_file
 
 lg = logging.getLogger(__name__)
 from util.logger import path
@@ -19,6 +20,29 @@ class Moderation(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command(name="blacklist")
+    @commands.has_role(config.getBotAdminRole())
+    async def blacklist(self, ctx, target):
+
+        jf = json_file(name="blacklist.json", path=path)
+        infoEmbed = discord.Embed(title="Blacklist",
+                                  color=config.getDiscordColour("blue"),
+                                  timestamp=datetime.now())
+        if target == "list":
+            member_ids = [member.id for member in ctx.author.guild.members]
+            for user in jf.read()["blacklisted"]:
+                user = discord.get(member_ids, id=user)
+                infoEmbed.add_field(name=user, value="Blacklisted", inline=False)
+
+            await ctx.send(embed=infoEmbed)
+        else:
+            user = discord.utils.get([member.id for member in ctx.author.guild.members], id=target)
+            blacklisted = jf.read()["blacklisted"]
+            blacklisted.append(user)
+            infoEmbed.add_field(name=user, value=f"Blacklisted")
+            await ctx.send(embed=infoEmbed)
+            jf.write({"blacklisted": blacklisted})
 
     @commands.command(name="mute", help="Mutes a user")
     @commands.has_role("Administrator")
@@ -102,10 +126,18 @@ class Moderation(commands.Cog):
         try:
             await ctx.author.voice.channel.edit(user_limit=len(ctx.author.voice.channel.members))
             lg.info(f"Locked the channel {ctx.author.voice.channel.name} to a maximum of {len(ctx.author.voice.channel.members)}")
-            await ctx.send(
-                f"Der Channel {ctx.author.voice.channel.name} wurde auf {len(ctx.author.voice.channel.members)} Benutzer beschränkt", delete_after=5)
+            infoEmbed = discord.Embed(title="Lock",
+                                      description=f"Locked the channel {ctx.author.voice.channel.name} to a maximum"
+                                                  f" of {len(ctx.author.voice.channel.members)}",
+                                      color=config.getDiscordColour("blue"),
+                                      timestamp=datetime.now())
+            await ctx.send(embed=infoEmbed)
         except Exception as e:
-            await ctx.send("Du bist in keinem Voice Channel", delete_after=5)
+            errorEmbed = discord.Embed(title="Lock Error",
+                                       description="You are not connected to a voice channel!",
+                                       colour=config.getDiscordColour("red"),
+                                       timestamp=datetime.now())
+            await ctx.send(embed=errorEmbed)
             lg.error(e)
 
     @commands.command(name="unlock", help="Sets the user limit of your current channel to infinite")
@@ -114,10 +146,17 @@ class Moderation(commands.Cog):
         try:
             await ctx.author.voice.channel.edit(user_limit=0)
             lg.info(f"Locked the channel {ctx.author.voice.channel.name} to a maximum of 0")
-            await ctx.send(
-                f"Der Channel {ctx.author.voice.channel.name} wurde unlocked", delete_after=5)
+
+            infoEmbed = discord.Embed(title="Unlock",
+                                      description=f"The channel {ctx.author.voice.channel.name} was unlocked",
+                                      colour=config.getDiscordColour("blue"),
+                                      timestamp=datetime.now())
         except Exception as e:
-            await ctx.send("Du bist in keinem Voice Channel", delete_after=5)
+            errorEmbed = discord.Embed(title="Lock Error",
+                                       description="You are not connected to a voice channel!",
+                                       colour=config.getDiscordColour("red"),
+                                       timestamp=datetime.now())
+            await ctx.send(embed=errorEmbed)
             lg.error(e)
 
     @commands.command(name="status", help="Changes the Status of the bot")
