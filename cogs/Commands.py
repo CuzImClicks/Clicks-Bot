@@ -110,10 +110,16 @@ class Commands(commands.Cog):
             await ctx.send(embed=errorEmbed)
             return
 
-        await ctx.send(args)
+        string = ""
+        args = list(args)
+        for word in args:
+            lg.info(word)
+            string = f"{string} {word}"
+
+        await ctx.send(string)
 
     @commands.command(name="help", help="Shows this list")
-    @commands.has_any_role()
+    @commands.has_role("Member")
     async def help_command(self, ctx, *args):
         helpEmbed = discord.Embed(title="Help", description="A list of all available commands")
 
