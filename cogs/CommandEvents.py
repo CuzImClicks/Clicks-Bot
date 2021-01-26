@@ -38,7 +38,7 @@ class CommandEvents(commands.Cog):
             errorEmbed.add_field(name="Error Message", value=error_msg)
             errorEmbed.add_field(name="Raised by", value=ctx.author.name)
             await ctx.send(embed=errorEmbed)
-            await logger.log_error(error_msg)
+            lg.error(error_msg)
 
         elif isinstance(error, commands.errors.CommandNotFound):
                 cmdnfEmbed = discord.Embed(title="Command Error", color= discord.Colour(0x9D1309), timestamp=time_now)
