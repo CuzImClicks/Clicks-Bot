@@ -23,11 +23,8 @@ TODO:
 - Fix the loop function
 - Create more moderation tools
 - More documentation in the files
-- on_member_remove event with logger
 - help command
 	- bot.remove_command("help")
-- version update
-	- using the last github commit
 - Error Embed feedback
 	- @<command_name>.error
 
