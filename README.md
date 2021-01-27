@@ -5,6 +5,7 @@ It uses discord.py from:
 https://www.github.com/Rapptz/discord.py
 
 cogs.SteamAPI-Handler.isOnline() from mg393/steamcheck.py
+https://gist.github.com/mg393/3119259
 
 integrated a few functions from Smudge-Studios/HypixelBot
 cogs/GitHubFetcher.py is by mass1ve-err0r -> GitHub link in file
