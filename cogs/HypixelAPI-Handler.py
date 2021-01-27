@@ -14,7 +14,7 @@ from clicks_util.json_util import JsonFile
 from util.hypixel.player import Player
 
 key = config.getKey()
-lg = logging.getLogger(__name__)
+lg = logging.getLogger(__name__[5:])
 path = os.getcwd()
 
 
@@ -40,7 +40,7 @@ class HypixelAPI_Handler(commands.Cog):
         """Get the magma boss channel"""
         return self.bot.get_channel(799220589243007007)
 
-    @commands.command(name="add_player")
+    @commands.command(name="add_hypixel_player")
     @commands.has_role(config.getBotAdminRole())
     async def add_player(self, ctx, playername):
         """Add a player to the hypixel online task
@@ -95,7 +95,11 @@ class HypixelAPI_Handler(commands.Cog):
                                           colour=config.getDiscordColour("blue"),
                                           timestamp=datetime.now())
                 if value <= 0.1:
-                    await channel.send(embed=infoEmbed)
+                    try:
+                        await channel.send(embed=infoEmbed)
+
+                    except AttributeError:
+                        self.magmaboss
 
     @commands.command(name="bazaar", aliases=["bz"])
     @commands.has_role(config.getDefaultRole())
