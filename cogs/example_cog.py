@@ -6,10 +6,7 @@ import logging
 from util import config
 import datetime
 
-lg = logging.getLogger(__name__)
-fl = logging.FileHandler(f"{path}\logs\log.log")
-fl.setLevel(logging.INFO)
-lg.addHandler(fl)
+lg = logging.getLogger(__name__[5:])
 
 
 class example_cog(commands.Cog):
