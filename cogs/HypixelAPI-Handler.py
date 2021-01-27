@@ -57,29 +57,39 @@ class HypixelAPI_Handler(commands.Cog):
         if not channel:
             await asyncio.sleep(5)
             channel = self.player_channel
-        async with aiohttp.ClientSession() as session:
-            self.jf = JsonFile("players.json", f"{path}\cogs")
-            jf_data = self.jf.read()
-            for player in jf_data.keys():
-                playername = jf_data[player]["name"]
-                uuid = jf_data[player]["uuid"]
-                status = bool(jf_data[player]["status"])
-                async with session.get(f'https://api.hypixel.net/status?key={key}&uuid={uuid}') as data:
-                    content = json.loads(await data.text())
-                    online = content["session"]["online"]
-                if online == True and status == False:
-                    game = content["session"]["gameType"]
-                    infoEmbed = discord.Embed(title="Online", description=f"{playername} is in {game} now online",
-                                              color=config.getDiscordColour("blue"), timestamp=datetime.now())
-                    await channel.send(embed=infoEmbed)
+        try:
+            async with aiohttp.ClientSession() as session:
+                self.jf = JsonFile("players.json", f"{path}\cogs")
+                jf_data = self.jf.read()
+                for player in jf_data.keys():
+                    playername = jf_data[player]["name"]
+                    uuid = jf_data[player]["uuid"]
+                    status = bool(jf_data[player]["status"])
+                    async with session.get(f'https://api.hypixel.net/status?key={key}&uuid={uuid}') as data:
+                        content = json.loads(await data.text())
+                        online = content["session"]["online"]
+                    if online == True and status == False:
+                        game = content["session"]["gameType"]
+                        infoEmbed = discord.Embed(title="Online", description=f"{playername} is now in {game}  online",
+                                                  color=config.getDiscordColour("blue"), timestamp=datetime.now())
+                        infoEmbed.set_thumbnail(url=f"https://crafatar.com/avatars/{uuid}")
+                        infoEmbed.set_footer(text="mc.hypixel.net",
+                                             icon_url="https://de.wikipedia.org/wiki/Hypixel#/media/Datei:LogoHypixel.png")
+                        await channel.send(embed=infoEmbed)
 
-                elif not online and status:
-                    infoEmbed = discord.Embed(title="Offline", description=f"{playername} is in now offline",
-                                              color=config.getDiscordColour("blue"), timestamp=datetime.now())
-                    await channel.send(embed=infoEmbed)
+                    elif not online and status:
+                        infoEmbed = discord.Embed(title="Offline", description=f"{playername} is in now offline",
+                                                  color=config.getDiscordColour("blue"), timestamp=datetime.now())
+                        infoEmbed.set_thumbnail(url=f"https://crafatar.com/avatars/{uuid}")
+                        infoEmbed.set_footer(text="mc.hypixel.net",
+                                             icon_url="https://de.wikipedia.org/wiki/Hypixel#/media/Datei:LogoHypixel.png")
+                        await channel.send(embed=infoEmbed)
 
-                jf_data[player]["status"] = online
-                self.jf.write(jf_data)
+                    jf_data[player]["status"] = online
+                    self.jf.write(jf_data)
+
+        except KeyError:
+            pass
 
     @tasks.loop(minutes=1)
     async def magmaboss(self):
