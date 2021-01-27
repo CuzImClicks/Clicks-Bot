@@ -25,7 +25,6 @@ class User:
 
     @property
     def response(self) -> urllib.request:
-        lg.info(f"Requesting player summary for user: {self.steam_id}")
         return urllib.request.urlopen(self.Request)
 
     @property
@@ -51,6 +50,10 @@ class User:
     @property
     def state(self) -> int:
         return int(self.player["personastate"])
+
+    @property
+    def avatar(self) -> str:
+        return str(self.player["avatarmedium"])
 
     def save(self):
         jf = JsonFile(name="")
