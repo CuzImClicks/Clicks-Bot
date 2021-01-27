@@ -1,17 +1,13 @@
-import discord
-from discord.ext import commands
 import asyncio
 from datetime import datetime
-from multiprocessing import Process, Lock
-import youtube_dl
-import logging
 from random import choice
 
-from util import strings
-from util import logger
-from util.logger import *
-from util import config
+import discord
+import youtube_dl
+from discord.ext import commands, tasks
 
+from util import config, strings, logger, cleanup
+from util.logger import *
 
 lg = logging.getLogger(__name__)
 
@@ -23,6 +19,7 @@ youtube_dl.utils.bug_reports_message = lambda msg: lg.error(msg)
 global last_song, loop
 last_song = ""
 loop = False
+
 
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5):
@@ -59,7 +56,8 @@ class MusicBot(commands.Cog):
         channel = ctx.author.voice.channel
 
         if not ctx.message.author.voice:
-            errorEmbed = discord.Embed(title="Command Error", description="You are not connected to a voice channel", color=discord.Colour(0x9D1309), timestamp=datetime.now())
+            errorEmbed = discord.Embed(title="Command Error", description="You are not connected to a voice channel",
+                                       color=discord.Colour(0x9D1309), timestamp=datetime.now())
             await ctx.send(embed=errorEmbed)
             return
 
@@ -71,15 +69,18 @@ class MusicBot(commands.Cog):
                 await channel.connect()
 
             except discord.ClientException:
-                errorEmbed = discord.Embed(title="Command Error", description="Already connected to your voice channel", color=discord.Colour(0x9D1309), timestamp=datetime.now())
+                errorEmbed = discord.Embed(title="Command Error", description="Already connected to your voice channel",
+                                           color=discord.Colour(0x9D1309), timestamp=datetime.now())
                 await ctx.send(embed=errorEmbed)
 
-        infoEmbed = discord.Embed(title="Join", description="If you want to add songs to the queue use .queue, then if you want to play use .play", color=discord.Colour(0x000030), timestamp=datetime.now())
+        infoEmbed = discord.Embed(title="Join",
+                                  description="If you want to add songs to the queue use .queue, then if you want to play use .play",
+                                  color=discord.Colour(0x000030), timestamp=datetime.now())
         await ctx.send(embed=infoEmbed)
 
     @commands.command(name="play", help="Mit .play startest du die Wiedergabe der Musik in deinem Channel."
-                                   " Dies funktioniert nur wenn du einem Sprachchannel bist und nur wenn bereits Songs"
-                                   " in der Queue sind. Gebe .queue ohne Argumente ein um zu sehen ob songs in der Queue sind.")
+                                        " Dies funktioniert nur wenn du einem Sprachchannel bist und nur wenn bereits Songs"
+                                        " in der Queue sind. Gebe .queue ohne Argumente ein um zu sehen ob songs in der Queue sind.")
     @commands.has_role(config.getBotAdminRole())
     async def play(self, ctx):
 
@@ -94,19 +95,21 @@ class MusicBot(commands.Cog):
                 player = await YTDLSource.from_url(str(queue[0]), loop=self.bot.loop)
                 voice_channel.play(player, after=lambda e: lg.error(e) if e else None)
                 playing = True
-                global last_song 
+                global last_song
                 last_song = str(queue[0])
                 if not loop:
                     lg.info(f"Removed song {queue[0]} from the queue ")
-                    del(queue[0])
+                    del (queue[0])
 
-                infoEmbed = discord.Embed(title="Play", description=f"Now playing {player.title}", color=discord.Colour(0x000030), timestamp=datetime.now())
+                infoEmbed = discord.Embed(title="Play", description=f"Now playing {player.title}",
+                                          color=discord.Colour(0x000030), timestamp=datetime.now())
                 await ctx.send(embed=infoEmbed)
-                        
+
         except IndexError as e:
 
             lg.error(f"No songs left in queue!")
-            errorEmbed = discord.Embed(title="Command Error", description="No songs left in the queue", color=discord.Colour(0x9D1309), timestamp=datetime.now())
+            errorEmbed = discord.Embed(title="Command Error", description="No songs left in the queue",
+                                       color=discord.Colour(0x9D1309), timestamp=datetime.now())
             await ctx.send(embed=errorEmbed)
 
     async def wait_for_end(self, guild: discord.Guild):
@@ -118,7 +121,7 @@ class MusicBot(commands.Cog):
     @commands.command(name="among_us", help="Dieser Befehl setzt alle Lieder die als Among Us Lied gespeichert wurden"
                                             " in zufälliger Reihenfolge in die Warteschleife. Mit .skipall"
                                             "werden alle Songs die der Bot und die Queue hinzugefügt hat übersprungen. "
-                                            )
+                      )
     @commands.has_role(config.getBotAdminRole())
     async def among_us(self, ctx):
 
@@ -141,7 +144,8 @@ class MusicBot(commands.Cog):
             queue.append(song)
             del (list[list.index(song)])
 
-        infoEmbed = discord.Embed(title="Among Us", description="Queued the Among Us songs", color=discord.Colour(0x000030), timestamp=datetime.now())
+        infoEmbed = discord.Embed(title="Among Us", description="Queued the Among Us songs",
+                                  color=discord.Colour(0x000030), timestamp=datetime.now())
         await ctx.send(embed=infoEmbed)
 
         for i in range(0, len(queue)):
@@ -161,7 +165,8 @@ class MusicBot(commands.Cog):
 
         responses = ["Clicks Bot going dark ... ... ...", ]
 
-        infoEmbed = discord.Embed(title="Shutdown", description=responses[0], color=discord.Colour(0x000030), timestamp=datetime.now())
+        infoEmbed = discord.Embed(title="Shutdown", description=responses[0], color=discord.Colour(0x000030),
+                                  timestamp=datetime.now())
         await ctx.send(choice(embed=infoEmbed))
 
     @commands.command(name="loop", help="Continues to play the same song")
@@ -170,7 +175,8 @@ class MusicBot(commands.Cog):
         global queue, loop
         loop = True
         queue.append(last_song)
-        infoEmbed = discord.Embed(title="Loop", description="Looping song", color=discord.Colour(0x000030), timestamp=datetime.now())
+        infoEmbed = discord.Embed(title="Loop", description="Looping song", color=discord.Colour(0x000030),
+                                  timestamp=datetime.now())
         await ctx.send(embed=infoEmbed)
 
     @commands.command(name="queue", help=strings.get_help("queue_help"))
@@ -186,7 +192,8 @@ class MusicBot(commands.Cog):
 
         if url is None:
             if len(queue) == 0:
-                errorEmbed = discord.Embed(title="Command Error", description="There are no songs in the queue", color=discord.Colour(0x9D1309), timestamp=datetime.now())
+                errorEmbed = discord.Embed(title="Command Error", description="There are no songs in the queue",
+                                           color=discord.Colour(0x9D1309), timestamp=datetime.now())
                 await ctx.send(embed=errorEmbed)
 
             else:
@@ -199,10 +206,10 @@ class MusicBot(commands.Cog):
 
             queue.append(url)
             lg.info(f"Added {url} to queue")
-            infoEmbed = discord.Embed(title="Queue", description=f"Added {url} to the queue", color=discord.Colour(0x000030), timestamp=datetime.now())
+            infoEmbed = discord.Embed(title="Queue", description=f"Added {url} to the queue",
+                                      color=discord.Colour(0x000030), timestamp=datetime.now())
             await ctx.send(embed=infoEmbed)
             lg.info(args)
-
 
     @commands.command(name="remove")
     @commands.has_role(config.getBotAdminRole())
@@ -212,15 +219,18 @@ class MusicBot(commands.Cog):
 
         try:
             if number > len(queue):
-                errorEmbed = discord.Embed(title="Command Error", description="The queue isn't that long", color=discord.Colour(0x9D1309), timestamp=datetime.now())
+                errorEmbed = discord.Embed(title="Command Error", description="The queue isn't that long",
+                                           color=discord.Colour(0x9D1309), timestamp=datetime.now())
                 await ctx.send(embed=errorEmbed)
             del (queue[int(number)])
             lg.info(f"Deleted {queue[int(number)]} from queue")
-            infoEmbed = discord.Embed(title="Remove", description="The song was removed from the queue", color=discord.Colour(0x000030), timestamp=datetime.now())
+            infoEmbed = discord.Embed(title="Remove", description="The song was removed from the queue",
+                                      color=discord.Colour(0x000030), timestamp=datetime.now())
             await ctx.send(embed=infoEmbed)
 
         except:
-            errorEmbed = discord.Embed(title="Command Error", description="The queue is empty", color=discord.Colour(0x9D1309), timestamp=datetime.now())
+            errorEmbed = discord.Embed(title="Command Error", description="The queue is empty",
+                                       color=discord.Colour(0x9D1309), timestamp=datetime.now())
             await ctx.send(embed=errorEmbed)
 
     @commands.command(name="rick")
@@ -248,8 +258,8 @@ class MusicBot(commands.Cog):
         voice_channel.pause()
 
     @commands.command(name="skip",
-                 help="Mit $skip überspringst du den aktuell spielenden Song und der Bot spielt automatisch "
-                      "den nächsten Song in der Queue ab.")
+                      help="Mit $skip überspringst du den aktuell spielenden Song und der Bot spielt automatisch "
+                           "den nächsten Song in der Queue ab.")
     @commands.has_role(config.getBotAdminRole())
     async def skip(self, ctx):
 
@@ -261,7 +271,7 @@ class MusicBot(commands.Cog):
         await ctx.send(f"Skipped the song!", delete_after=5)
         if len(queue) > 0:
             lg.info(f"Removed the song {queue[0]} from the queue")
-            del(queue[0])
+            del (queue[0])
             await self.play(ctx)
 
         else:
@@ -277,7 +287,8 @@ class MusicBot(commands.Cog):
 
         voice_channel.pause()
         lg.info(f"Paused the song currently playing!")
-        await ctx.send(f"Der aktuell spielende Song wurde pausiert. Mit .resume spielt der Song weiter.", delete_after=5)
+        await ctx.send(f"Der aktuell spielende Song wurde pausiert. Mit .resume spielt der Song weiter.",
+                       delete_after=5)
         await logger.log_send(ctx, f"Paused song currently playing!")
 
     @commands.command(name="resume", help="Der pausierte Song wird weiter abgespielt.")
@@ -313,6 +324,10 @@ class MusicBot(commands.Cog):
             voice_client = ctx.message.guild.voice_client
             await voice_client.disconnect()
             lg.info(f"Disconnected from channel {ctx.message.author.voice.channel}")
+
+    @tasks.loop(minutes=5)
+    async def cleanup(self):
+        cleanup.remove_songs()
 
 
 def setup(bot):
