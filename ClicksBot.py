@@ -54,9 +54,14 @@ async def load(ctx, extension):
         extEmbed = discord.Embed(title="Load Extensions", description="Loading all extensions", color=discord.Colour(0x0BAF07), timestamp=datetime.now())
 
         for file in files:
-            bot.load_extension(file)
-            extEmbed.add_field(name=file, value="Load complete")
-            lg_pl.info(f"Loaded the extension: {file[:-3]}")
+            try:
+                bot.load_extension(file)
+                extEmbed.add_field(name=file, value="Load complete")
+                lg_pl.info(f"Loaded the extension: {file[:-3]}")
+
+            except Exception as e:
+                extEmbed.insert_field_at(index=0, name=file, value="Failed to load")
+                lg_pl.info(f"Failed to load extension: {file}")
 
         await ctx.send(embed=extEmbed)
 
@@ -79,10 +84,15 @@ async def reload(ctx, extension):
 
         extEmbed = discord.Embed(title="Reload Extensions", description="Reloading all extensions", color=discord.Colour(0x0BAF07), timestamp=datetime.now())
         for file in files:
+            try:
+                bot.reload_extension(f"cogs.{file}")
+                extEmbed.add_field(name=file, value="Reload complete")
+                lg_pl.info(f"Reloaded the extension: {file}")
 
-            bot.reload_extension(f"cogs.{file}")
-            extEmbed.add_field(name=file, value="Reload complete")
-            lg_pl.info(f"Reloaded the extension: {file}")
+            except Exception as e:
+                extEmbed.insert_field_at(index=0, name=file, value="Failed to reload")
+                lg_pl.info(f"Failed to reload extension: {file}")
+                lg_pl.info(f"Failed with: {e}")
 
         await ctx.send(embed=extEmbed)
             
@@ -108,10 +118,14 @@ async def unload(ctx, extension):
                                  timestamp=datetime.now())
         await ctx.send(embed=extEmbed)
         for file in files:
+            try:
+                bot.unload_extension(f"cogs.{file}")
+                extEmbed.add_field(name=file, value="Unload complete")
+                lg_pl.info(f"Unloaded the extension: {file[:-3]}")
 
-            bot.unload_extension(f"cogs.{file}")
-            extEmbed.add_field(name=file, value="Unload complete")
-            lg_pl.info(f"Unloaded the extension: {file[:-3]}")
+            except Exception as e:
+                extEmbed.insert_field_at(index=0, name=file, value="Failed to unload")
+                lg_pl.info(f"Failed to unload extension: {file}")
 
     else:
         if not str(extension) + ".py" in os.listdir(f"{path}/cogs"):
@@ -124,6 +138,7 @@ async def unload(ctx, extension):
         await ctx.send(embed=extEmbed)
         bot.unload_extension(f"cogs.{extension}")
         lg_pl.info(f"Unloaded the extension: {extension[:-3]}")
+
 
 @bot.event
 async def on_message(message):
@@ -147,8 +162,13 @@ try:
     for filename in os.listdir(f"{path}/cogs"):
         if filename.endswith(".py"):
             if not filename == "example_cog.py":
-                bot.load_extension(f"cogs.{filename[:-3]}")
-                lg_pl.info(f"Loaded Extension: {filename}")
+                try:
+                    bot.load_extension(f"cogs.{filename[:-3]}")
+                    lg_pl.info(f"Loaded Extension: {filename}")
+
+                except Exception as e:
+                    lg_pl.error(f"Failed to load extension: {filename}")
+                    lg_pl.error(f"Failed with: {e}")
 
         else:
             pass
