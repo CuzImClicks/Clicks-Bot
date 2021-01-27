@@ -15,6 +15,20 @@ from util import config
 lg = logging.getLogger(__name__[5:])
 
 
+def translate_state_code(state: int):
+    if state > 3:
+        return "Unknown Code"
+
+    if state == 1:
+        return "online"
+
+    elif state == 2:
+        return "busy"
+
+    elif state == 3:
+        return "away"
+
+
 class SteamAPI_Handler(commands.Cog):
     """A handler for the steam api, I get the key from config.getSteamKey()
     if you want a key for yourself log in on this official steam website
@@ -38,8 +52,8 @@ class SteamAPI_Handler(commands.Cog):
         return JsonFile(name="users.json", path=f"{path}/steam")
 
     @commands.command(name="add_steam_player")
-    @commands.has_role(config.getBotAdminRole())
-    async def add_player(self, ctx, steam_id):
+    @commands.has_role(config.getBotAccessRole())
+    async def add_steam_player(self, ctx, steam_id):
         """Add a player to the steam online task
         by typing the command with the player's steam id"""
         user = User(steam_id)
@@ -47,6 +61,16 @@ class SteamAPI_Handler(commands.Cog):
         user = User(steam_id)
         data[user.name] = {"name": user.name, "steam_id": user.steam_id, "status": False}
         self.jf.write(data)
+
+        infoEmbed = discord.Embed(title="Add Steam Player",
+                                  description="Added player to the list of watched steam profiles",
+                                  colour=config.getDiscordColour("green"))
+        infoEmbed.add_field(name="Name", value=user.name, inline=False)
+        infoEmbed.add_field(name="Steam ID", value=str(user.steam_id))
+        infoEmbed.add_field(name="State", value=translate_state_code(int(user.state)))
+        infoEmbed.set_thumbnail(url=user.avatar)
+
+        await ctx.send(embed=infoEmbed)
 
     @tasks.loop(seconds=20)
     async def online(self):
@@ -57,19 +81,19 @@ class SteamAPI_Handler(commands.Cog):
 
         jf_data = self.jf.read()
         for user in jf_data.keys():
-            #lg.info(f"Checking for user {user}")
             user = User(self.jf.read()[user]["steam_id"])
             status = self.jf.read()[user.name]["status"]
             state = user.state
-            #lg.info(f"{user.name} is currently {user.state} - {status}")
             if status == 0 and state == 1 or status == False and state == 2 or state == 3 and status == False:
-                lg.info(True)
-                infoEmbed = discord.Embed(title="Online", description=f"{user.name} is in Steam now online",
+                lg.info(f"{user.name} is now online - status code: {state}")
+                infoEmbed = discord.Embed(title="Online", description=f"{user.name} is now in Steam  "
+                                                                      f"{translate_state_code(user.state)}",
                                           color=config.getDiscordColour("blue"), timestamp=datetime.now())
+                infoEmbed.set_thumbnail(url=user.avatar)
                 await channel.send(embed=infoEmbed)
 
             elif state == 0 and status == 1:
-                lg.info(False)
+                lg.info(f"{user.name} is now offline")
                 infoEmbed = discord.Embed(title="Online", description=f"{user.name} is in Steam now offline",
                                           color=config.getDiscordColour("blue"), timestamp=datetime.now())
                 await channel.send(embed=infoEmbed)
