@@ -10,7 +10,7 @@ import discord
 from datetime import datetime
 import os
 from util.minecraft import User
-from clicks_util.json_util import json_file
+from clicks_util.json_util import JsonFile
 from util.hypixel.player import Player
 
 key = config.getKey()
@@ -58,7 +58,7 @@ class HypixelAPI_Handler(commands.Cog):
             await asyncio.sleep(5)
             channel = self.player_channel
         async with aiohttp.ClientSession() as session:
-            self.jf = json_file("players.json", f"{path}\cogs")
+            self.jf = JsonFile("players.json", f"{path}\cogs")
             jf_data = self.jf.read()
             for player in jf_data.keys():
                 playername = jf_data[player]["name"]
@@ -109,7 +109,7 @@ class HypixelAPI_Handler(commands.Cog):
             async with aiohttp.ClientSession() as session:
                 async with session.get(f"https://api.hypixel.net/skyblock/bazaar?key={key}&productId={item}") as data:
                     content = json.loads(await data.text())
-                    jf = json_file("bazaar.json", path=f"{path}\hypixel")
+                    jf = JsonFile("bazaar.json", path=f"{path}\hypixel")
                     jf.write(content)
                     if not item in content["products"]:
                         errorEmbed = discord.Embed(title="Bazaar Error",

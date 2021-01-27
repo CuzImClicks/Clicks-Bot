@@ -3,7 +3,7 @@ import logging
 from util import config
 from discord.ext import commands
 import os
-from clicks_util.json_util import json_file
+from clicks_util.json_util import JsonFile
 from datetime import datetime
 
 path = os.getcwd()
@@ -23,7 +23,7 @@ fl.setFormatter(fmt)
 lg.addHandler(fl)
 
 #read the file containing all the blacklisted people
-jf = json_file("blacklist.json", path)
+jf = JsonFile("blacklist.json", path)
 blacklisted = jf.read()["blacklisted"]
 
 #gain the ability to access all guild members

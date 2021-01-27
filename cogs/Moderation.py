@@ -6,7 +6,7 @@ from datetime import datetime
 from util import strings
 from util.logger import *
 from util import config
-from clicks_util.json_util import json_file
+from clicks_util.json_util import JsonFile
 
 lg = logging.getLogger(__name__)
 from util.logger import path
@@ -25,7 +25,7 @@ class Moderation(commands.Cog):
     @commands.has_role(config.getBotAdminRole())
     async def blacklist(self, ctx, target):
 
-        jf = json_file(name="blacklist.json", path=path)
+        jf = JsonFile(name="blacklist.json", path=path)
         infoEmbed = discord.Embed(title="Blacklist",
                                   color=config.getDiscordColour("blue"),
                                   timestamp=datetime.now())
