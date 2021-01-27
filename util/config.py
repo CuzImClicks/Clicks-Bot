@@ -3,9 +3,10 @@ from clicks_util import json_util
 import os
 import discord
 
-path = os.getcwd()
+path = str(os.getcwd())
 
-jf = json_util.json_file("config.json", f"{path}/util")
+
+jf = json_util.JsonFile("config.json", f"{path}/util")
 
 
 def getLoggingLevel():
