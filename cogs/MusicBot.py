@@ -8,6 +8,7 @@ from discord.ext import commands, tasks
 
 from util import config, strings, logger, cleanup
 from util.logger import *
+from discord.utils import get
 
 lg = logging.getLogger(__name__)
 
@@ -48,6 +49,10 @@ class MusicBot(commands.Cog):
     def __init__(self, bot):
 
         self.bot = bot
+        self.cleanup.start()
+
+    def cog_unload(self):
+        self.cleanup.cancel()
 
     @commands.command(name="join", help="Mit .join joint der Musikbot deinem Sprachchannel.")
     @commands.has_role(config.getBotAdminRole())
@@ -56,8 +61,10 @@ class MusicBot(commands.Cog):
         channel = ctx.author.voice.channel
 
         if not ctx.message.author.voice:
-            errorEmbed = discord.Embed(title="Command Error", description="You are not connected to a voice channel",
-                                       color=discord.Colour(0x9D1309), timestamp=datetime.now())
+            errorEmbed = discord.Embed(title="Command Error",
+                                       color=config.getDiscordColour("red"), timestamp=datetime.now())
+            errorEmbed.add_field(name="Error Message", value="You are not connected to a voice channel")
+            errorEmbed.add_field(name="Raised by", value=ctx.author.name)
             await ctx.send(embed=errorEmbed)
             return
 
@@ -69,13 +76,16 @@ class MusicBot(commands.Cog):
                 await channel.connect()
 
             except discord.ClientException:
-                errorEmbed = discord.Embed(title="Command Error", description="Already connected to your voice channel",
-                                           color=discord.Colour(0x9D1309), timestamp=datetime.now())
+                errorEmbed = discord.Embed(title="Command Error",
+                                           color=config.getDiscordColour("red"), timestamp=datetime.now())
+                errorEmbed.add_field(name="Error Message", value="Already connected to your voice channel")
+                errorEmbed.add_field(name="Raised by", value=ctx.author.name)
                 await ctx.send(embed=errorEmbed)
 
         infoEmbed = discord.Embed(title="Join",
-                                  description="If you want to add songs to the queue use .queue, then if you want to play use .play",
-                                  color=discord.Colour(0x000030), timestamp=datetime.now())
+                                  color=config.getDiscordColour("blue"), timestamp=datetime.now())
+        infoEmbed.add_field(name="Channel", value=f"{ctx.author.guild} - {channel}")
+        infoEmbed.add_field(name="Requested by", value=ctx.author)
         await ctx.send(embed=infoEmbed)
 
     @commands.command(name="play", help="Mit .play startest du die Wiedergabe der Musik in deinem Channel."
@@ -102,8 +112,12 @@ class MusicBot(commands.Cog):
                     del (queue[0])
 
                 infoEmbed = discord.Embed(title="Play", description=f"Now playing {player.title}",
-                                          color=discord.Colour(0x000030), timestamp=datetime.now())
+                                          color=config.getDiscordColour("blue"), timestamp=datetime.now())
                 await ctx.send(embed=infoEmbed)
+
+            await self.wait_for_end(guild=ctx.author.guild)
+            if queue:
+                await self.play(ctx)
 
         except IndexError as e:
 
@@ -199,7 +213,7 @@ class MusicBot(commands.Cog):
             else:
                 for i in range(0, len(queue)):
                     await ctx.send("This is the full queue right now:")
-                    await ctx.send(queue[i], delete_after=5)
+                    await ctx.send(queue[i])
                     await log_send(ctx, queue[i])
 
         else:
@@ -210,6 +224,9 @@ class MusicBot(commands.Cog):
                                       color=discord.Colour(0x000030), timestamp=datetime.now())
             await ctx.send(embed=infoEmbed)
             lg.info(args)
+            voice = get(self.bot.voice_clients, guild=ctx.author.guild)
+            if not voice.is_playing():
+                await self.play(ctx)
 
     @commands.command(name="remove")
     @commands.has_role(config.getBotAdminRole())
@@ -252,8 +269,8 @@ class MusicBot(commands.Cog):
 
         queue.clear()
 
-        await ctx.send(f"Cleared the playlist!", delete_after=5)
-        await log_send(ctx, f"Cleared the playlist!")
+        # TODO: convert to embed
+        await ctx.send(f"Cleared the playlist!")
 
         voice_channel.pause()
 
@@ -268,13 +285,14 @@ class MusicBot(commands.Cog):
         server = ctx.message.author.guild
         voice_channel = server.voice_client
 
-        await ctx.send(f"Skipped the song!", delete_after=5)
+        await ctx.send(f"Skipped the song!")
         if len(queue) > 0:
             lg.info(f"Removed the song {queue[0]} from the queue")
             del (queue[0])
             await self.play(ctx)
 
         else:
+            # TODO: convert to embed
             await ctx.send(f"There are no more songs in the queue")
             voice_channel.pause()
 
@@ -287,9 +305,8 @@ class MusicBot(commands.Cog):
 
         voice_channel.pause()
         lg.info(f"Paused the song currently playing!")
-        await ctx.send(f"Der aktuell spielende Song wurde pausiert. Mit .resume spielt der Song weiter.",
-                       delete_after=5)
-        await logger.log_send(ctx, f"Paused song currently playing!")
+        # TODO: convert to embed
+        await ctx.send(f"Der aktuell spielende Song wurde pausiert. Mit .resume spielt der Song weiter.")
 
     @commands.command(name="resume", help="Der pausierte Song wird weiter abgespielt.")
     @commands.has_role(config.getBotAdminRole())
@@ -300,9 +317,8 @@ class MusicBot(commands.Cog):
 
         voice_channel.resume()
         lg.info(f"Resumed the song currently playing!")
-
-        await ctx.send(f"Resumed song currently playing!", delete_after=5)
-        await logger.log_send(ctx, f"Resumed song currently playing!")
+        #TODO: convert to embed
+        await ctx.send(f"Resumed song currently playing!")
 
     @commands.command(name="volume")
     @commands.has_role(config.getBotAdminRole())
@@ -315,8 +331,8 @@ class MusicBot(commands.Cog):
     async def leave(self, ctx):
 
         if not ctx.message.author.voice:
-
-            await ctx.send("You are not connected to a voice channel!", delete_after=5)
+            #TODO: convert to embed
+            await ctx.send("You are not connected to a voice channel!")
             return
 
         else:
