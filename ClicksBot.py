@@ -154,6 +154,9 @@ async def on_message(message):
         #Blacklisted people can't send messages on servers that the bot is running on
         lg_pl.info(f"Blacklisted user {message.author.name} tried to send '{message.content}' in the channel {message.channel}")
         return
+
+    elif message.channel.id == 799291117425524756:
+        await message.delete()
     
     lg_chat.info(f"[{message.guild}] -  {message.channel}: {message.author.name}: {message.content}")
     await bot.process_commands(message)
