@@ -113,6 +113,9 @@ class MusicBot(commands.Cog):
 
                 infoEmbed = discord.Embed(title="Play", description=f"Now playing {player.title}",
                                           color=config.getDiscordColour("blue"), timestamp=datetime.now())
+                infoEmbed.set_thumbnail(url=f"https://img.youtube.com/vi/{str(last_song).split('=')[1]}/sddefault.jpg")
+                lg.info(f"Downloading the song thumbnail from "
+                        + f"https://img.youtube.com/vi/{str(last_song).split('=')[1]}/sddefault.jpg")
                 await ctx.send(embed=infoEmbed)
 
             await self.wait_for_end(guild=ctx.author.guild)
@@ -181,17 +184,24 @@ class MusicBot(commands.Cog):
 
         infoEmbed = discord.Embed(title="Shutdown", description=responses[0], color=discord.Colour(0x000030),
                                   timestamp=datetime.now())
-        await ctx.send(choice(embed=infoEmbed))
+        await ctx.send(embed=infoEmbed)
 
     @commands.command(name="loop", help="Continues to play the same song")
     @commands.has_role(config.getBotAdminRole())
     async def loop(self, ctx, *args):
         global queue, loop
-        loop = True
-        queue.append(last_song)
-        infoEmbed = discord.Embed(title="Loop", description="Looping song", color=discord.Colour(0x000030),
-                                  timestamp=datetime.now())
-        await ctx.send(embed=infoEmbed)
+        if not loop:
+            loop = True
+            queue.append(last_song)
+            infoEmbed = discord.Embed(title="Loop", description="Looping song", color=discord.Colour(0x000030),
+                                      timestamp=datetime.now())
+            await ctx.send(embed=infoEmbed)
+
+        elif loop:
+            loop = False
+            infoEmbed = discord.Embed(title="Loop", description="Not looping song anymore", color=discord.Colour(0x000030),
+                                      timestamp=datetime.now())
+            await ctx.send(embed=infoEmbed)
 
     @commands.command(name="queue", help=strings.get_help("queue_help"))
     @commands.has_role(config.getBotAdminRole())
@@ -211,10 +221,9 @@ class MusicBot(commands.Cog):
                 await ctx.send(embed=errorEmbed)
 
             else:
+                infoEmbed = discord.Embed(title="Queue", description="This is the full queue right now")
                 for i in range(0, len(queue)):
-                    await ctx.send("This is the full queue right now:")
-                    await ctx.send(queue[i])
-                    await log_send(ctx, queue[i])
+                    infoEmbed.add_field(name="Song", value=queue[i])
 
         else:
 
@@ -222,6 +231,8 @@ class MusicBot(commands.Cog):
             lg.info(f"Added {url} to queue")
             infoEmbed = discord.Embed(title="Queue", description=f"Added {url} to the queue",
                                       color=discord.Colour(0x000030), timestamp=datetime.now())
+            infoEmbed.set_thumbnail(url=f"https://img.youtube.com/vi/{str(url).split('=')[1]}/sddefault.jpg")
+            infoEmbed.set_author(name=ctx.author, url=ctx.author.avatar_url)
             await ctx.send(embed=infoEmbed)
             lg.info(args)
             voice = get(self.bot.voice_clients, guild=ctx.author.guild)
@@ -292,8 +303,10 @@ class MusicBot(commands.Cog):
             await self.play(ctx)
 
         else:
-            # TODO: convert to embed
-            await ctx.send(f"There are no more songs in the queue")
+            infoEmbed = discord.Embed(title="Queue Error",
+                                      colour=config.getDiscordColour("red"))
+            infoEmbed.add_field(name="Error Message", value=f"There are no more songs in the queue")
+            infoEmbed.set_author(name=ctx.author, url=ctx.author.avatar_url)
             voice_channel.pause()
 
     @commands.command(name="pause", help="Pausiert den aktuell spielenden Song.")
@@ -343,7 +356,8 @@ class MusicBot(commands.Cog):
 
     @tasks.loop(minutes=5)
     async def cleanup(self):
-        cleanup.remove_songs()
+        lg.info(f"Cleaning up the song files...")
+        await cleanup.remove_songs()
 
 
 def setup(bot):
