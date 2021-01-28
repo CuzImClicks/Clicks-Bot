@@ -7,7 +7,8 @@ Created on 28.10.2020
 import json
 import os
 
-class json_file:
+
+class JsonFile:
     
     def __init__(self, name, path):
         
@@ -27,14 +28,13 @@ class json_file:
             
             f.close()   
             
-    def read(self):
+    def read(self) -> dict:
         
         with open(self.full_path, "r") as f:
             
             data = json.load(f)
             f.close()
             return data
-        
         
     def move(self, new_path):
 
@@ -44,7 +44,6 @@ class json_file:
         except Exception as e:
 
             print(e)
-            
             
     def rename(self, new_name):
 
