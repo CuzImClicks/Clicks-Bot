@@ -27,7 +27,7 @@ jf = JsonFile("blacklist.json", path)
 blacklisted = jf.read()["blacklisted"]
 
 #gain the ability to access all guild members
-intentions = discord.Intents.default()
+intentions = discord.Intents.all()
 intentions.members = True
 
 bot = commands.Bot(command_prefix=config.getCommandPrefix(), intents=intentions)
