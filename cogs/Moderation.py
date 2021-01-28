@@ -2,7 +2,7 @@ import logging
 import discord
 from discord.ext import commands
 from datetime import datetime
-
+from discord.utils import get
 from util import strings
 from util.logger import *
 from util import config
@@ -247,6 +247,35 @@ class Moderation(commands.Cog):
         infoEmbed.set_footer(text=str(user.id))
 
         await ctx.send(embed=infoEmbed)
+
+    @commands.command(name="add_role", aliases=["create_role"])
+    @commands.has_role(config.getBotAdminRole())
+    async def add_role(self, ctx):
+        user = ctx.message.mentions[0]
+        role = ctx.message.role_mentions[0]
+        lg.info(type(role))
+        infoEmbed = discord.Embed(title="Add Role",
+                                  colour=config.getDiscordColour("green"))
+        infoEmbed.add_field(name="Role", value=role, inline=False)
+        infoEmbed.add_field(name="User", value=user.name, inline=False)
+        await user.add_roles(role)
+        await ctx.send(embed=infoEmbed)
+
+    @commands.command(name="remove_role", aliases=["rem_role"])
+    @commands.has_role(config.getBotAdminRole())
+    async def remove_role(self, ctx):
+        user = ctx.message.mentions[0]
+        role = ctx.message.role_mentions[0]
+        lg.info(type(role))
+        infoEmbed = discord.Embed(title="Remove Role",
+                                  colour=config.getDiscordColour("green"))
+        infoEmbed.add_field(name="Role", value=role, inline=False)
+        infoEmbed.add_field(name="User", value=user.name, inline=False)
+        await user.remove_roles(role)
+        await ctx.send(embed=infoEmbed)
+
+
+
 
 
 def setup(bot):
