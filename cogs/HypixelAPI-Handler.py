@@ -150,6 +150,8 @@ class HypixelAPI_Handler(commands.Cog):
                                        timestamp=datetime.now())
             await ctx.send(embed=errorEmbed)
 
+    #TODO: Add auctions
+
     @commands.command(name="fairy_souls")
     @commands.has_role(config.getDefaultRole())
     async def fairy_souls(self, ctx, playername):
@@ -163,6 +165,15 @@ class HypixelAPI_Handler(commands.Cog):
             infoEmbed.add_field(name=profile, value=f"{skyblock.profiles[profile].fairy_souls_collected} of 220")
 
         await ctx.send(embed=infoEmbed)
+
+    @commands.command(name="skyblock_infos")
+    @commands.has_role(config.getBotAdminRole())
+    async def skyblock_infos(self, ctx):
+        lg.info(os.getcwd())
+        with open(f"{os.getcwd()}/hypixel/Cuz_Im_Clicks-Skyblock.json") as f:
+            data = dict(json.load(f))["Kiwi"]["profile"]["members"]["9c9cac92358e47b88697f1df72f0e3b5"]
+            keys = list(data.keys())
+            await ctx.send(keys)
 
 
 def setup(bot):
