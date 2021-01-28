@@ -9,6 +9,7 @@ import asyncio
 import discord
 from datetime import datetime
 import os
+from varname import nameof
 from util.minecraft import User
 from clicks_util.json_util import JsonFile
 from util.hypixel.player import Player
@@ -156,7 +157,6 @@ class HypixelAPI_Handler(commands.Cog):
     @commands.has_role(config.getDefaultRole())
     async def fairy_souls(self, ctx, playername):
         """Get the collected fairy souls of a player"""
-        lg.info(playername)
         pl = Player(playername)
         skyblock = pl.SkyBlock(pl.data, pl.name, pl.uuid)
         infoEmbed = discord.Embed(title="Fairy Souls",
@@ -165,15 +165,6 @@ class HypixelAPI_Handler(commands.Cog):
             infoEmbed.add_field(name=profile, value=f"{skyblock.profiles[profile].fairy_souls_collected} of 220")
 
         await ctx.send(embed=infoEmbed)
-
-    @commands.command(name="skyblock_infos")
-    @commands.has_role(config.getBotAdminRole())
-    async def skyblock_infos(self, ctx):
-        lg.info(os.getcwd())
-        with open(f"{os.getcwd()}/hypixel/Cuz_Im_Clicks-Skyblock.json") as f:
-            data = dict(json.load(f))["Kiwi"]["profile"]["members"]["9c9cac92358e47b88697f1df72f0e3b5"]
-            keys = list(data.keys())
-            await ctx.send(keys)
 
 
 def setup(bot):
