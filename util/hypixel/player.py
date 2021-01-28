@@ -1,5 +1,5 @@
 import json
-
+from datetime import datetime
 import aiohttp
 import requests
 from util.minecraft import User
@@ -77,18 +77,148 @@ class Player:
             def name(self):
                 return self.profile["cute_name"]
 
-            @property
-            def fairy_souls_collected(self):
-                return self.data_profile["fairy_souls_collected"]
+            class User:
 
-            @property
-            def stats(self):
-                return self.data_profile["stats"]
+                def __init__(self, profile_data):
+                    self.profile_data = profile_data
+                    self.stats = self.Stats(self.profile_data["stats"])
+                    self.slayers = list()
+                    for slayerboss in list(self.profile_data["slayer"].values()):
+                        self.slayers.append(self.SlayerBoss(slayerboss, self.profile_data["slayer_bosses"][slayerboss]))
 
-            @property
-            def death_count(self):
-                return self.data_profile["death_count"]
+                @property
+                def fairy_souls_collected(self):
+                    return self.profile_data["fairy_souls_collected"]
 
-            @property
-            def slayer(self):
-                return self.data_profile["slayer"]
+                @property
+                def death_count(self):
+                    return self.profile_data["death_count"]
+
+                @property
+                def last_save(self):
+                    return datetime.fromtimestamp(int(self.profile_data["last_save"]))
+
+                @property
+                def inv_armor(self):
+                    return str(self.profile_data["inv_armor"]["data"]).split("/")
+
+                @property
+                def coop_invitation(self):
+                    return self.profile_data["coop_invitation"]
+
+                @property
+                def first_join(self):
+                    return self.profile_data["first_join"]
+
+                @property
+                def first_join_hub(self):
+                    return self.profile_data["first_join_hub"]
+
+                class Stats:
+
+                    def __init__(self, stats):
+
+                        self.stats = dict(stats)
+
+                    @property
+                    def deaths(self):
+                        return self.stats["deaths"]
+
+                    @property
+                    def deaths_void(self):
+                        return self.stats["deaths_void"]
+
+                    @property
+                    def highest_critical_damage(self):
+                        return self.stats["highest_critical_damage"]
+
+                    @property
+                    def kills(self):
+                        return self.stats["kills"]
+
+                    @property
+                    def auctions_bids(self):
+                        return self.stats["auctions_bids"]
+
+                    @property
+                    def auctions_highest_bid(self):
+                        return self.stats["auctions_highest_bid"]
+
+                    @property
+                    def auctions_won(self):
+                        return self.stats["auctions_won"]
+
+                    @property
+                    def auctions_gold_spent(self):
+                        return self.stats["auctions_gold_spent"]
+
+                    @property
+                    def ender_crystals_destroyed(self):
+                        return self.stats["ender_crystals_destroyed"]
+
+                @property
+                def coin_purse(self):
+                    self.profile_data["coin_purse"]
+
+                @property
+                def last_death(self):
+                    return self.profile_data["last_death"]
+
+                @property
+                def fairy_exchanges(self):
+                    return self.profile_data["fairy_exchanges"]
+
+                class SlayerBoss:
+
+                    def __init__(self, name, slayer_data):
+
+                        self.slayer_data = slayer_data
+                        self.name = name
+
+                    @property
+                    def claimed_levels(self):
+                        return list(self.slayer_data["claimed_levels"].values())
+
+                    @property
+                    def xp(self):
+                        return self.slayer_data["xp"]
+
+                class Pet:
+
+                    def __init__(self, pet_data):
+
+                        self.pet_data = pet_data
+
+                    @property
+                    def uuid(self):
+                        return self.pet_data["uuid"]
+
+                    @property
+                    def name(self):
+                        return str(self.pet_data["type"]).lower()
+
+                    @property
+                    def exp(self):
+                        return self.pet_data["exp"]
+
+                    @property
+                    def active(self):
+                        return self.pet_data["active"]
+
+                    @property
+                    def tier(self):
+                        return str(self.pet_data["tier"]).lower()
+
+                    @property
+                    def heldItem(self):
+                        return self.pet_data["heldItem"]
+
+                    @property
+                    def candyUsed(self):
+                        return self.pet_data["candyUsed"]
+
+                    @property
+                    def skin(self):
+                        return self.pet_data["skin"]
+
+
