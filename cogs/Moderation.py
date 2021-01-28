@@ -7,13 +7,11 @@ from util import strings
 from util.logger import *
 from util import config
 from clicks_util.json_util import JsonFile
-
-lg = logging.getLogger(__name__)
 from util.logger import path
 import logging
-fl = logging.FileHandler(f"{path}\logs\log.log")
-fl.setLevel(logging.INFO)
-lg.addHandler(fl)
+
+
+lg = logging.getLogger(__name__)
 
 
 class Moderation(commands.Cog):
@@ -51,7 +49,8 @@ class Moderation(commands.Cog):
         user = discord.utils.get(ctx.author.guild.members, name=str(target))
 
         lg.info(user.name)
-        muteEmbed = discord.Embed(title="Mute", description=f"Muted {user.name}", color=discord.Colour(0x000030), timestamp=datetime.now())
+        muteEmbed = discord.Embed(title="Mute", description=f"Muted {user.name}", color=discord.Colour(0x000030),
+                                  timestamp=datetime.now())
         await ctx.send(embed=muteEmbed)
 
         lg.info(f"Muted {user.name}")
@@ -64,7 +63,8 @@ class Moderation(commands.Cog):
         user = discord.utils.get(ctx.author.guild.members, name=str(target))
 
         lg.info(user)
-        unmuteEmbed = discord.Embed(title="Unmute", description=f"Unmuted {user.name}", color=discord.Colour(0x000030), timestamp=datetime.now())
+        unmuteEmbed = discord.Embed(title="Unmute", description=f"Unmuted {user.name}", color=discord.Colour(0x000030),
+                                    timestamp=datetime.now())
         await ctx.send(embed=unmuteEmbed)
 
         lg.info(f"Unmuted {user.name}")
@@ -76,7 +76,8 @@ class Moderation(commands.Cog):
 
         user = discord.utils.get(ctx.author.guild.members, name=str(target))
 
-        kickEmbed = discord.Embed(title="Kick", description=f"Kicked {user.name} from the server", color=discord.Colour(0x000030), timestamp=datetime.now())
+        kickEmbed = discord.Embed(title="Kick", description=f"Kicked {user.name} from the server",
+                                  color=discord.Colour(0x000030), timestamp=datetime.now())
         await ctx.send(embed=kickEmbed)
         await self.bot.kick(user)
 
@@ -94,11 +95,13 @@ class Moderation(commands.Cog):
                     await user.edit(mute=True)
                     lg.info(f"Muted user: {user.nick}")
 
-            maEmbed = discord.Embed(title="Mute All", description=f"Muted all users in {ctx.author.voice.channel.name}", color=discord.Color(0x9D1309), timestamp=datetime.now())
+            maEmbed = discord.Embed(title="Mute All", description=f"Muted all users in {ctx.author.voice.channel.name}",
+                                    color=discord.Color(0x9D1309), timestamp=datetime.now())
             await ctx.send(embed=maEmbed)
 
         except Exception as e:
-            errorEmbed = discord.Embed(title="Command Error", description="You're not in a voice channel", color=discord.Colour(0x000030), timestamp=datetime.now())
+            errorEmbed = discord.Embed(title="Command Error", description="You're not in a voice channel",
+                                       color=discord.Colour(0x000030), timestamp=datetime.now())
             await ctx.send(embed=errorEmbed)
             lg.error(e)
 
@@ -125,7 +128,8 @@ class Moderation(commands.Cog):
     async def lock(self, ctx):
         try:
             await ctx.author.voice.channel.edit(user_limit=len(ctx.author.voice.channel.members))
-            lg.info(f"Locked the channel {ctx.author.voice.channel.name} to a maximum of {len(ctx.author.voice.channel.members)}")
+            lg.info(
+                f"Locked the channel {ctx.author.voice.channel.name} to a maximum of {len(ctx.author.voice.channel.members)}")
             infoEmbed = discord.Embed(title="Lock",
                                       description=f"Locked the channel {ctx.author.voice.channel.name} to a maximum"
                                                   f" of {len(ctx.author.voice.channel.members)}",
@@ -167,7 +171,8 @@ class Moderation(commands.Cog):
 
         if str(args[0]) == "servers":
 
-            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=f"Online on {len(self.bot.guilds)} servers"))
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing,
+                                                                     name=f"Online on {len(self.bot.guilds)} servers"))
             lg.info(f"Changed the status to: Online on {len(self.bot.guilds)} servers")
             await ctx.send(f"Changed status to: Online on {len(self.bot.guilds)} servers", delete_after=5)
 
@@ -217,6 +222,31 @@ class Moderation(commands.Cog):
         await log_send(ctx, shutdown_msg)
         await lg.warning(f"Shutting down")
         await ctx.bot.logout()
+
+    @commands.command(name="info")
+    @commands.has_role(config.getBotAdminRole())
+    async def info(self, ctx):
+
+        user = ctx.message.mentions[0]
+
+        infoEmbed = discord.Embed(title="Informations",
+                                  colour=config.getDiscordColour("blue"))
+        infoEmbed.set_author(name=user.name, icon_url=user.avatar_url)
+        infoEmbed.add_field(name="Name", value=user.name)
+        infoEmbed.add_field(name="Discriminator", value=user.discriminator)
+        infoEmbed.add_field(name="Nick", value=user.nick, inline=False)
+        lg.info(user.activity)
+        if user.activity:
+            infoEmbed.add_field(name="Type", value=user.activity.type.name)
+            infoEmbed.add_field(name="Activity", value=user.activity.name)
+        infoEmbed.set_thumbnail(url=user.avatar_url)
+        infoEmbed.add_field(name="Status", value=user.status, inline=False)
+        infoEmbed.add_field(name="Mobile", value=user.is_on_mobile())
+        infoEmbed.add_field(name="Joined at", value=str(user.joined_at)[:-7])
+        infoEmbed.add_field(name="Roles", value=str([role.name for role in user.roles]), inline=False)
+        infoEmbed.set_footer(text=str(user.id))
+
+        await ctx.send(embed=infoEmbed)
 
 
 def setup(bot):
