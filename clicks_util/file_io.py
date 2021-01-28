@@ -1,11 +1,11 @@
-'''
-Dateien umbenennen, löschen, erstellen, verschieben.
-Mit File("name der datei", "path der datei") ein Datei Objekt erstellen.
-'''
 
 import os 
 
 class File:
+    '''
+    Dateien umbenennen, lï¿½schen, erstellen, verschieben.
+    Mit File("name der datei", "path der datei") ein Datei Objekt erstellen.
+    '''
 
     def init(self, name, path):
 
@@ -75,4 +75,4 @@ def remove(path):
 
     except Exception as e:
         
-        print(e)
+        pass
