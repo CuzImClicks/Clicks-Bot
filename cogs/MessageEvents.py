@@ -9,8 +9,6 @@ import os
 
 lg = logging.getLogger(__name__)
 lg_chat = logging.getLogger("CHAT")
-#TODO: revert path
-#path = os.getcwd()
 from util.logger import path
 import logging
 fl = logging.FileHandler(f"{path}\logs\log.log")
