@@ -5,13 +5,14 @@ import logging
 from util import logger
 from util.logger import path
 from datetime import datetime
-
+from util import config
 lg = logging.getLogger(__name__)
 import logging
 fl = logging.FileHandler(f"{path}\logs\log.log")
 fl.setLevel(logging.INFO)
 lg.addHandler(fl)
 
+#TODO: convert all embed colours to config.getDiscordColour()
 
 class CommandEvents(commands.Cog):
     '''
@@ -22,11 +23,6 @@ class CommandEvents(commands.Cog):
 
         self.bot = client
 
-    '''    async def delete_cmd(self, ctx):
-
-        time.sleep(5)
-        await ctx.message.delete()'''
-
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
 
@@ -34,7 +30,7 @@ class CommandEvents(commands.Cog):
         if isinstance(error, commands.errors.CheckFailure):
 
             error_msg = "Du hast nicht genügend Rechte für diesen Befehl!"
-            errorEmbed = discord.Embed(title="Command Error", color = discord.Colour(0x9D1309), timestamp=time_now)
+            errorEmbed = discord.Embed(title="Command Error", colour=config.getDiscordColour("red"), timestamp=time_now)
             errorEmbed.add_field(name="Error Message", value=error_msg)
             errorEmbed.add_field(name="Raised by", value=ctx.author.name)
             await ctx.send(embed=errorEmbed)
