@@ -1,98 +1,81 @@
-from flask import Flask, url_for, redirect, request, jsonify, send_file
+from fastapi import FastAPI, status
+from fastapi.responses import FileResponse
 from web_server.database import *
+from clicks_util import logger
 from PIL import Image
+import asyncio
+import logging
+from util.hypixel.player import Player
 
-server = Flask(__name__)
+server = FastAPI()
 
-users = {"henrik": {"name": "henrik hoppe", "alter": 15}}
-
-
-@server.route("/")
-def index():
-    return redirect(url_for("api_key"))
+lg = logging.getLogger(__name__)
 
 
-@server.route("/api/users", methods=["GET"])
-def api_users():
-    print(request.args)
-    req = dict(request.args)
-    try:
-        key = req["key"]
-    except KeyError:
-        print({"success": False, "error": "No API-Key provided"})
-        return jsonify({"success": False, "error": "No API-Key provided"})
+@server.get("/")
+async def index():
+    return {"message": "Clicks Bot API"}
 
-    try:
-        name = req["name"]
 
-    except KeyError:
-        print({"success": False, "error": "No name provided"})
-        return jsonify({"success": False, "error": "No name provided"})
+@server.get("/api", status_code=status.HTTP_200_OK)
+async def api(key: str = ""):
+    key_valid = check_key(key)
+    lg.info(key_valid)
+    return {"key": key_valid}
 
-    try:
-        user = users[req["name"]]
 
-    except KeyError:
-        print({"success": False, "error": "User not found"})
-        return jsonify({"success": False, "error": "User not found"})
+@server.get("/api/assets/steam_icon")
+async def steam_icon(key: str = ""):
+    if not check_key(key):
+        return status.HTTP_401_UNAUTHORIZED
 
-    if key and name and user:
-        print(user, key)
-        if check_key(key):
-            return jsonify({"success": True, "user": user})
+    else:
+        return FileResponse(f"{os.getcwd()}/assets/steam_icon.jpg")
+
+
+@server.get("/api/assets/Clicks-Bot_API")
+async def steam_icon(key: str = ""):
+    if not check_key(key):
+        return status.HTTP_401_UNAUTHORIZED
+
+    else:
+        return FileResponse(f"{os.getcwd()}/assets/Clicks-Bot API.jpg")
+
+
+@server.get("/api/Hypixel")
+async def hypixel(key: str = "", username: str = ""):
+    if not check_key(key):
+        return status.HTTP_401_UNAUTHORIZED
+
+    else:
+        pl = Player(username)
+
+        return pl.data
+
+
+@server.get("/api/Hypixel/SkyBlock")
+async def hypixel(key: str = "", username: str = ""):
+    if not check_key(key):
+        return status.HTTP_401_UNAUTHORIZED
+
+    else:
+        pl = Player(username)
+
+        return pl.skyblock.profiles
+
+
+@server.get("/api/steam")
+async def steam(key: str = "", username: str = ""):
+    if not check_key(key):
+        return status.HTTP_401_UNAUTHORIZED
+
+    else:
+        lg.info(os.getcwd())
+
+        data = json.load(open(f"{os.getcwd()}/steam/users.json"))
+        if username in data.keys():
+            return data[username]
 
         else:
-            return jsonify({"success": False, "error": "Invalid key provided"})
+            return status.HTTP_204_NO_CONTENT
 
-    else:
-        return jsonify({"success": True, "error": "Internal error"})
-
-
-@server.route("/api/key")
-def api_key():
-
-    print(request.args)
-    req = dict(request.args)
-
-    try:
-        user_name = req["name"]
-
-    except KeyError:
-        return jsonify({"success": False, "error": "No name provided"})
-
-    if not check_for_key(user_name):
-        key = create_key(user_name)
-        return jsonify({"success": True, "key": key})
-
-    else:
-        return jsonify({"success": False, "key": get_key(user_name)})
-
-
-@server.route("/assets/steam_icon")
-def steam_icon():
-
-    req = dict(request.args)
-    try:
-        key = req["key"]
-    except KeyError:
-        print({"success": False, "error": "No API-Key provided"})
-        return jsonify({"success": False, "error": "No API-Key provided"})
-
-    return send_file(f"{os.getcwd()}/assets/steam_icon.jpg")
-
-
-@server.route("/assets/Clicks-BotAPI")
-def clicksapi_picture():
-
-    req = dict(request.args)
-    try:
-        key = req["key"]
-    except KeyError:
-        print({"success": False, "error": "No API-Key provided"})
-        return jsonify({"success": False, "error": "No API-Key provided"})
-
-    return send_file(f"{os.getcwd()}/assets/Clicks-Bot API.jpg")
-
-
-async def run(debug=False):
-    server.run(debug=debug)
