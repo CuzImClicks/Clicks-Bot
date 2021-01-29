@@ -85,7 +85,7 @@ class MusicBot(commands.Cog):
         infoEmbed = discord.Embed(title="Join",
                                   color=config.getDiscordColour("blue"), timestamp=datetime.now())
         infoEmbed.add_field(name="Channel", value=f"{ctx.author.guild} - {channel}")
-        infoEmbed.add_field(name="Requested by", value=ctx.author)
+        infoEmbed.set_author(name=ctx.author, url=ctx.author.avatar_url)
         await ctx.send(embed=infoEmbed)
 
     @commands.command(name="play", help="Mit .play startest du die Wiedergabe der Musik in deinem Channel."
