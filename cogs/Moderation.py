@@ -235,7 +235,6 @@ class Moderation(commands.Cog):
         infoEmbed.add_field(name="Name", value=user.name)
         infoEmbed.add_field(name="Discriminator", value=user.discriminator)
         infoEmbed.add_field(name="Nick", value=user.nick, inline=False)
-        lg.info(user.activity)
         if user.activity:
             infoEmbed.add_field(name="Type", value=user.activity.type.name)
             infoEmbed.add_field(name="Activity", value=user.activity.name)
@@ -243,7 +242,9 @@ class Moderation(commands.Cog):
         infoEmbed.add_field(name="Status", value=user.status, inline=False)
         infoEmbed.add_field(name="Mobile", value=user.is_on_mobile())
         infoEmbed.add_field(name="Joined at", value=str(user.joined_at)[:-7])
-        infoEmbed.add_field(name="Roles", value=str([role.name for role in user.roles]), inline=False)
+        roles = [role.name for role in user.roles]
+        roles.reverse()
+        infoEmbed.add_field(name="Roles", value=str(roles), inline=False)
         infoEmbed.set_footer(text=str(user.id))
 
         await ctx.send(embed=infoEmbed)
