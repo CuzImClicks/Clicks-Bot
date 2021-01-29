@@ -55,5 +55,5 @@ class User:
     def avatar(self) -> str:
         return str(self.player["avatarmedium"])
 
-    def save(self):
-        jf = JsonFile(name="")
+    def __dict__(self):
+        return {self.name: {"name": self.name, "steam_id": self.steam_id, "state": self.state}}
