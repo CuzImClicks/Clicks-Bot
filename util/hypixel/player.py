@@ -59,6 +59,7 @@ class Player:
             def __init__(self, profile: dict, uuid: str):
                 self.profile = profile
                 self.uuid = uuid
+                self.user = self.User(self.data_profile)
 
             @property
             def content(self):
@@ -83,8 +84,9 @@ class Player:
                     self.profile_data = profile_data
                     self.stats = self.Stats(self.profile_data["stats"])
                     self.slayers = list()
-                    for slayerboss in list(self.profile_data["slayer"].values()):
-                        self.slayers.append(self.SlayerBoss(slayerboss, self.profile_data["slayer_bosses"][slayerboss]))
+                    #FIXME: TypeError: unhashable type: 'dict'
+                    #for slayerboss in list(self.profile_data["slayer_bosses"].values()):
+                    #    self.slayers.append(self.SlayerBoss(slayerboss, self.profile_data["slayer_bosses"][slayerboss]))
 
                 @property
                 def fairy_souls_collected(self):
@@ -96,6 +98,7 @@ class Player:
 
                 @property
                 def last_save(self):
+                    #FIXME: OSError: [Errno 22] Invalid argument
                     return datetime.fromtimestamp(int(self.profile_data["last_save"]))
 
                 @property
@@ -156,8 +159,23 @@ class Player:
                     def ender_crystals_destroyed(self):
                         return self.stats["ender_crystals_destroyed"]
 
+                    def important_dict(self):
+                        return {"stats": {"deaths": self.deaths,
+                         "deaths_void": self.deaths_void,
+                          "highest_critical_damage": self.highest_critical_damage,
+                          "kills": self.kills,
+                          "auctions_bids": self.auctions_bids,
+                          "auctions_highest_bid": self.auctions_highest_bid,
+                          "auctions_won": self.auctions_won,
+                          "auctions_gold_spent": self.auctions_gold_spent,
+                          "ender_crystals_destroyed": self.ender_crystals_destroyed}}
+
+                    def __dict__(self):
+                        return self.stats
+
                 @property
                 def coin_purse(self):
+                    #FIXME: returns None
                     self.profile_data["coin_purse"]
 
                 @property
