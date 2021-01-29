@@ -5,10 +5,13 @@ from discord.ext import commands
 import os
 from clicks_util.json_util import JsonFile
 from datetime import datetime
+import colorama
+
+colorama.init()
 
 path = os.getcwd()
 
-logging.basicConfig(level=logging.INFO, format="\u001b[37m[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
+logging.basicConfig(level=logging.INFO, format="[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s"+colorama.Fore.RESET, datefmt="%H:%M:%S")
 
 lg = logging.getLogger("Clicks-Bot")
 lg_pl = logging.getLogger("Extension Loader")
@@ -57,11 +60,11 @@ async def load(ctx, extension):
             try:
                 bot.load_extension(file)
                 extEmbed.add_field(name=file, value="Load complete")
-                lg_pl.info(f"Loaded the extension: {file[:-3]}")
+                lg_pl.info(f"{colorama.Fore.LIGHTGREEN_EX}Loaded the extension: {file[:-3]}")
 
             except Exception as e:
                 extEmbed.insert_field_at(index=0, name=file, value="Failed to load")
-                lg_pl.info(f"Failed to load extension: {file}")
+                lg_pl.info(f"{colorama.Fore.LIGHTRED_EX}Failed to load extension: {file}")
 
         await ctx.send(embed=extEmbed)
 
@@ -73,7 +76,7 @@ async def load(ctx, extension):
             embed=discord.Embed(title="Loading Extensions", description=f"Loading extension '{extension}'",
                                 color=discord.Colour(0x0BAF07)))
         bot.load_extension(f"cogs.{extension}")
-        lg_pl.info(f"Loading extension: {extension}")
+        lg_pl.info(f"{colorama.Fore.LIGHTGREEN_EX}Loading extension: {extension}")
 
 
 @bot.command(name="reload", aliases=["rl"])
@@ -87,12 +90,12 @@ async def reload(ctx, extension):
             try:
                 bot.reload_extension(f"cogs.{file}")
                 extEmbed.add_field(name=file, value="Reload complete")
-                lg_pl.info(f"Reloaded the extension: {file}")
+                lg_pl.info(f"{colorama.Fore.LIGHTGREEN_EX}Reloaded the extension: {file}")
 
             except Exception as e:
                 extEmbed.insert_field_at(index=0, name=file, value="Failed to reload")
-                lg_pl.info(f"Failed to reload extension: {file}")
-                lg_pl.info(f"Failed with: {e}")
+                lg_pl.info(f"{colorama.Fore.LIGHTRED_EX}Failed to reload extension: {file}")
+                lg_pl.info(f"{colorama.Fore.LIGHTRED_EX}Failed with: {e}")
 
         await ctx.send(embed=extEmbed)
             
@@ -104,7 +107,7 @@ async def reload(ctx, extension):
         await ctx.send(embed=discord.Embed(title="Reloading Extensions",
                                            description=f"Reloading extension '{extension}'",
                                            color=discord.Colour(0x0BAF07)))
-        lg_pl.info(f"Reloaded the extension: {extension}")
+        lg_pl.info(f"{colorama.Fore.LIGHTGREEN_EX}Reloaded the extension: {extension}")
 
 
 @bot.command(name="unload", aliases=["ul"])
@@ -121,11 +124,11 @@ async def unload(ctx, extension):
             try:
                 bot.unload_extension(f"cogs.{file}")
                 extEmbed.add_field(name=file, value="Unload complete")
-                lg_pl.info(f"Unloaded the extension: {file[:-3]}")
+                lg_pl.info(f"{colorama.Fore.LIGHTGREEN_EX}Unloaded the extension: {file[:-3]}")
 
             except Exception as e:
                 extEmbed.insert_field_at(index=0, name=file, value="Failed to unload")
-                lg_pl.info(f"Failed to unload extension: {file}")
+                lg_pl.info(f"{colorama.Fore.LIGHTRED_EX}Failed to unload extension: {file}")
 
     else:
         if not str(extension) + ".py" in os.listdir(f"{path}/cogs"):
@@ -137,7 +140,7 @@ async def unload(ctx, extension):
                                  timestamp=datetime.now())
         await ctx.send(embed=extEmbed)
         bot.unload_extension(f"cogs.{extension}")
-        lg_pl.info(f"Unloaded the extension: {extension[:-3]}")
+        lg_pl.info(f"{colorama.Fore.LIGHTGREEN_EX}Unloaded the extension: {extension[:-3]}")
 
 
 @bot.event
@@ -158,7 +161,7 @@ async def on_message(message):
     elif message.channel.id == 799291117425524756:
         await message.delete()
     
-    lg_chat.info(f"[{message.guild}] -  {message.channel}: {message.author.name}: {message.content}")
+    lg_chat.info(f"{colorama.Fore.LIGHTYELLOW_EX}[{message.guild}] -  {message.channel}: {message.author.name}: {message.content}")
     await bot.process_commands(message)
 
 try:
@@ -167,10 +170,10 @@ try:
             if not filename == "example_cog.py":
                 try:
                     bot.load_extension(f"cogs.{filename[:-3]}")
-                    lg_pl.info(f"Loaded Extension: {filename}")
+                    lg_pl.info(f"{colorama.Fore.LIGHTGREEN_EX}Loaded Extension: {filename}")
 
                 except Exception as e:
-                    lg_pl.error(f"Failed to load extension: {filename}")
+                    lg_pl.error(f"{colorama.Fore.LIGHTRED_EX}Failed to load extension: {filename}")
                     lg_pl.error(f"Failed with: {e}")
 
         else:
