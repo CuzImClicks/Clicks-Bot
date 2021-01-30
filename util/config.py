@@ -89,3 +89,6 @@ def getDiscordColour(colourname):
 
     elif colourname == "green":
         return discord.Colour(0x0BAF07)
+
+def getPiHoleIp() -> str:
+    return jf.read()["pihole_ip"]
