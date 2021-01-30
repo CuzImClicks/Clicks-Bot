@@ -1,4 +1,5 @@
 import logging
+from os import name
 import discord
 from discord.ext import commands
 from datetime import datetime
@@ -9,9 +10,20 @@ from util import config
 from clicks_util.json_util import JsonFile
 from util.logger import path
 import logging
+import varname
 
 
 lg = logging.getLogger(__name__)
+
+async def make_bugreport_embed(ctx, bugreport: dict) -> discord.Embed:
+    user = get(ctx.guild.members, name=bugreport["author"])
+    infoEmbed = discord.Embed(title="Bugreport", colour=config.getDiscordColour("green"))
+    infoEmbed.add_field(name="Name", value=bugreport["name"], inline=False)
+    infoEmbed.add_field(name="Command", value=bugreport["command"], inline=False)
+    infoEmbed.add_field(name="description", value=bugreport["description"], inline=False)
+    infoEmbed.add_field(name="Fixed", value=bugreport["status"], inline=False)
+    infoEmbed.set_author(name=bugreport["author"], icon_url=user.avatar_url)
+    return infoEmbed
 
 
 class Moderation(commands.Cog):
@@ -275,8 +287,50 @@ class Moderation(commands.Cog):
         await user.remove_roles(role)
         await ctx.send(embed=infoEmbed)
 
+    @commands.command(name="bugreport")
+    async def bugreport(self, ctx, name: str, theme: str, command:str ="",description: str=""):
+        jf = JsonFile("bugreports.json", f"{os.getcwd()}/bugreports")
 
+        data = jf.read()
+        bugreport = {"name": name,"author": ctx.author.name, "command": command, "description": description, "status": True}
+        infoEmbed = discord.Embed(title="Bugreport", colour=config.getDiscordColour("green"))
+        infoEmbed.add_field(name="Name", value=bugreport["name"], inline=False)
+        infoEmbed.add_field(name="Command", value=bugreport["command"], inline=False)
+        infoEmbed.add_field(name="description", value=bugreport["description"], inline=False)
+        infoEmbed.add_field(name="Status", value= bugreport["status"], inline=False)
+        infoEmbed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=infoEmbed)
+        data[name] = bugreport
+        jf.write(data)
 
+    @commands.command(name="get_bugreports")
+    @commands.has_role(config.getBotAdminRole())
+    async def get_bugreports(self, ctx):
+
+        jf = JsonFile("bugreports.json", f"{os.getcwd()}/bugreports")
+        data = jf.read()
+        for bugreport in list(data.keys()):
+            bugreport = data[bugreport]
+            user = get(ctx.guild.members, name=bugreport["author"])
+            infoEmbed = discord.Embed(title="Bugreport", colour=config.getDiscordColour("green"))
+            infoEmbed.add_field(name="Name", value=bugreport["name"], inline=False)
+            infoEmbed.add_field(name="Command", value=bugreport["command"], inline=False)
+            infoEmbed.add_field(name="description", value=bugreport["description"], inline=False)
+            infoEmbed.add_field(name="Status", value= bugreport["status"], inline=False)
+            infoEmbed.set_author(name=bugreport["author"], icon_url=user.avatar_url)
+            if bugreport["status"] == False:
+                await ctx.send(embed=infoEmbed)
+
+    @commands.command(name="fixed")
+    @commands.has_role(config.getBotAdminRole())
+    async def fixed(self, ctx, name):
+        jf = JsonFile("bugreports.json", f"{os.getcwd()}/bugreports")
+        data = jf.read()
+
+        if name in list(data.keys()):
+            data[name]["status"] = False
+            await ctx.send(embed=await make_bugreport_embed(ctx, data[name]))
+            jf.write(data)
 
 
 def setup(bot):

@@ -28,5 +28,7 @@ TODO:
 	- bot.remove_command("help")
 - Error Embed feedback
 	- @<command_name>.error
+- bugreport command
+	- database
 
 
