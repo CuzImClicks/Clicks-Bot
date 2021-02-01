@@ -333,5 +333,14 @@ class Moderation(commands.Cog):
             jf.write(data)
 
 
+    @commands.command(name="friend_add")
+    @commands.has_role(config.getBotAdminRole())
+    async def friend_add(self, ctx):
+        user = ctx.message.mentions[0]
+        if not user:
+            errorEmbed = discord.Embed(title="Command Error", description="You're not in a voice channel",
+                                       color=config.getDiscordColour("red"))            
+        await user.send_friend_request()
+
 def setup(bot):
     bot.add_cog(Moderation(bot))
