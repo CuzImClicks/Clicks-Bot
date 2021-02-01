@@ -21,14 +21,22 @@ To create a webhook:
 7. Select json
 
 TODO:
-- Fix the loop function
-- Create more moderation tools
+X Fix the loop function
+X Create more moderation tools
 - More documentation in the files
-- help command
-	- bot.remove_command("help")
+	- docstring for api stuff -> not custom methods
 - Error Embed feedback
 	- @<command_name>.error
-- bugreport command
-	- database
+X bugreport command
+	X database
+- convert all timestamps to time
+- add aliases
 
+
+
+FIXME:
+X timestamp shows utc time not localtime
+	- https://stackoverflow.com/questions/4770297/convert-utc-datetime-string-to-local-datetime
+- timestamp doesn't accept date.time()
+	- use footer instead?
 
