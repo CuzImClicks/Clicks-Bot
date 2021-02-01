@@ -1,11 +1,13 @@
 import json
 from datetime import datetime
 import aiohttp
+from nbt import nbt
 import requests
 from util.minecraft import User
 from util import config
 import logging
 import os
+from clicks_util import timeconvert, nbt_data
 
 lg = logging.getLogger(__name__)
 key = config.getKey()
@@ -14,7 +16,12 @@ path = os.getcwd()
 
 class Player:
 
-    def __init__(self, name):
+    def __init__(self, name: str):
+        """[summary]
+
+        Args:
+            name (str): [name of the player]
+        """
         self.name = name
         self.user = User(name)
         self.uuid = self.user.get_uuid()
@@ -22,22 +29,37 @@ class Player:
         self.skyblock = self.SkyBlock(self.data, self.name, self.uuid)
 
     @property
-    def data(self):
+    def data(self) -> dict:
+        """[summary]
+
+        Returns:
+            dict: [api informations about the player]
+        """
         return requests.get(f"https://api.hypixel.net/player?key={key}&player={self.name}&uuid={self.uuid}").json()
 
     @property
-    def profile_id(self):
+    def profile_id(self) -> int:
+        """[summary]
 
+        Returns:
+            int: [the profile id of the player]
+        """
         return self.data["player"]["_id"]
 
     def save(self):
-
         with open(f"{path}/hypixel/{self.name}.json", "w+") as f:
             json.dump(self.data, f, indent=2)
 
     class SkyBlock:
 
         def __init__(self, data: dict, name, uuid):
+            """[summary]
+
+            Args:
+                data (dict): [data of the player]
+                name ([type]): [name of the player]
+                uuid ([type]): [uuid of the player]
+            """
             self.name = name
             self.data = data
             self.profiles_raw = self.data["player"]["stats"]["SkyBlock"]["profiles"]
@@ -57,30 +79,61 @@ class Player:
         class Profile:
 
             def __init__(self, profile: dict, uuid: str):
+                """[summary]
+
+                Args:
+                    profile (dict): [profile from the data]
+                    uuid (str): [uuid of the player]
+                """
                 self.profile = profile
                 self.uuid = uuid
                 self.user = self.User(self.data_profile)
 
             @property
-            def content(self):
+            def content(self) -> dict:
+                """[summary]
+
+                Returns:
+                    dict: [the profile's data]
+                """
                 return requests.get(
                     f"https://api.hypixel.net/skyblock/profile?key={key}&profile={self.profile['profile_id']}").json()
 
             @property
-            def data_profile(self):
+            def data_profile(self) -> dict:
+                """[summary]
+
+                Returns:
+                    dict: [the players data of the profile]
+                """
                 return self.content["profile"]["members"][self.uuid]
 
             @property
-            def profile_id(self):
+            def profile_id(self) -> int:
+                """[summary]
+
+                Returns:
+                    int: [the profile's id]
+                """
                 return self.profile["profile_id"]
 
             @property
-            def name(self):
+            def name(self) -> str:
+                """[summary]
+
+                Returns:
+                    str: [the ingame name of the profile("Kiwi", "Pineapple", "Orange", ...)]
+                """
                 return self.profile["cute_name"]
 
             class User:
 
-                def __init__(self, profile_data):
+                def __init__(self, profile_data: dict):
+                    """[summary]
+
+                    Args:
+                        profile_data (dict): [the players data of the profile]
+                    """
                     self.profile_data = profile_data
                     self.stats = self.Stats(self.profile_data["stats"])
                     self.slayers = list()
@@ -89,51 +142,93 @@ class Player:
                     #    self.slayers.append(self.SlayerBoss(slayerboss, self.profile_data["slayer_bosses"][slayerboss]))
 
                 @property
-                def fairy_souls_collected(self):
+                def fairy_souls_collected(self) -> int:
+                    """[summary]
+
+                    Returns:
+                        int: [the amount of fairy souls collected]
+                    """
                     return self.profile_data["fairy_souls_collected"]
 
                 @property
-                def death_count(self):
+                def death_count(self) -> int:
+                    """[summary]
+
+                    Returns:
+                        int: [amount of deaths]
+                    """
                     return self.profile_data["death_count"]
 
                 @property
-                def last_save(self):
-                    #FIXME: OSError: [Errno 22] Invalid argument
-                    return datetime.fromtimestamp(int(self.profile_data["last_save"]))
+                def last_save(self) -> str:
+                    """[summary]
+
+                    Returns:
+                        str: [date and time of last save]
+                    """
+                    return timeconvert.fulldatefromtimestamp(int(self.profile_data["last_save"]))
 
                 @property
                 def inv_armor(self):
+                    #TODO: nbt encoded in base64
                     return str(self.profile_data["inv_armor"]["data"]).split("/")
 
                 @property
-                def coop_invitation(self):
+                def coop_invitation(self) -> dict:
+                    """[summary]
+
+                    Returns:
+                        dict: [timestamp of invite, invited by(uuid), confirmed(bool), confirmed timestamp]
+                    """
                     return self.profile_data["coop_invitation"]
 
                 @property
-                def first_join(self):
-                    return self.profile_data["first_join"]
+                def first_join(self) -> str:
+                    """[summary]
+
+                    Returns:
+                        str: [full date and time of first join]
+                    """
+                    return timeconvert.fulldatefromtimestamp(int(self.profile_data["first_join"]))
 
                 @property
-                def first_join_hub(self):
-                    return self.profile_data["first_join_hub"]
+                def first_join_hub(self) -> str:
+                    """[summary]
+
+                    Returns:
+                        str: [full date and time of first join in the hub]
+                    """
+                    return timeconvert.fulldatefromtimestamp(int(self.profile_data["first_join_hub"]))
 
                 class Stats:
+
+                    #TODO: Documentation
 
                     def __init__(self, stats):
 
                         self.stats = dict(stats)
 
                     @property
-                    def deaths(self):
-                        return self.stats["deaths"]
+                    def deaths(self) -> int:
+                        """[summary]
+
+                        Returns:
+                            int: [amount of deaths]
+                        """
+                        return int(self.stats["deaths"])
 
                     @property
                     def deaths_void(self):
                         return self.stats["deaths_void"]
 
                     @property
-                    def highest_critical_damage(self):
-                        return self.stats["highest_critical_damage"]
+                    def highest_critical_damage(self) -> int:
+                        """[summary]
+
+                        Returns:
+                            int: [highest ever dealt crit damage]
+                        """
+                        return int(self.stats["highest_critical_damage"])
 
                     @property
                     def kills(self):
@@ -179,11 +274,11 @@ class Player:
                     self.profile_data["coin_purse"]
 
                 @property
-                def last_death(self):
+                def last_death(self) -> datetime.time:
                     return self.profile_data["last_death"]
 
                 @property
-                def fairy_exchanges(self):
+                def fairy_exchanges(self) -> int:
                     return self.profile_data["fairy_exchanges"]
 
                 class SlayerBoss:
@@ -238,5 +333,44 @@ class Player:
                     @property
                     def skin(self):
                         return self.pet_data["skin"]
+
+                @property
+                def dungeons(self) -> dict:
+                    return dict(self.profile_data["dungeons"])
+
+                @property
+                def griffin(self) -> dict:
+                    return dict(self.profile_data["griffin"])
+
+                @property
+                def jacob2(self) -> dict:
+                    return dict(self.profile_data["jacob2"])
+
+                @property
+                def experimentation(self) -> dict:
+                    return dict(self.profile_data["experimentation"])                
+
+                @property
+                def experience_skill_runecrafting(self) -> dict:
+                    return dict(self.profile_data["experience_skill_runecrafting"])
+
+                @property
+                def experience_skill_combat(self) -> dict:
+                    return dict(self.profile_data["experience_skill_combat"])    
+
+                @property
+                def experience_skill_mining(self) -> dict:
+                    return dict(self.profile_data["experience_skill_mining"])  
+
+                @property
+                def unlocked_coll_tiers(self) -> dict:
+                    return dict(self.profile_data["unlocked_coll_tiers"])  
+
+                #TODO: Add more API options
+
+                @property
+                def quiver(self):
+                    return nbt_data.decode_inventory_data(self.profile_data["quiver"])
+
 
 
