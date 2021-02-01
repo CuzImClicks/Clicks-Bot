@@ -31,6 +31,9 @@ X bugreport command
 	X database
 - convert all timestamps to time
 - add aliases
+- config
+	- magmaboss 
+	- minecraft online function
 
 
 
@@ -39,4 +42,5 @@ X timestamp shows utc time not localtime
 	- https://stackoverflow.com/questions/4770297/convert-utc-datetime-string-to-local-datetime
 - timestamp doesn't accept date.time()
 	- use footer instead?
+- cleanup function runs on every reload
 
