@@ -6,6 +6,7 @@ from util import config
 import datetime
 from multiprocessing import Process, Lock
 import os
+from clicks_util import timeconvert
 
 path = os.getcwd()
 
@@ -51,19 +52,19 @@ class MainEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
 
-        lg.info(f"{member} joined the guild {member.guild}")
-        if member.guild == "RezURekted":
+        lg.info(f"{member} joined the guild {member.guild.name}")
+        if member.guild.name == "RezURekted":
+
             await member.add_roles("Member")
 
             embed = discord.Embed(color=0x2b4f22, description=f"Ein wildes {member.name} erscheint!")
             embed.set_thumbnail(url=str(member.avatar_url))
-            embed.set_footer(text=f"{member.guild} - {datetime.datetime.utcnow()}", icon_url=member.guild.icon_url)
+            embed.set_footer(text=f"{member.guild} - {timeconvert.getDateAndTime()}", icon_url=member.guild.icon_url)
             embed.set_thumbnail(member.guild.banner_url)
+            #TODO: Test and change channel to lobby
             channel = self.bot.get_channel(get(member.guild.channels, "bot-testing"))
 
             await channel.send(embed=embed)
-
-            await member.create_dm()
 
     @commands.Cog.listener()
     async def on_member_leave(self, member):
@@ -74,8 +75,9 @@ class MainEvents(commands.Cog):
 
             embed = discord.Embed(color=0x2b4f22, description=f"Das wilde {member.name} ist geflüchtet!")
             embed.set_thumbnail(url=str(member.avatar_url))
-            embed.set_footer(text=f"{member.guild} - {datetime.datetime.utcnow()}", icon_url=member.guild.icon_url)
+            embed.set_footer(text=f"{member.guild} - {timeconvert.getDateAndTime()}", icon_url=member.guild.icon_url)
             embed.set_thumbnail(member.guild.banner_url)
+            #TODO: Test and change channel to lobby
             channel = self.bot.get_channel(get(member.guild.channels, "bot-testing"))
 
             await channel.send(embed=embed)
