@@ -15,3 +15,9 @@ async def remove_songs():
             file_io.remove(f"{os.getcwd()}/{song}")
 
 
+async def remove_hypixel_jsons():
+    for file in os.listdir(os.getcwd()+"/hypixel"):
+        lg.info(f"Removing the file {file[:-5]}")
+        file_io.remove(f"{os.getcwd()}/hypixel/{file}")
+
+
