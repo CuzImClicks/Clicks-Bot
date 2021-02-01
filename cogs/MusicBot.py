@@ -9,6 +9,7 @@ from discord.ext import commands, tasks
 from util import config, strings, logger, cleanup
 from util.logger import *
 from discord.utils import get
+from clicks_util import timeconvert
 
 lg = logging.getLogger(__name__)
 
@@ -17,9 +18,10 @@ ytdl = youtube_dl.YoutubeDL(strings.get_ytdl_format_options())
 queue = []
 youtube_dl.utils.bug_reports_message = lambda msg: lg.error(msg)
 
-global last_song, loop
+global last_song, loop, override_playing
 last_song = ""
 loop = False
+override_playing = False
 
 
 class YTDLSource(discord.PCMVolumeTransformer):
@@ -49,10 +51,11 @@ class MusicBot(commands.Cog):
     def __init__(self, bot):
 
         self.bot = bot
-        self.cleanup.start()
+        #self.cleanup.start()
 
     def cog_unload(self):
-        self.cleanup.cancel()
+        #self.cleanup.cancel()
+        pass
 
     @commands.command(name="join", help="Mit .join joint der Musikbot deinem Sprachchannel.")
     @commands.has_role(config.getBotAdminRole())
@@ -94,7 +97,7 @@ class MusicBot(commands.Cog):
     @commands.has_role(config.getBotAdminRole())
     async def play(self, ctx):
 
-        global queue
+        global queue, override_playing, loop
         server = ctx.message.author.guild
 
         voice_channel = server.voice_client
@@ -116,11 +119,13 @@ class MusicBot(commands.Cog):
                 infoEmbed.set_thumbnail(url=f"https://img.youtube.com/vi/{str(last_song).split('=')[1]}/sddefault.jpg")
                 lg.info(f"Downloading the song thumbnail from "
                         + f"https://img.youtube.com/vi/{str(last_song).split('=')[1]}/sddefault.jpg")
-                await ctx.send(embed=infoEmbed)
+                if override_playing  == True or loop == True:
+                    await ctx.send(embed=infoEmbed)
 
             await self.wait_for_end(guild=ctx.author.guild)
             if queue:
-                await self.play(ctx)
+                if override_playing == True:
+                    await self.play(ctx)
 
         except IndexError as e:
 
@@ -130,10 +135,14 @@ class MusicBot(commands.Cog):
             await ctx.send(embed=errorEmbed)
 
     async def wait_for_end(self, guild: discord.Guild):
+        global is_playing
         from discord.utils import get
         voice = get(self.bot.voice_clients, guild=guild)
         while voice.is_playing():
             await asyncio.sleep(1)
+            is_playing = True
+        is_playing = False
+            
 
     @commands.command(name="among_us", help="Dieser Befehl setzt alle Lieder die als Among Us Lied gespeichert wurden"
                                             " in zufälliger Reihenfolge in die Warteschleife. Mit .skipall"
@@ -175,14 +184,14 @@ class MusicBot(commands.Cog):
         global queue
         server = ctx.message.author.guild
         voice_channel = server.voice_client
-
+        #FIXME:  IndexError: list index out of range
         voice_channel.pause()
         queue.clear()
         lg.info(f"Cleared the queue!")
 
-        responses = ["Clicks Bot going dark ... ... ...", ]
+        response = "Clicks Bot going dark ... ... ...", 
 
-        infoEmbed = discord.Embed(title="Shutdown", description=responses[0], color=discord.Colour(0x000030),
+        infoEmbed = discord.Embed(title="Shutdown", description=response, color=discord.Colour(0x000030),
                                   timestamp=datetime.now())
         await ctx.send(embed=infoEmbed)
 
@@ -231,7 +240,18 @@ class MusicBot(commands.Cog):
             lg.info(f"Added {url} to queue")
             infoEmbed = discord.Embed(title="Queue", description=f"Added {url} to the queue",
                                       color=discord.Colour(0x000030), timestamp=datetime.now())
-            infoEmbed.set_thumbnail(url=f"https://img.youtube.com/vi/{str(url).split('=')[1]}/sddefault.jpg")
+            try:
+                thumbnail = f"https://img.youtube.com/vi/{str(url).split('=')[1]}/sddefault.jpg"
+
+            except IndexError:
+                errorEmbed = discord.Embed(title="Command Error", description="Invalid URL",
+                                           color=discord.Colour(0x9D1309))
+                errorEmbed.add_field(name="Possible causes", value="youtube short urls and indirect links can cause errors while downloading")
+                errorEmbed.set_footer(text=timeconvert.getTime())
+
+                await ctx.send(embed=errorEmbed)
+                return
+            infoEmbed.set_thumbnail(url=thumbnail)
             infoEmbed.set_author(name=ctx.author, url=ctx.author.avatar_url)
             await ctx.send(embed=infoEmbed)
             lg.info(args)
@@ -291,7 +311,7 @@ class MusicBot(commands.Cog):
     @commands.has_role(config.getBotAdminRole())
     async def skip(self, ctx):
 
-        global queue
+        global queue, override_playing
 
         server = ctx.message.author.guild
         voice_channel = server.voice_client
@@ -307,6 +327,7 @@ class MusicBot(commands.Cog):
                                       colour=config.getDiscordColour("red"))
             infoEmbed.add_field(name="Error Message", value=f"There are no more songs in the queue")
             infoEmbed.set_author(name=ctx.author, url=ctx.author.avatar_url)
+            override_playing = True
             voice_channel.pause()
 
     @commands.command(name="pause", help="Pausiert den aktuell spielenden Song.")
@@ -317,6 +338,7 @@ class MusicBot(commands.Cog):
         voice_channel = server.voice_client
 
         voice_channel.pause()
+        #FIXME: When paused with the loop function, the bot starts playing instantly again
         lg.info(f"Paused the song currently playing!")
         # TODO: convert to embed
         await ctx.send(f"Der aktuell spielende Song wurde pausiert. Mit .resume spielt der Song weiter.")
@@ -354,10 +376,10 @@ class MusicBot(commands.Cog):
             await voice_client.disconnect()
             lg.info(f"Disconnected from channel {ctx.message.author.voice.channel}")
 
-    @tasks.loop(minutes=5)
+"""    @tasks.loop(minutes=5)
     async def cleanup(self):
         lg.info(f"Cleaning up the song files...")
-        await cleanup.remove_songs()
+        await cleanup.remove_songs()"""
 
 
 def setup(bot):
