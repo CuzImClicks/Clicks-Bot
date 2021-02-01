@@ -15,6 +15,14 @@ class Hypixel:
         self.session = aiohttp.ClientSession()
 
     async def guild(self, name: str) -> dict:
+        """[summary]
+
+        Args:
+            name (str): [Name of the player]
+
+        Returns:
+            dict: [guild as a dict]
+        """
         async with self.session.get(f"https://api.hypixel.net/findGuild?key={key}&byName={name}") as response:
             data = await response.json()
             guildid = data["guild"]
@@ -27,14 +35,29 @@ class Hypixel:
                 return await response.json()
 
     async def watchdog(self) -> dict:
+        """[summary]
+
+        Returns:
+            dict: [informations about the watchdog anti cheat system]
+        """
         async with self.session.get(f"https://api.hypixel.net/watchdogstats?key={key}") as response:
             return await response.json()
 
     async def leaderbords(self) -> dict:
+        """[summary]
+
+        Returns:
+            dict: [the leaderboards of hypixel]
+        """
         async with self.session.get(f"https://api.hypixel.net/leaderbords?key={key}") as response:
             return await response.json()
 
     async def counts(self) -> dict:
+        """[summary]
+
+        Returns:
+            dict: [the amount of players playing each gamemode]
+        """
         async with self.session.get('https://api.hypixel.net/gameCounts?key=' + key) as response:
             return await response.json()
 
@@ -42,7 +65,15 @@ class Hypixel:
         async with self.session.get(f'https://api.mcsrvstat.us/2/{ip}:{port}') as response:
             return await response.json()
 
-    async def playerguild(self, uuid) -> str:
+    async def playerguild(self, uuid: str) -> str:
+        """[summary]
+
+        Args:
+            uuid (str): [uuid of a minecraft player]
+
+        Returns:
+            str: [name of the guild]
+        """
         async with self.session.get('https://api.hypixel.net/guild?key=' + key + '&player=' + uuid) as response:
             data = await response.json()
             if data['guild'] is None:
