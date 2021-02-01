@@ -6,6 +6,8 @@ import logging
 from util import config
 import datetime
 from web_server.database import create_key, get_key
+from clicks_util import timeconvert
+
 
 lg = logging.getLogger(__name__[5:])
 
@@ -29,6 +31,7 @@ class Clicks_BotAPI_Handler(commands.Cog):
         infoEmbed.add_field(name="Key", value=key, inline=False)
         infoEmbed.add_field(name="Requested by", value=ctx.author.name)
         infoEmbed.set_author(name=username, icon_url=user.avatar_url)
+        infoEmbed.set_footer(text=timeconvert.getTime())
 
         await ctx.send(embed=infoEmbed)
 
@@ -40,13 +43,13 @@ class Clicks_BotAPI_Handler(commands.Cog):
         key = get_key(username)
         infoEmbed = discord.Embed(title="API Key",
                                   description=f"Read the API key for {username} from the database",
-                                  colour=config.getDiscordColour("green"))
+                                  colour=config.getDiscordColour("green")) 
         infoEmbed.add_field(name="Key", value=key, inline=False)
         infoEmbed.add_field(name="Requested by", value=ctx.author.name)
         infoEmbed.set_author(name=username, icon_url=user.avatar_url)
+        infoEmbed.set_footer(text=timeconvert.getDateAndTime())
 
         await ctx.send(embed=infoEmbed)
-
 
 
 def setup(bot):
