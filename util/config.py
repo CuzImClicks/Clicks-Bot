@@ -5,11 +5,49 @@ import discord
 
 path = str(os.getcwd())
 
+lg = logging.getLogger(__name__[5:])
+
 jf = json_util.JsonFile("config.json", f"{path}/util")
+data = jf.read()
+boolean_settings = ["magmaboss", "hypixel_online"]
+changeable_settings = ["command_prefix", "status"]
+
+def enable(feature: str) -> bool:
+    if feature not in boolean_settings:
+        return False
+    data[feature] = True
+    lg.info(f"Enabled feature '{feature}' and wrote the change to the config file")
+    jf.write(data)
+    return True
+
+def disable(feature: str) -> bool:
+    if feature not in boolean_settings:
+        return False
+    data[feature] = False
+    lg.info(f"Disabled feature '{feature}' and wrote the change to to the config file")
+    jf.write(data)
+    return True
+
+def toggle(feature: str) -> bool:
+    if feature not in boolean_settings:
+        return False
+    data[feature] = not data[feature]
+    lg.info(f"Toggled feature '{feature}' and wrote the change to the config file")
+    jf.write(data)
+    return True
+
+def change(feature: str, new_value) -> bool:
+    if feature not in changeable_settings:
+        return False
+    old_value = data[feature]
+    data[feature] = new_value
+    lg.info(f"Changed value of feature '{feature}' from {old_value} to {new_value}")
+    jf.write(data)
+    return True
 
 
 def getLoggingLevel():
-    level = jf.read()["level"]
+    level = data["level"]
 
     if level.upper() == "INFO":
 
@@ -29,7 +67,7 @@ def getLoggingLevel():
 
 
 def getFileLoggingLevel():
-    flevel = jf.read()["file_level"]
+    flevel = data["file_level"]
 
     if flevel.upper() == "INFO":
 
@@ -49,35 +87,35 @@ def getFileLoggingLevel():
 
 
 def getToken():
-    return jf.read()["token"]
+    return data["token"]
 
 
 def getCommandPrefix():
-    return jf.read()["command_prefix"]
+    return data["command_prefix"]
 
 
 def getStatus():
-    return jf.read()["status"]
+    return data["status"]
 
 
 def getBotAccessRole():
-    return jf.read()["Bot Access Role"]
+    return data["Bot Access Role"]
 
 
 def getBotAdminRole():
-    return jf.read()["Bot Admin Role"]
+    return data["Bot Admin Role"]
 
 
 def getDefaultRole():
-    return jf.read()["Default Role"]
+    return data["Default Role"]
 
 
 def getKey():
-    return jf.read()["key"]
+    return data["key"]
 
 
 def getSteamKey():
-    return jf.read()["steam_key"]
+    return data["steam_key"]
 
 
 def getDiscordColour(colourname):
@@ -91,4 +129,10 @@ def getDiscordColour(colourname):
         return discord.Colour(0x0BAF07)
 
 def getPiHoleIp() -> str:
-    return jf.read()["pihole_ip"]
+    return data["pihole_ip"]
+
+def getMagmaboss() -> bool:
+    return data["magmaboss"]
+
+def getHypixelOnline() -> bool:
+    return data["hypixel_online"]
