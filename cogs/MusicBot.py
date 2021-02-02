@@ -18,10 +18,10 @@ ytdl = youtube_dl.YoutubeDL(strings.get_ytdl_format_options())
 queue = []
 youtube_dl.utils.bug_reports_message = lambda msg: lg.error(msg)
 
-global last_song, loop, override_playing
+global last_song, loop, paused
 last_song = ""
 loop = False
-override_playing = False
+paused = False
 
 
 class YTDLSource(discord.PCMVolumeTransformer):
@@ -58,7 +58,7 @@ class MusicBot(commands.Cog):
         pass
 
     @commands.command(name="join", help="Mit .join joint der Musikbot deinem Sprachchannel.")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def join(self, ctx):
 
         channel = ctx.author.voice.channel
@@ -94,10 +94,10 @@ class MusicBot(commands.Cog):
     @commands.command(name="play", help="Mit .play startest du die Wiedergabe der Musik in deinem Channel."
                                         " Dies funktioniert nur wenn du einem Sprachchannel bist und nur wenn bereits Songs"
                                         " in der Queue sind. Gebe .queue ohne Argumente ein um zu sehen ob songs in der Queue sind.")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def play(self, ctx):
 
-        global queue, override_playing, loop
+        global queue, loop
         server = ctx.message.author.guild
 
         voice_channel = server.voice_client
@@ -119,13 +119,12 @@ class MusicBot(commands.Cog):
                 infoEmbed.set_thumbnail(url=f"https://img.youtube.com/vi/{str(last_song).split('=')[1]}/sddefault.jpg")
                 lg.info(f"Downloading the song thumbnail from "
                         + f"https://img.youtube.com/vi/{str(last_song).split('=')[1]}/sddefault.jpg")
-                if override_playing  == True or loop == True:
+                if not loop:
                     await ctx.send(embed=infoEmbed)
 
             await self.wait_for_end(guild=ctx.author.guild)
             if queue:
-                if override_playing == True:
-                    await self.play(ctx)
+                await self.play(ctx)
 
         except IndexError as e:
 
@@ -148,7 +147,7 @@ class MusicBot(commands.Cog):
                                             " in zufälliger Reihenfolge in die Warteschleife. Mit .skipall"
                                             "werden alle Songs die der Bot und die Queue hinzugefügt hat übersprungen. "
                       )
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def among_us(self, ctx):
 
         interstellar_no_time_for_caution = "https://www.youtube.com/watch?v=m3zvVGJrTP8"
@@ -178,25 +177,27 @@ class MusicBot(commands.Cog):
             await self.play(ctx)
 
     @commands.command(name="die")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def die(self, ctx):
 
         global queue
         server = ctx.message.author.guild
         voice_channel = server.voice_client
-        #FIXME:  IndexError: list index out of range
         voice_channel.pause()
         queue.clear()
         lg.info(f"Cleared the queue!")
-
-        response = "Clicks Bot going dark ... ... ...", 
+        """
+        FIXME:  HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In embed.description: Could not interpret "['Clicks Bot going dark ... ... ...']" as string.
+        """
+        response = "Clicks Bot going dark ... ... ..."
 
         infoEmbed = discord.Embed(title="Shutdown", description=response, color=discord.Colour(0x000030),
                                   timestamp=datetime.now())
         await ctx.send(embed=infoEmbed)
 
     @commands.command(name="loop", help="Continues to play the same song")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def loop(self, ctx, *args):
         global queue, loop
         if not loop:
@@ -213,7 +214,7 @@ class MusicBot(commands.Cog):
             await ctx.send(embed=infoEmbed)
 
     @commands.command(name="queue", help=strings.get_help("queue_help"))
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def queue_func(self, ctx, *args):
 
         global queue
@@ -233,6 +234,8 @@ class MusicBot(commands.Cog):
                 infoEmbed = discord.Embed(title="Queue", description="This is the full queue right now")
                 for i in range(0, len(queue)):
                     infoEmbed.add_field(name="Song", value=queue[i])
+
+                await ctx.send(embed=infoEmbed)
 
         else:
 
@@ -254,13 +257,12 @@ class MusicBot(commands.Cog):
             infoEmbed.set_thumbnail(url=thumbnail)
             infoEmbed.set_author(name=ctx.author, url=ctx.author.avatar_url)
             await ctx.send(embed=infoEmbed)
-            lg.info(args)
             voice = get(self.bot.voice_clients, guild=ctx.author.guild)
             if not voice.is_playing():
                 await self.play(ctx)
 
     @commands.command(name="remove")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def remove(self, ctx, number):
 
         global queue
@@ -281,8 +283,18 @@ class MusicBot(commands.Cog):
                                        color=discord.Colour(0x9D1309), timestamp=datetime.now())
             await ctx.send(embed=errorEmbed)
 
-    @commands.command(name="rick")
+    @commands.command(name="insert")
     @commands.has_role(config.getBotAdminRole())
+    async def insert(self, ctx, url):
+        global queue
+        queue.insert(0, url)
+        infoEmbed = discord.Embed(title="Queue",
+        description="Inserted song at index 0", 
+        colour=config.getDiscordColour("blue"))
+        await ctx.send(embed=infoEmbed)
+
+    @commands.command(name="rick")
+    @commands.has_role(config.getBotMusicRole())
     async def rick(self, ctx):
 
         queue.insert(0, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
@@ -290,7 +302,7 @@ class MusicBot(commands.Cog):
 
     @commands.command(name="skipall", help="Dieser Befehl löscht die gesamte Song-Warteschleife und hört auf Musik "
                                            "abzuspielen. Nun kannst du neue Songs in die Queue stellen.")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def skipall(self, ctx):
 
         global queue
@@ -308,18 +320,17 @@ class MusicBot(commands.Cog):
     @commands.command(name="skip",
                       help="Mit $skip überspringst du den aktuell spielenden Song und der Bot spielt automatisch "
                            "den nächsten Song in der Queue ab.")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def skip(self, ctx):
 
-        global queue, override_playing
+        global queue
 
         server = ctx.message.author.guild
         voice_channel = server.voice_client
 
         await ctx.send(f"Skipped the song!")
         if len(queue) > 0:
-            lg.info(f"Removed the song {queue[0]} from the queue")
-            del (queue[0])
+            voice_channel.pause()
             await self.play(ctx)
 
         else:
@@ -327,42 +338,44 @@ class MusicBot(commands.Cog):
                                       colour=config.getDiscordColour("red"))
             infoEmbed.add_field(name="Error Message", value=f"There are no more songs in the queue")
             infoEmbed.set_author(name=ctx.author, url=ctx.author.avatar_url)
-            override_playing = True
             voice_channel.pause()
 
     @commands.command(name="pause", help="Pausiert den aktuell spielenden Song.")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def pause(self, ctx):
+        global paused
 
         server = ctx.message.author.guild
         voice_channel = server.voice_client
 
         voice_channel.pause()
+        paused = True
         #FIXME: When paused with the loop function, the bot starts playing instantly again
         lg.info(f"Paused the song currently playing!")
         # TODO: convert to embed
         await ctx.send(f"Der aktuell spielende Song wurde pausiert. Mit .resume spielt der Song weiter.")
 
     @commands.command(name="resume", help="Der pausierte Song wird weiter abgespielt.")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def resume(self, ctx):
-
+        global paused
         server = ctx.message.author.guild
         voice_channel = server.voice_client
 
         voice_channel.resume()
+        paused = False
         lg.info(f"Resumed the song currently playing!")
         #TODO: convert to embed
         await ctx.send(f"Resumed song currently playing!")
 
     @commands.command(name="volume")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def volume(self, ctx):
 
         pass
 
     @commands.command(name="leave")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def leave(self, ctx):
 
         if not ctx.message.author.voice:
