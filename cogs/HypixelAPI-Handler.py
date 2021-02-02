@@ -23,13 +23,17 @@ class HypixelAPI_Handler(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.online.start()  # start the task
-        self.magmaboss.start()  # start the task
+        if config.getHypixelOnline():  # check if the feature is enabled
+            self.online.start()  # start the task
+        if config.getMagmaboss():
+            self.magmaboss.start()  # start the task
 
     def cog_unload(self):
         """Unload the tasks"""
-        self.online.cancel()
-        self.magmaboss.cancel()
+        if config.getHypixelOnline():
+            self.online.cancel()  # cancel the task 
+        if config.getMagmaboss():
+            self.magmaboss.cancel()  # cancel the task
 
     @property
     def player_channel(self):
