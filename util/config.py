@@ -109,6 +109,9 @@ def getBotAdminRole():
 def getDefaultRole():
     return data["Default Role"]
 
+def getBotMusicRole():
+    return data["Bot Music Role"]
+
 
 def getKey():
     return data["key"]
@@ -116,6 +119,9 @@ def getKey():
 
 def getSteamKey():
     return data["steam_key"]
+
+def getYoutubeKey():
+    return data["youtube_api"]
 
 
 def getDiscordColour(colourname):
