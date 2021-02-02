@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO, format="[%(asctime)s] - %(name)s - [%(le
 
 lg = logging.getLogger("Clicks-Bot")
 lg_pl = logging.getLogger("Extension Loader")
-lg_chat = logging.getLogger("Chat")
+lg_chat = logging.getLogger("Chat") #TODO: Add chat log file handler
 logging.getLogger("discord.gateway").disabled = True
 fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
@@ -24,6 +24,12 @@ fl.setLevel(logging.INFO)
 fl.setFormatter(fmt)
 
 lg.addHandler(fl)
+
+fl_chat = logging.FileHandler(f"{path}/logs/chat.log")
+fl_chat.setLevel(logging.INFO)
+fl_chat.setFormatter(fmt)
+
+lg_chat.addHandler(fl_chat)
 
 #read the file containing all the blacklisted people
 jf = JsonFile("blacklist.json", path)
@@ -155,10 +161,10 @@ async def on_message(message):
             ))
     if str(message.author.id) in blacklisted:
         #Blacklisted people can't send messages on servers that the bot is running on
-        lg_pl.info(f"Blacklisted user {message.author.name} tried to send '{message.content}' in the channel {message.channel}")
+        lg.info(f"Blacklisted user {message.author.name} tried to send '{message.content}' in the channel {message.channel}")
         return
 
-    elif message.channel.id == 799291117425524756:
+    elif message.channel.id == 799291117425524756:  #TODO: add list of channels that are blocked  
         await message.delete()
     
     lg_chat.info(f"{colorama.Fore.LIGHTYELLOW_EX}[{message.guild}] -  {message.channel}: {message.author.name}: {message.content}")
