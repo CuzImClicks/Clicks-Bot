@@ -44,4 +44,5 @@ X timestamp shows utc time not localtime
 X timestamp doesn't accept date.time()
 	X use footer instead?
 - cleanup function runs on every reload
+X die command AtrributeError
 
