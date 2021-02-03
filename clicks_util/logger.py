@@ -5,5 +5,8 @@ Created on 28.10.2020
 '''
 
 import logging
+import colorama
 
-logging.basicConfig(level=logging.DEBUG, format="[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
+colorama.init()
+
+logging.basicConfig(level=logging.INFO, format="[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s"+colorama.Fore.RESET, datefmt="%H:%M:%S")
