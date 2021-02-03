@@ -18,11 +18,7 @@ def get_help(name):
     elif "help_unmuteall":
 
         return help_unmuteall
-
-    elif "unmuteall_ausgabe":
-
-        return help_unmuteall_ausgabe
-
+        
     elif "muteall_ausgabe":
 
         return ausgabe_muteall
@@ -35,18 +31,7 @@ def get_help(name):
 
         return "Mit $queue fügst du einen Song/Video in die Warteschlange des Musikbots." \
                " Dein Song wird abgespielt wenn alle songs die vorher in der queue waren abgespielt oder geskipped wurden."
-
-
-def get_promotion_text(promoter, user):
-
-    text = f"Hey {user.name},\n der Admin {promoter.name} hat dir nun Botaccess gewährt.\n Du kannst jetzt auf den Channel" \
-           " #bot-infos und #bot-testing" \
-           " zugreifen und Befehle an den Bot schreiben.\n Wenn du im #bot-testing .github schreibst erhälst du den Link" \
-           " zum Clicks-Bot Repo.\n Wenn du eine übersicht über die Hauptbefehle des Bots brauchst, gebe einfach " \
-           ".commands ein.\n Viel spaß!"
-
-    return text
-
+               
 
 def get_credits():
     '''
