@@ -6,8 +6,9 @@ import os
 from clicks_util.json_util import JsonFile
 from datetime import datetime
 import colorama
+from util import cleanup
 
-colorama.init()
+cleanup.remove_songs()
 
 path = os.getcwd()
 
@@ -50,7 +51,7 @@ for filename_ in os.listdir(f"{path}/cogs"):
     else:
         pass
 
-bot.remove_command("help")
+#bot.remove_command("help")
 
 #load, unload, reload files and extension while the bot is running
 
