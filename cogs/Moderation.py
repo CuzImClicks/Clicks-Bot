@@ -203,11 +203,10 @@ class Moderation(commands.Cog):
         await channel.delete_messages(await channel.history().flatten())
 
     @commands.command(name="botaccess")
-    @commands.has_role("Dev")
-    async def botaccess(self, ctx, target):
+    @commands.has_role(config.getBotAdminRole())
+    async def botaccess(self, ctx):
 
-        lg.info(target)
-        user = discord.utils.get(ctx.author.guild.members, name=str(target))
+        user = ctx.message.mentions[0]
 
         lg.info(f"Got User {user.name} as target for promotion")
 
@@ -216,16 +215,15 @@ class Moderation(commands.Cog):
         await user.add_roles(role)
         lg.info(f"Added '{role.name}' to '{user.name}'")
 
-        # await embed.send_embed_dm(bot, user, infos=("Bot Access", "Bot Access Output"), names=("Granted bot access"), values=(strings.get_promotion_text(ctx.author, user)))
-
-        await ctx.send(f"Added '{role.name}' to '{user.name}'")
-        await log_send(ctx, f"Added '{role.name} to {user.name}'")
+        infoEmbed = discord.Embed(title="Access to the bots features", description=f"The admin has granted you access to the role 'bot-access'\n"\
+            + "You can use .help to see all of the bots features. \nIf you have any problems with using the bot please contact a admin")
+        infoEmbed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
 
         await user.create_dm()
-        await user.dm_channel.send(strings.get_promotion_text(ctx.author, user))
+        await user.dm_channel.send(embed=infoEmbed)
 
     @commands.command(name="shutdown", help="Shuts the Bot off.")
-    @commands.has_role("Administrator")
+    @commands.has_role(config.getBotAdminRole())
     async def shutdown(self, ctx):
 
         shutdown_msg = "Bot1 going dark... ... ..."
