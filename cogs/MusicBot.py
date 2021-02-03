@@ -57,7 +57,7 @@ class MusicBot(commands.Cog):
         #self.cleanup.cancel()
         pass
 
-    @commands.command(name="join", help="Mit .join joint der Musikbot deinem Sprachchannel.")
+    @commands.command(name="join", help="The bot joins your channel")
     @commands.has_role(config.getBotMusicRole())
     async def join(self, ctx):
 
@@ -86,14 +86,20 @@ class MusicBot(commands.Cog):
                 await ctx.send(embed=errorEmbed)
 
         infoEmbed = discord.Embed(title="Join",
-                                  color=config.getDiscordColour("blue"), timestamp=datetime.now())
-        infoEmbed.add_field(name="Channel", value=f"{ctx.author.guild} - {channel}")
-        infoEmbed.set_author(name=ctx.author, url=ctx.author.avatar_url)
+                    description=f"Joined the channel {channel} in guild {ctx.author.guild.name}",
+                    colour=config.getDiscordColour("blue"))
+        infoEmbed.add_field(name="Queue commands", value=f"""
+        .queue <url> - add a song to the queue(the bot will start playing automaticly)
+        .insert <url> - insert a song at the start of the queue
+        .skip - skip a song(the next song will start playing)
+        .skipall - clear the entire queue
+        .remove <index(starts at 0)> - remove the song at the given index
+         """)
+        infoEmbed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+        infoEmbed.set_footer(text=timeconvert.getTime())
         await ctx.send(embed=infoEmbed)
 
-    @commands.command(name="play", help="Mit .play startest du die Wiedergabe der Musik in deinem Channel."
-                                        " Dies funktioniert nur wenn du einem Sprachchannel bist und nur wenn bereits Songs"
-                                        " in der Queue sind. Gebe .queue ohne Argumente ein um zu sehen ob songs in der Queue sind.")
+    @commands.command(name="play", help="Starts playing the first song in the queue")
     @commands.has_role(config.getBotMusicRole())
     async def play(self, ctx):
 
@@ -143,10 +149,7 @@ class MusicBot(commands.Cog):
         is_playing = False
             
 
-    @commands.command(name="among_us", help="Dieser Befehl setzt alle Lieder die als Among Us Lied gespeichert wurden"
-                                            " in zufälliger Reihenfolge in die Warteschleife. Mit .skipall"
-                                            "werden alle Songs die der Bot und die Queue hinzugefügt hat übersprungen. "
-                      )
+    @commands.command(name="among_us", help="Queues all configured Among Us songs")
     @commands.has_role(config.getBotMusicRole())
     async def among_us(self, ctx):
 
@@ -176,23 +179,26 @@ class MusicBot(commands.Cog):
         for i in range(0, len(queue)):
             await self.play(ctx)
 
-    @commands.command(name="die")
-    @commands.has_role(config.getBotMusicRole())
+    @commands.command(name="die", help="Hard resets the queue and stops playing")
+    @commands.has_role(config.getBotAdminRole())
     async def die(self, ctx):
-
         global queue
-        server = ctx.message.author.guild
-        voice_channel = server.voice_client
-        voice_channel.pause()
+        try:
+            server = ctx.message.author.guild
+            voice_channel = server.voice_client
+            voice_channel.pause()
+        except AttributeError:
+            errorEmbed = discord.Embed(title="Die Error", 
+            description="You are not connected to a voice channel",
+            colour=config.getDiscordColour("red"))
+            errorEmbed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=errorEmbed)
+            return
         queue.clear()
         lg.info(f"Cleared the queue!")
-        """
-        FIXME:  HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
-In embed.description: Could not interpret "['Clicks Bot going dark ... ... ...']" as string.
-        """
         response = "Clicks Bot going dark ... ... ..."
 
-        infoEmbed = discord.Embed(title="Shutdown", description=response, color=discord.Colour(0x000030),
+        infoEmbed = discord.Embed(title="Shutdown", description=response, color=config.getDiscordColour("red"),
                                   timestamp=datetime.now())
         await ctx.send(embed=infoEmbed)
 
@@ -203,14 +209,12 @@ In embed.description: Could not interpret "['Clicks Bot going dark ... ... ...']
         if not loop:
             loop = True
             queue.append(last_song)
-            infoEmbed = discord.Embed(title="Loop", description="Looping song", color=discord.Colour(0x000030),
-                                      timestamp=datetime.now())
+            infoEmbed = discord.Embed(title="Loop", description="Looping the current song", color=config.getDiscordColour("blue"),)
             await ctx.send(embed=infoEmbed)
 
         elif loop:
             loop = False
-            infoEmbed = discord.Embed(title="Loop", description="Not looping song anymore", color=discord.Colour(0x000030),
-                                      timestamp=datetime.now())
+            infoEmbed = discord.Embed(title="Loop", description="Not looping song anymore", color=config.getDiscordColour("blue"),)
             await ctx.send(embed=infoEmbed)
 
     @commands.command(name="queue", help=strings.get_help("queue_help"))
@@ -301,7 +305,7 @@ In embed.description: Could not interpret "['Clicks Bot going dark ... ... ...']
         await self.play(ctx)
 
     @commands.command(name="skipall", help="Dieser Befehl löscht die gesamte Song-Warteschleife und hört auf Musik "
-                                           "abzuspielen. Nun kannst du neue Songs in die Queue stellen.")
+                                           "abzuspielen. Nun kannst du neue Songs in die Queue stellen.", aliases=["sa", "queue_clear", "qc"])
     @commands.has_role(config.getBotMusicRole())
     async def skipall(self, ctx):
 
@@ -368,12 +372,6 @@ In embed.description: Could not interpret "['Clicks Bot going dark ... ... ...']
         #TODO: convert to embed
         await ctx.send(f"Resumed song currently playing!")
 
-    @commands.command(name="volume")
-    @commands.has_role(config.getBotMusicRole())
-    async def volume(self, ctx):
-
-        pass
-
     @commands.command(name="leave")
     @commands.has_role(config.getBotMusicRole())
     async def leave(self, ctx):
@@ -388,11 +386,6 @@ In embed.description: Could not interpret "['Clicks Bot going dark ... ... ...']
             voice_client = ctx.message.guild.voice_client
             await voice_client.disconnect()
             lg.info(f"Disconnected from channel {ctx.message.author.voice.channel}")
-
-"""    @tasks.loop(minutes=5)
-    async def cleanup(self):
-        lg.info(f"Cleaning up the song files...")
-        await cleanup.remove_songs()"""
 
 
 def setup(bot):
