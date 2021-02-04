@@ -85,6 +85,32 @@ class MainEvents(commands.Cog):
             await member.create_dm()
 
 
+    @commands.Cog.listener()
+    async def on_member_update(self, before, after):
+        if not before.status == after.status:
+            lg.info(f"{after.name} changed their status from {before.status} to {after.status}")
+        
+        if not before.activity == after.activity:
+            if before.activity:
+                if not before.name == "Fortnite" and after.name == "Fortnite":
+                    lg.info(f"{after.name} changed their activity from {before.activity.name} to {after.activity.name}")
+
+            else:
+                lg.info(f"{after.name} started to play {after.activity.name}")
+
+        if not before.nick == after.nick:
+            lg.info(f"{after.name} changed their nick from {before.nick} to {after.nick}")
+        
+        if not before.roles == after.roles:
+            for role in before.roles:
+                if not role in after.roles:
+                    lg.info(f"{role.name} was removed from {after.name}")
+
+            for role  in after.roles:
+                if not role in before.roles:
+                    lg.info(f"{role.name} was added to {after.name}")
+
+
 def setup(bot):
 
     bot.add_cog(MainEvents(bot))
