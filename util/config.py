@@ -113,12 +113,14 @@ def getBotMusicRole():
     return data["Bot Music Role"]
 
 
-def getKey():
-    return data["key"]
-
+def getHypixelKey():
+    return data["hypixel_key"]
 
 def getSteamKey():
     return data["steam_key"]
+
+def getGeniusKey():
+    return data["genius_key"]
 
 def getDiscordColour(colourname):
     if colourname == "red":
