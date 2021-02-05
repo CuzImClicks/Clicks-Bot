@@ -6,6 +6,8 @@ from util import logger
 from util.logger import path
 from datetime import datetime
 from util import config
+import colorama
+
 lg = logging.getLogger(__name__)
 import logging
 fl = logging.FileHandler(f"{path}\logs\log.log")
@@ -30,23 +32,25 @@ class CommandEvents(commands.Cog):
         if isinstance(error, commands.errors.CheckFailure):
 
             error_msg = "Du hast nicht genügend Rechte für diesen Befehl!"
-            errorEmbed = discord.Embed(title="Command Error", colour=config.getDiscordColour("red"), timestamp=time_now)
+            errorEmbed = discord.Embed(title="Command Error", colour=config.getDiscordColour("red"))
             errorEmbed.add_field(name="Error Message", value=error_msg)
             errorEmbed.add_field(name="Raised by", value=ctx.author.name)
             await ctx.send(embed=errorEmbed)
-            lg.error(error_msg)
+            lg.error(colorama.Fore.RED+error_msg)
 
         elif isinstance(error, commands.errors.CommandNotFound):
-                cmdnfEmbed = discord.Embed(title="Command Error", color= discord.Colour(0x9D1309), timestamp=time_now)
+                cmdnfEmbed = discord.Embed(title="Command Error", color=config.getDiscordColour("red"))
                 cmdnfEmbed.add_field(name="Error Message", value=f"Command not found")
                 cmdnfEmbed.add_field(name="Raised by", value=ctx.author.name)
                 await ctx.send(embed=cmdnfEmbed)
+                lg.info(colorama.Fore.RED+str(error))
+
         else:
-            lg.error(error)
-            errorEmbed = discord.Embed(title="Command Error", color=discord.Colour(0x9D1309), timestamp=time_now)
+            errorEmbed = discord.Embed(title="Command Error", color=config.getDiscordColour("red"))
             errorEmbed.add_field(name="Error Message", value=str(error))
             errorEmbed.add_field(name="Raised by", value=ctx.author.name)
             await ctx.send(embed=errorEmbed)
+            lg.error(colorama.Fore.RED+str(error))
     
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):
