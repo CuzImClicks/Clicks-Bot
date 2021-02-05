@@ -122,7 +122,7 @@ class MusicBot(commands.Cog):
 
                 infoEmbed = discord.Embed(title="Play", description=f"Now playing {player.title}",
                                           color=config.getDiscordColour("blue"), timestamp=datetime.now())
-                infoEmbed.set_thumbnail(url=f"https://img.youtube.com/vi/{str(last_song).split('=')[1]}/sddefault.jpg")
+                infoEmbed.set_image(url=f"https://img.youtube.com/vi/{str(last_song).split('=')[1]}/sddefault.jpg")
                 lg.info(f"Downloading the song thumbnail from "
                         + f"https://img.youtube.com/vi/{str(last_song).split('=')[1]}/sddefault.jpg")
                 if not loop:
@@ -258,7 +258,7 @@ class MusicBot(commands.Cog):
 
                 await ctx.send(embed=errorEmbed)
                 return
-            infoEmbed.set_thumbnail(url=thumbnail)
+            infoEmbed.set_image(url=thumbnail)
             infoEmbed.set_author(name=ctx.author, url=ctx.author.avatar_url)
             await ctx.send(embed=infoEmbed)
             voice = get(self.bot.voice_clients, guild=ctx.author.guild)
