@@ -10,7 +10,7 @@ import os
 from clicks_util import timeconvert, nbt_data
 
 lg = logging.getLogger(__name__)
-key = config.getKey()
+key = config.getHypixelKey()
 path = os.getcwd()
 
 
