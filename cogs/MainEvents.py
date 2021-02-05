@@ -92,7 +92,7 @@ class MainEvents(commands.Cog):
         
         if not before.activity == after.activity:
             if before.activity:
-                if not before.name == "Fortnite" and after.name == "Fortnite":
+                if not before.activity == "Fortnite" and after.activity == "Fortnite":
                     lg.info(f"{after.name} changed their activity from {before.activity.name} to {after.activity.name}")
 
             else:
