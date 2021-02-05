@@ -40,32 +40,32 @@ class VoiceEvents(commands.Cog):
                     lg.info(f"{member.guild} - {member.name} started streaming in {after.channel.name}")
                     self.current_streamers.append(member.id)
 
-                elif member.voice.self_mute:
+                if member.voice.self_mute:
                     lg.info(f"{member.guild} - {member.name} muted himself")
                     self.current_muted.append(member.id)
 
-                elif member.voice.self_deaf:
+                if member.voice.self_deaf:
                     lg.info(f"{member.guild} - {member.name} deafened himself")
                     self.current_deaf.append(member.id)
 
-                else:
-                    for streamer in self.current_streamers:
-                        if member.id == streamer:
-                            if not member.voice.self_stream:
-                                self.current_streamers.remove(member.id)
-                                lg.info(f"{member.guild} - {member.name} stopped streaming")
 
-                    for muted in self.current_muted:
-                        if member.id == muted:
-                            if not member.voice.self_mute:
-                                self.current_muted.remove(member.id)
-                                lg.info(f"{member.guild} - {member.name} unmuted himself")
+                for streamer in self.current_streamers:
+                    if member.id == streamer:
+                        if not member.voice.self_stream:
+                            self.current_streamers.remove(member.id)
+                            lg.info(f"{member.guild} - {member.name} stopped streaming")
 
-                    for deaf in self.current_deaf:
-                        if member.id == deaf:
-                            if not member.voice.self_deaf:
-                                self.current_deaf.remove(member.id)
-                                lg.info(f"{member.guild} - {member.name} undeafened himself")
+                for muted in self.current_muted:
+                    if member.id == muted:
+                        if not member.voice.self_mute:
+                            self.current_muted.remove(member.id)
+                            lg.info(f"{member.guild} - {member.name} unmuted himself")
+
+                for deaf in self.current_deaf:
+                    if member.id == deaf:
+                        if not member.voice.self_deaf:
+                            self.current_deaf.remove(member.id)
+                            lg.info(f"{member.guild} - {member.name} undeafened himself")
 
 
 def setup(bot):
