@@ -6,14 +6,16 @@ from PIL import Image
 import asyncio
 import logging
 from util.hypixel.player import Player
+from util.hypixel.hypixel_server import Hypixel
 import qrcode
 from util.steam.user import User
 
 server = FastAPI()
 
 #uvicorn server:server --host 127.0.0.1 --port 5000
+#can't be executed with os.popen()
 
-lg = logging.getLogger(__name__)
+lg = logging.getLogger("Server")
 
 
 @server.get("/")
@@ -55,6 +57,14 @@ async def hypixel(key: str = "", username: str = ""):
         pl = Player(username)
 
         return JSONResponse(status_code=200, content=pl.data)
+
+@server.get("/api/Hypixel/WatchDog")
+async def hypixel_watchdog(key: str = ""):
+    if not check_key(key):
+        return JSONResponse(status_code=401, content="Invalid key")
+    
+    else:
+        return JSONResponse(status_code=200, content=await Hypixel.watchdog())
 
 
 @server.get("/api/Hypixel/SkyBlock")
@@ -129,7 +139,4 @@ async def qr_code(key: str = "", content: str = "", version: int = 1):
         img.save(f"{os.getcwd()}/qr_codes/qr.png")
 
         return FileResponse(f"{os.getcwd()}/qr_codes/qr.png")
-
-
-
 
