@@ -35,6 +35,7 @@ X config
 	X magmaboss 
 	X minecraft online function
 	X enable and disable command
+X Lyrics command
 
 
 
