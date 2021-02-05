@@ -120,10 +120,6 @@ def getKey():
 def getSteamKey():
     return data["steam_key"]
 
-def getYoutubeKey():
-    return data["youtube_api"]
-
-
 def getDiscordColour(colourname):
     if colourname == "red":
         return discord.Colour(0x9D1309)
