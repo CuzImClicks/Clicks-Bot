@@ -1,7 +1,7 @@
 import logging
 import os
 
-lg = logging.getLogger(__name__)
+lg = logging.getLogger(__name__[5:])
 path = os.getcwd()
 
 fl = logging.FileHandler(f"{path}/logs/log.log")
@@ -11,12 +11,6 @@ fl.setLevel(logging.INFO)
 async def get_file_logger():
 
     return fl
-
-
-async def log_typing(channel, user, when):
-
-    lg.info(f"[{str(user)}] is typing in {str(channel)} since {when}")
-
 
 async def log_send(ctx, msg):
 

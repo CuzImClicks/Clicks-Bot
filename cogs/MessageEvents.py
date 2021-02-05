@@ -7,7 +7,7 @@ from util.logger import *
 import logging
 import os
 
-lg = logging.getLogger(__name__)
+lg = logging.getLogger(__name__[5:])
 lg_chat = logging.getLogger("CHAT")
 from util.logger import path
 import logging
@@ -52,7 +52,7 @@ class MessageEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_typing(self, channel, user, when):
 
-        await log_typing(channel, user, when)
+        lg.info(f"[{str(user)}] is typing in {str(channel)} since {when}")
 
 
 def setup(bot):

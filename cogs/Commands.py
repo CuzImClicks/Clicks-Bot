@@ -13,7 +13,7 @@ from datetime import datetime
 
 path = os.getcwd()
 
-lg = logging.getLogger(__name__)
+lg = logging.getLogger(__name__[5:])
 
 fl = logging.FileHandler(f"{path}/logs/log.log")
 fl.setLevel(logging.INFO)

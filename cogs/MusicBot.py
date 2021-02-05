@@ -14,7 +14,7 @@ from clicks_util import timeconvert
 from lyricsgenius import Genius
 from cogs.GeniusAPI_Handler import HiddenPrints
 
-lg = logging.getLogger(__name__)
+lg = logging.getLogger(__name__[5:])
 
 global ytdl, queue
 ytdl = youtube_dl.YoutubeDL(strings.get_ytdl_format_options())

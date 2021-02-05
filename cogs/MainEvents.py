@@ -10,7 +10,7 @@ from clicks_util import timeconvert
 
 path = os.getcwd()
 
-lg = logging.getLogger(__name__)
+lg = logging.getLogger(__name__[5:])
 lg_chat = logging.getLogger("CHAT")
 fl_chat = logging.FileHandler(f"{path}/logs/chat.log")
 fl_chat.setLevel(config.getFileLoggingLevel())

@@ -9,7 +9,7 @@ from discord.ext import commands
 # added logger - removed print statements
 import logging
 
-lg = logging.getLogger(__name__)
+lg = logging.getLogger(__name__[5:])
 
 
 class GitHubFetcher(commands.Cog):

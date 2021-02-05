@@ -8,7 +8,7 @@ from datetime import datetime
 from util import config
 import colorama
 
-lg = logging.getLogger(__name__)
+lg = logging.getLogger(__name__[5:])
 import logging
 fl = logging.FileHandler(f"{path}\logs\log.log")
 fl.setLevel(logging.INFO)

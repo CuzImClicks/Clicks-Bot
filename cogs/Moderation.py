@@ -14,7 +14,7 @@ import logging
 import varname
 
 
-lg = logging.getLogger(__name__)
+lg = logging.getLogger(__name__[5:])
 
 async def make_bugreport_embed(ctx, bugreport: dict) -> discord.Embed:
     user = get(ctx.guild.members, name=bugreport["author"])
