@@ -3,6 +3,7 @@ from datetime import datetime
 from random import choice
 
 import discord
+from requests import __title__
 import youtube_dl
 from discord.ext import commands, tasks
 
@@ -10,6 +11,8 @@ from util import config, strings, logger, cleanup
 from util.logger import *
 from discord.utils import get
 from clicks_util import timeconvert
+from lyricsgenius import Genius
+from cogs.GeniusAPI_Handler import HiddenPrints
 
 lg = logging.getLogger(__name__)
 
@@ -17,6 +20,8 @@ global ytdl, queue
 ytdl = youtube_dl.YoutubeDL(strings.get_ytdl_format_options())
 queue = []
 youtube_dl.utils.bug_reports_message = lambda msg: lg.error(msg)
+
+genius = Genius(config.getGeniusKey())
 
 global last_song, loop, paused
 last_song = ""
@@ -223,7 +228,25 @@ class MusicBot(commands.Cog):
 
         global queue
         if args:
-            url = args[0]
+            if str(args[0]).startswith("https://"):
+                url = args[0]
+            
+            else:
+                convertTuple = lambda tup: str(tup).replace("(", "").replace("'", "").replace(")", "").replace(",", "")
+                msg = convertTuple(args)
+                infoEmbed = discord.Embed(title=f"Searching song '{msg}'")
+                await ctx.send(embed=infoEmbed)
+                with HiddenPrints():
+                    song = genius.search_song(msg)
+                    if song.media[0]["provider"] == "youtube":
+                        url = song.media[0]["url"]
+
+                    else:
+                        errorEmbed = discord.Embed(title="Command Error",
+                        description="Could not find song on YouTube",
+                        colour=config.getDiscordColour("red"))
+                        await ctx.send(embed=errorEmbed)
+                        return
 
         else:
             url = None
@@ -242,7 +265,6 @@ class MusicBot(commands.Cog):
                 await ctx.send(embed=infoEmbed)
 
         else:
-
             queue.append(url)
             lg.info(f"Added {url} to queue")
             infoEmbed = discord.Embed(title="Queue", description=f"Added {url} to the queue",
