@@ -1,4 +1,6 @@
 import logging
+
+from discord import colour
 from clicks_util import json_util
 import os
 import discord
@@ -131,6 +133,9 @@ def getDiscordColour(colourname):
 
     elif colourname == "green":
         return discord.Colour(0x0BAF07)
+
+    elif colourname == "genius_yellow":
+        return discord.Colour(0xffff64)
 
 def getPiHoleIp() -> str:
     return data["pihole_ip"]
