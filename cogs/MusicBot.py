@@ -44,7 +44,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
 
         if 'entries' in data:
-            # take first item from a playlist
             data = data['entries'][0]
 
         filename = data['url'] if stream else ytdl.prepare_filename(data)
@@ -125,9 +124,10 @@ class MusicBot(commands.Cog):
                     lg.info(f"Removed song {queue[0]} from the queue ")
                     del (queue[0])
 
-                infoEmbed = discord.Embed(title="Play", description=f"Now playing {player.title}",
-                                          color=config.getDiscordColour("blue"), timestamp=datetime.now())
+                infoEmbed = discord.Embed(description=f"Now playing [{player.title}]({last_song})",
+                                          color=config.getDiscordColour("blue"))
                 infoEmbed.set_image(url=f"https://img.youtube.com/vi/{str(last_song).split('=')[1]}/sddefault.jpg")
+
                 lg.info(f"Downloading the song thumbnail from "
                         + f"https://img.youtube.com/vi/{str(last_song).split('=')[1]}/sddefault.jpg")
                 if not loop:
@@ -141,7 +141,7 @@ class MusicBot(commands.Cog):
 
             lg.error(f"No songs left in queue!")
             errorEmbed = discord.Embed(title="Command Error", description="No songs left in the queue",
-                                       color=discord.Colour(0x9D1309), timestamp=datetime.now())
+                                       color=config.getDiscordColour("red"), timestamp=datetime.now())
             await ctx.send(embed=errorEmbed)
 
     async def wait_for_end(self, guild: discord.Guild):
@@ -178,7 +178,7 @@ class MusicBot(commands.Cog):
             del (list[list.index(song)])
 
         infoEmbed = discord.Embed(title="Among Us", description="Queued the Among Us songs",
-                                  color=discord.Colour(0x000030), timestamp=datetime.now())
+                                  color=config.getDiscordColour("blue"), timestamp=datetime.now())
         await ctx.send(embed=infoEmbed)
 
         for i in range(0, len(queue)):
@@ -202,7 +202,7 @@ class MusicBot(commands.Cog):
         queue.clear()
         lg.info(f"Cleared the queue!")
         response = "Clicks Bot going dark ... ... ..."
-
+        loop = False
         infoEmbed = discord.Embed(title="Shutdown", description=response, color=config.getDiscordColour("red"),
                                   timestamp=datetime.now())
         await ctx.send(embed=infoEmbed)
@@ -236,25 +236,37 @@ class MusicBot(commands.Cog):
                 msg = convertTuple(args)
                 infoEmbed = discord.Embed(title=f"Searching song '{msg}'")
                 await ctx.send(embed=infoEmbed)
-                with HiddenPrints():
-                    song = genius.search_song(msg)
-                    if song.media[0]["provider"] == "youtube":
-                        url = song.media[0]["url"]
+                try:
+                    with HiddenPrints():
+                        song = genius.search_song(msg)
+                        url = ""
+                        for provider in song.media:
+                            lg.info(provider)
+                            if provider["provider"] == "youtube":
+                                url = song.media[int(song.media.index(provider))]["url"].replace("http", "https")
+                                lg.info(url)
 
-                    else:
-                        errorEmbed = discord.Embed(title="Command Error",
-                        description="Could not find song on YouTube",
-                        colour=config.getDiscordColour("red"))
-                        await ctx.send(embed=errorEmbed)
-                        return
+                        if url == "":
+                            errorEmbed = discord.Embed(title="Command Error",
+                            description="Could not find song on YouTube",
+                            colour=config.getDiscordColour("red"))
+                            await ctx.send(embed=errorEmbed)
+                            return
 
+                except AttributeError:
+                            errorEmbed = discord.Embed(title="Command Error",
+                            description="Could not find song on Genius, please provide more information or post the song directly with a youtube.com link",
+                            colour=config.getDiscordColour("red"))
+                            await ctx.send(embed=errorEmbed)
+                            return
+                
         else:
             url = None
 
         if url is None:
             if len(queue) == 0:
                 errorEmbed = discord.Embed(title="Command Error", description="There are no songs in the queue",
-                                           color=discord.Colour(0x9D1309), timestamp=datetime.now())
+                                           color=config.getDiscordColour("red"), timestamp=datetime.now())
                 await ctx.send(embed=errorEmbed)
 
             else:
@@ -267,21 +279,22 @@ class MusicBot(commands.Cog):
         else:
             queue.append(url)
             lg.info(f"Added {url} to queue")
-            infoEmbed = discord.Embed(title="Queue", description=f"Added {url} to the queue",
-                                      color=discord.Colour(0x000030), timestamp=datetime.now())
+            infoEmbed = discord.Embed(title="Queue", description=f"Added [song]({url}) to the queue",
+                                      color=config.getDiscordColour("blue"))
             try:
                 thumbnail = f"https://img.youtube.com/vi/{str(url).split('=')[1]}/sddefault.jpg"
 
             except IndexError:
                 errorEmbed = discord.Embed(title="Command Error", description="Invalid URL",
-                                           color=discord.Colour(0x9D1309))
+                                           color=config.getDiscordColour("red"))
                 errorEmbed.add_field(name="Possible causes", value="youtube short urls and indirect links can cause errors while downloading")
                 errorEmbed.set_footer(text=timeconvert.getTime())
 
                 await ctx.send(embed=errorEmbed)
                 return
             infoEmbed.set_image(url=thumbnail)
-            infoEmbed.set_author(name=ctx.author, url=ctx.author.avatar_url)
+            infoEmbed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+            infoEmbed.add_field(name="Position in queue", value=int(len(queue) + 1))
             await ctx.send(embed=infoEmbed)
             voice = get(self.bot.voice_clients, guild=ctx.author.guild)
             if not voice.is_playing():
@@ -296,17 +309,17 @@ class MusicBot(commands.Cog):
         try:
             if number > len(queue):
                 errorEmbed = discord.Embed(title="Command Error", description="The queue isn't that long",
-                                           color=discord.Colour(0x9D1309), timestamp=datetime.now())
+                                           color=config.getDiscordColour("red"), timestamp=datetime.now())
                 await ctx.send(embed=errorEmbed)
             del (queue[int(number)])
             lg.info(f"Deleted {queue[int(number)]} from queue")
             infoEmbed = discord.Embed(title="Remove", description="The song was removed from the queue",
-                                      color=discord.Colour(0x000030), timestamp=datetime.now())
+                                      color=config.getDiscordColour("blue"), timestamp=datetime.now())
             await ctx.send(embed=infoEmbed)
 
         except:
             errorEmbed = discord.Embed(title="Command Error", description="The queue is empty",
-                                       color=discord.Colour(0x9D1309), timestamp=datetime.now())
+                                       color=config.getDiscordColour("red"), timestamp=datetime.now())
             await ctx.send(embed=errorEmbed)
 
     @commands.command(name="insert")
