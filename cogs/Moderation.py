@@ -35,13 +35,14 @@ class Moderation(commands.Cog):
 
     @commands.command(name="blacklist")
     @commands.has_role(config.getBotAdminRole())
-    async def blacklist(self, ctx, target):
+    async def blacklist(self, ctx):
 
+        user = ctx.message.mentions[0]
         jf = JsonFile(name="blacklist.json", path=path)
         infoEmbed = discord.Embed(title="Blacklist",
                                   color=config.getDiscordColour("blue"),
                                   timestamp=timeconvert.getTime())
-        if target == "list":
+        if user.id == "list":
             member_ids = [member.id for member in ctx.author.guild.members]
             for user in jf.read()["blacklisted"]:
                 user = discord.get(member_ids, id=user)
@@ -49,7 +50,7 @@ class Moderation(commands.Cog):
 
             await ctx.send(embed=infoEmbed)
         else:
-            user = discord.utils.get([member.id for member in ctx.author.guild.members], id=target)
+            user = discord.utils.get([member.id for member in ctx.author.guild.members], id=user.id)
             blacklisted = jf.read()["blacklisted"]
             blacklisted.append(user)
             infoEmbed.add_field(name=user, value=f"Blacklisted")
@@ -58,9 +59,9 @@ class Moderation(commands.Cog):
 
     @commands.command(name="mute", help="Mutes a user")
     @commands.has_role(config.getBotAdminRole())
-    async def mute(self, ctx, target):
+    async def mute(self, ctx):
 
-        user = discord.utils.get(ctx.author.guild.members, name=str(target))
+        user = ctx.message.mentions[0]
 
         lg.info(user.name)
         muteEmbed = discord.Embed(title="Mute", description=f"Muted {user.name}", colour=config.getDiscordColour("blue"),
@@ -72,9 +73,9 @@ class Moderation(commands.Cog):
 
     @commands.command(name="unmute", help="Unmutes a user")
     @commands.has_role(config.getBotAdminRole())
-    async def unmute(self, ctx, target):
+    async def unmute(self, ctx):
 
-        user = discord.utils.get(ctx.author.guild.members, name=str(target))
+        user = ctx.message.mentions[0]
 
         lg.info(user)
         unmuteEmbed = discord.Embed(title="Unmute", description=f"Unmuted {user.name}", colour=config.getDiscordColour("blue"),
@@ -86,9 +87,9 @@ class Moderation(commands.Cog):
 
     @commands.command(name="kick")
     @commands.has_role(config.getBotAdminRole())
-    async def kick(self, ctx, target):
+    async def kick(self, ctx):
 
-        user = discord.utils.get(ctx.author.guild.members, name=str(target))
+        user = ctx.message.mentions[0]
 
         kickEmbed = discord.Embed(title="Kick", description=f"Kicked {user.name} from the server",
                                   colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime())
