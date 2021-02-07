@@ -29,8 +29,8 @@ X Fix the loop function
 X Create more moderation tools
 - More documentation in the files
 	- docstring for api stuff -> not custom methods
-- Error Embed feedback
-	- @<command_name>.error
+X Error Embed feedback
+	X @<command_name>.error
 X bugreport command
 	X database
 - convert all timestamps to time
