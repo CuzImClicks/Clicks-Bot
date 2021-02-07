@@ -9,6 +9,8 @@ from util.hypixel.player import Player
 from util.hypixel.hypixel_server import Hypixel
 import qrcode
 from util.steam.user import User
+from lyricsgenius import Genius
+from util import config
 
 server = FastAPI()
 
@@ -16,7 +18,6 @@ server = FastAPI()
 #can't be executed with os.popen()
 
 lg = logging.getLogger("Server")
-
 
 @server.get("/")
 async def index():
@@ -140,3 +141,14 @@ async def qr_code(key: str = "", content: str = "", version: int = 1):
 
         return FileResponse(f"{os.getcwd()}/qr_codes/qr.png")
 
+@server.get("/api/lyrics")
+async def lyrics(key: str="", song_name: str=""):
+    if not check_key(key):
+        return JSONResponse(status_code=401, content="Invalid key")
+
+    else:
+        genuis = Genius(config.getGeniusKey())
+        song = genuis.search_song(song_name)
+        if song == None:
+            return JSONResponse(status_code=204, content={"success": False, "error": {""}})
+        return JSONResponse(status_code=200, content={"success": True, song_name: song.lyrics})
