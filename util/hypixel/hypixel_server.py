@@ -56,7 +56,7 @@ class Hypixel:
             dict: [the leaderboards of hypixel]
         """
         async with ClientSession() as session:
-            async with session.get(f"https://api.hypixel.net/leaderbords?key={key}") as response:
+            async with session.get(f"https://api.hypixel.net/leaderboards?key={key}") as response:
                 return await response.json()
 
     @classmethod
