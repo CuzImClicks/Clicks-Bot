@@ -20,6 +20,10 @@ To create a webhook:
 6. Paste the url and add /github to it
 7. Select json
 
+install dependencies:
+windows: python -m pip install -r requirements.txt
+linux: sudo python3.8 -m pip install -r requirements.txt
+
 TODO:
 X Fix the loop function
 X Create more moderation tools

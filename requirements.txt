@@ -1,0 +1,10 @@
+discord
+youtube-dl 
+ffmpeg-python 
+aiohttp
+aiofiles
+mojang
+qrcode
+varname
+NBT
+lyricsgenius
