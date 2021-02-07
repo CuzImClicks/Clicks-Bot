@@ -12,6 +12,7 @@ from clicks_util.json_util import JsonFile
 from util.logger import path
 import logging
 import varname
+from clicks_util import timeconvert
 
 
 lg = logging.getLogger(__name__[5:])
@@ -39,7 +40,7 @@ class Moderation(commands.Cog):
         jf = JsonFile(name="blacklist.json", path=path)
         infoEmbed = discord.Embed(title="Blacklist",
                                   color=config.getDiscordColour("blue"),
-                                  timestamp=datetime.now())
+                                  timestamp=timeconvert.getTime())
         if target == "list":
             member_ids = [member.id for member in ctx.author.guild.members]
             for user in jf.read()["blacklisted"]:
@@ -56,46 +57,46 @@ class Moderation(commands.Cog):
             jf.write({"blacklisted": blacklisted})
 
     @commands.command(name="mute", help="Mutes a user")
-    @commands.has_role("Administrator")
+    @commands.has_role(config.getBotAdminRole())
     async def mute(self, ctx, target):
 
         user = discord.utils.get(ctx.author.guild.members, name=str(target))
 
         lg.info(user.name)
-        muteEmbed = discord.Embed(title="Mute", description=f"Muted {user.name}", color=discord.Colour(0x000030),
-                                  timestamp=datetime.now())
+        muteEmbed = discord.Embed(title="Mute", description=f"Muted {user.name}", colour=config.getDiscordColour("blue"),
+                                  timestamp=timeconvert.getTime())
         await ctx.send(embed=muteEmbed)
 
         lg.info(f"Muted {user.name}")
         await user.edit(mute=True)
 
     @commands.command(name="unmute", help="Unmutes a user")
-    @commands.has_role("Administrator")
+    @commands.has_role(config.getBotAdminRole())
     async def unmute(self, ctx, target):
 
         user = discord.utils.get(ctx.author.guild.members, name=str(target))
 
         lg.info(user)
-        unmuteEmbed = discord.Embed(title="Unmute", description=f"Unmuted {user.name}", color=discord.Colour(0x000030),
-                                    timestamp=datetime.now())
+        unmuteEmbed = discord.Embed(title="Unmute", description=f"Unmuted {user.name}", colour=config.getDiscordColour("blue"),
+                                    timestamp=timeconvert.getTime())
         await ctx.send(embed=unmuteEmbed)
 
         lg.info(f"Unmuted {user.name}")
         await user.edit(mute=False)
 
     @commands.command(name="kick")
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def kick(self, ctx, target):
 
         user = discord.utils.get(ctx.author.guild.members, name=str(target))
 
         kickEmbed = discord.Embed(title="Kick", description=f"Kicked {user.name} from the server",
-                                  color=discord.Colour(0x000030), timestamp=datetime.now())
+                                  colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime())
         await ctx.send(embed=kickEmbed)
         await self.bot.kick(user)
 
     @commands.command(name="muteall", help=strings.get_help("help_muteall"), aliases=["ma"])
-    @commands.has_role("Bot Access")
+    @commands.has_role(config.getBotAccessRole())
     async def muteall(self, ctx):
 
         try:
@@ -109,17 +110,17 @@ class Moderation(commands.Cog):
                     lg.info(f"Muted user: {user.nick}")
 
             maEmbed = discord.Embed(title="Mute All", description=f"Muted all users in {ctx.author.voice.channel.name}",
-                                    color=discord.Color(0x9D1309), timestamp=datetime.now())
+                                    colour=config.getDiscordColour("red"), timestamp=timeconvert.getTime())
             await ctx.send(embed=maEmbed)
 
         except Exception as e:
             errorEmbed = discord.Embed(title="Command Error", description="You're not in a voice channel",
-                                       color=discord.Colour(0x000030), timestamp=datetime.now())
+                                       colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime())
             await ctx.send(embed=errorEmbed)
             lg.error(e)
 
     @commands.command(name="unmuteall", help=strings.get_help("help_unmuteall"), aliases=["uma"])
-    @commands.has_role("Bot Access")
+    @commands.has_role(config.getBotAccessRole())
     async def unmuteall(self, ctx):
 
         try:
@@ -130,10 +131,10 @@ class Moderation(commands.Cog):
                 except discord.errors.NotFound as e:
                     lg.error(f"User {user.nick} is not connected to the voice chat anymore")
 
-            await ctx.send(f"Unmuted all users in '{ctx.author.voice.channel.name}'", delete_after=5)
+            await ctx.send(f"Unmuted all users in '{ctx.author.voice.channel.name}'")
 
         except Exception as e:
-            await ctx.send("Du bist in keinem Voice Channel", delete_after=5)
+            await ctx.send("Du bist in keinem Voice Channel")
             lg.error(e)
 
     @commands.command(name="lock", help="Locks the channel user limit to the current amount of users inside")
@@ -147,13 +148,13 @@ class Moderation(commands.Cog):
                                       description=f"Locked the channel {ctx.author.voice.channel.name} to a maximum"
                                                   f" of {len(ctx.author.voice.channel.members)}",
                                       color=config.getDiscordColour("blue"),
-                                      timestamp=datetime.now())
+                                      timestamp=timeconvert.getTime())
             await ctx.send(embed=infoEmbed)
         except Exception as e:
             errorEmbed = discord.Embed(title="Lock Error",
                                        description="You are not connected to a voice channel!",
                                        colour=config.getDiscordColour("red"),
-                                       timestamp=datetime.now())
+                                       timestamp=timeconvert.getTime())
             await ctx.send(embed=errorEmbed)
             lg.error(e)
 
@@ -187,21 +188,20 @@ class Moderation(commands.Cog):
             await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing,
                                                                      name=f"Online on {len(self.bot.guilds)} servers"))
             lg.info(f"Changed the status to: Online on {len(self.bot.guilds)} servers")
-            await ctx.send(f"Changed status to: Online on {len(self.bot.guilds)} servers", delete_after=5)
+            await ctx.send(f"Changed status to: Online on {len(self.bot.guilds)} servers")
 
         else:
 
             await self.bot.change_presence(
                 activity=discord.Activity(type=discord.ActivityType.watching, name="{}".format(" ".join(args))))
-            await ctx.send("Changing status to {}".format(" ".join(args)), delete_after=5)
+            await ctx.send("Changing status to {}".format(" ".join(args)))
 
     @commands.command(name="clear")
-    @commands.has_role("Dev")
+    @commands.has_role(config.getBotAdminRole())
     async def clear(self, ctx):
 
         channel = ctx.message.channel
-
-        await channel.delete_messages(await channel.history().flatten())
+        await channel.purge(await channel.history().flatten())
 
     @commands.command(name="botaccess")
     @commands.has_role(config.getBotAdminRole())
@@ -229,7 +229,7 @@ class Moderation(commands.Cog):
 
         shutdown_msg = "Bot1 going dark... ... ..."
 
-        await ctx.send(shutdown_msg, delete_after=5)
+        await ctx.send(shutdown_msg)
         await log_send(ctx, shutdown_msg)
         await lg.warning(f"Shutting down")
         await ctx.bot.logout()
@@ -287,6 +287,7 @@ class Moderation(commands.Cog):
         await ctx.send(embed=infoEmbed)
 
     @commands.command(name="bugreport")
+    @commands.has_role(config.getBotAdminRole())
     async def bugreport(self, ctx, name: str, theme: str, command:str ="",description: str=""):
         jf = JsonFile("bugreports.json", f"{os.getcwd()}/bugreports")
 
