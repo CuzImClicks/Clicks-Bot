@@ -7,7 +7,7 @@ import requests
 from util import minecraft
 from util import config
 
-key = config.gethypixelKey()
+key = config.getHypixelKey()
 lg = logging.getLogger(__name__)
 path = os.getcwd()
 
