@@ -11,15 +11,6 @@ from clicks_util import timeconvert
 path = os.getcwd()
 
 lg = logging.getLogger(__name__[5:])
-lg_chat = logging.getLogger("CHAT")
-fl_chat = logging.FileHandler(f"{path}/logs/chat.log")
-fl_chat.setLevel(config.getFileLoggingLevel())
-fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
-fl_chat.setFormatter(fmt)
-
-lg_chat.addHandler(fl_chat)
-
-previous_message_id = ""
 
 
 class MainEvents(commands.Cog):
@@ -27,7 +18,6 @@ class MainEvents(commands.Cog):
     def __init__(self, bot):
 
         self.bot = bot
-        self.previous_message_id = ""
 
     @commands.Cog.listener()
     async def on_ready(self):

@@ -117,7 +117,7 @@ class HypixelAPI_Handler(commands.Cog):
                         self.magmaboss
 
     @commands.command(name="bazaar", aliases=["bz"])
-    @commands.has_role(config.getDefaultRole())
+    @commands.has_role(config.getBotAccessRole())
     async def bazaar(self, ctx, *args):
         """Get the last prices for an item in the Hypixel SkyBlock bazaar"""
         if not args:
@@ -158,7 +158,7 @@ class HypixelAPI_Handler(commands.Cog):
     #TODO: Add auctions
 
     @commands.command(name="fairy_souls")
-    @commands.has_role(config.getDefaultRole())
+    @commands.has_role(config.getBotAccessRole())
     async def fairy_souls(self, ctx, playername):
         """Get the collected fairy souls of a player"""
         pl = Player(playername)

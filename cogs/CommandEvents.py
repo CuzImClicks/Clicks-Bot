@@ -14,8 +14,6 @@ fl = logging.FileHandler(f"{path}\logs\log.log")
 fl.setLevel(logging.INFO)
 lg.addHandler(fl)
 
-#TODO: convert all embed colours to config.getDiscordColour()
-
 class CommandEvents(commands.Cog):
     '''
     instead of using @bot.event use @bot.Cog.listener()
