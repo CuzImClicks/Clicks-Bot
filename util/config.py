@@ -108,9 +108,6 @@ def getBotAdminRole():
     return data["Bot Admin Role"]
 
 
-def getDefaultRole():
-    return data["Default Role"]
-
 def getBotMusicRole():
     return data["Bot Music Role"]
 
@@ -118,11 +115,14 @@ def getBotMusicRole():
 def getHypixelKey():
     return data["hypixel_key"]
 
+
 def getSteamKey():
     return data["steam_key"]
 
+
 def getGeniusKey():
     return data["genius_key"]
+
 
 def getDiscordColour(colourname):
     if colourname == "red":
@@ -137,11 +137,14 @@ def getDiscordColour(colourname):
     elif colourname == "genius_yellow":
         return discord.Colour(0xffff64)
 
+
 def getPiHoleIp() -> str:
     return data["pihole_ip"]
 
+
 def getMagmaboss() -> bool:
     return data["magmaboss"]
+
 
 def getHypixelOnline() -> bool:
     return data["hypixel_online"]
