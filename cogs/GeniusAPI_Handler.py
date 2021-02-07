@@ -10,7 +10,6 @@ import datetime
 from aiohttp import ClientSession
 import json
 import lyricsgenius
-import numpy
 
 lg = logging.getLogger(__name__[5:])
 
