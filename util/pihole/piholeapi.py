@@ -113,6 +113,11 @@ class PiHoleAPI:
 
     @property
     def recentBlocked(self) -> dict:
+        """[summary]
+
+        Returns:
+            dict: [a list of recently blocked domains]
+        """
         async with ClientSession() as session:
             async with session.get(self.url+"recentBlocked") as data:
                 content = json.loads(data.text())
