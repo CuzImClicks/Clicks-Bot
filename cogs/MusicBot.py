@@ -294,7 +294,7 @@ class MusicBot(commands.Cog):
                 return
             infoEmbed.set_image(url=thumbnail)
             infoEmbed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
-            infoEmbed.add_field(name="Position in queue", value=int(len(queue) + 1))
+            infoEmbed.add_field(name="Position in queue", value=int(len(queue)))
             await ctx.send(embed=infoEmbed)
             voice = get(self.bot.voice_clients, guild=ctx.author.guild)
             if not voice.is_playing():
