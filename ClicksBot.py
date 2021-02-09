@@ -36,6 +36,10 @@ lg_chat.addHandler(fl_chat)
 jf = JsonFile("blacklist.json", path)
 blacklisted = jf.read()["blacklisted"]
 
+#read the file containing all the blocked channels
+jf_blocked_channels = JsonFile("blocked_channels.json", path)
+blocked_channels = jf_blocked_channels.read()
+
 #gain the ability to access all guild members
 intentions = discord.Intents.all()
 intentions.members = True
@@ -163,6 +167,11 @@ async def on_message(message):
     if str(message.author.id) in blacklisted:
         #Blacklisted people can't send messages on servers that the bot is running on
         lg.info(f"Blacklisted user {message.author.name} tried to send '{message.content}' in the channel {message.channel}")
+        return
+
+    if message.channel.id in blocked_channels:
+        #check if the message is in the list of blocked channelsu
+        await message.delete()
         return
 
     elif message.channel.id == 799291117425524756:  #TODO: add list of channels that are blocked  
