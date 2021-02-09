@@ -159,11 +159,9 @@ async def on_message(message):
     '''Message Even'''
     if message.author.bot:
         return
+    
+    lg_chat.info(f"{colorama.Fore.LIGHTYELLOW_EX}[{message.guild}] -  {message.channel}: {message.author.name}: {message.content}")
 
-    if not message.guild:
-        return await message.channel.send((
-            "You can't use commands in direct messages"
-            ))
     if str(message.author.id) in blacklisted:
         #Blacklisted people can't send messages on servers that the bot is running on
         lg.info(f"Blacklisted user {message.author.name} tried to send '{message.content}' in the channel {message.channel}")
@@ -173,11 +171,7 @@ async def on_message(message):
         #check if the message is in the list of blocked channelsu
         await message.delete()
         return
-
-    elif message.channel.id == 799291117425524756:  #TODO: add list of channels that are blocked  
-        await message.delete()
     
-    lg_chat.info(f"{colorama.Fore.LIGHTYELLOW_EX}[{message.guild}] -  {message.channel}: {message.author.name}: {message.content}")
     await bot.process_commands(message)
 
 try:
