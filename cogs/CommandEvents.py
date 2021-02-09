@@ -30,23 +30,20 @@ class CommandEvents(commands.Cog):
         if isinstance(error, commands.errors.CheckFailure):
 
             error_msg = "Du hast nicht genügend Rechte für diesen Befehl!"
-            errorEmbed = discord.Embed(title="Command Error", colour=config.getDiscordColour("red"))
-            errorEmbed.add_field(name="Error Message", value=error_msg)
-            errorEmbed.add_field(name="Raised by", value=ctx.author.name)
+            errorEmbed = discord.Embed(title="Command Error", description=error_msg, colour=config.getDiscordColour("red"))
+            errorEmbed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
             await ctx.send(embed=errorEmbed)
             lg.error(colorama.Fore.RED+error_msg)
 
         elif isinstance(error, commands.errors.CommandNotFound):
-                cmdnfEmbed = discord.Embed(title="Command Error", color=config.getDiscordColour("red"))
-                cmdnfEmbed.add_field(name="Error Message", value=f"Command not found")
-                cmdnfEmbed.add_field(name="Raised by", value=ctx.author.name)
+                cmdnfEmbed = discord.Embed(title="Command Error", description="Command not found", colour=config.getDiscordColour("red"))
+                cmdnfEmbed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
                 await ctx.send(embed=cmdnfEmbed)
                 lg.info(colorama.Fore.RED+str(error))
 
         else:
-            errorEmbed = discord.Embed(title="Command Error", color=config.getDiscordColour("red"))
-            errorEmbed.add_field(name="Error Message", value=str(error))
-            errorEmbed.add_field(name="Raised by", value=ctx.author.name)
+            errorEmbed = discord.Embed(title="Command Error", description= str(error),colour=config.getDiscordColour("red"))
+            errorEmbed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
             await ctx.send(embed=errorEmbed)
             lg.error(colorama.Fore.RED+str(error))
     
