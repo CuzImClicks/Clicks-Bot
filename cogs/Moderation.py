@@ -1,3 +1,4 @@
+from exceptions import RestartException
 import logging
 from os import name
 import discord
@@ -228,12 +229,7 @@ class Moderation(commands.Cog):
     @commands.has_role(config.getBotAdminRole())
     async def shutdown(self, ctx):
 
-        shutdown_msg = "Bot1 going dark... ... ..."
-
-        await ctx.send(shutdown_msg)
-        await log_send(ctx, shutdown_msg)
-        await lg.warning(f"Shutting down")
-        await ctx.bot.logout()
+        raise RestartException("Restarting the bot")
 
     @commands.command(name="info")
     @commands.has_role(config.getBotAdminRole())
