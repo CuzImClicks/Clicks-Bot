@@ -26,6 +26,8 @@ class MessageEvents(commands.Cog):
             return
 
         else:
+
+            await message.channel.send("Deine Nachricht wurde gelöscht!", delete_after=5)
             lg.info(f"Deleted '{message.content}' from {message.channel} by {message.author.name}")
 
     @commands.Cog.listener()
