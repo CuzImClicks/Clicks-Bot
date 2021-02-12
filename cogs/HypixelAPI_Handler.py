@@ -23,6 +23,7 @@ class HypixelAPI_Handler(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.jf = JsonFile("players.json", f"{path}\cogs")
         if config.getHypixelOnline():  # check if the feature is enabled
             self.online.start()  # start the task
         if config.getMagmaboss():
@@ -47,12 +48,28 @@ class HypixelAPI_Handler(commands.Cog):
 
     @commands.command(name="add_hypixel_player")
     @commands.has_role(config.getBotAdminRole())
-    async def add_player(self, ctx, playername):
+    async def add_hypixel_player(self, ctx, playername):
         """Add a player to the hypixel online task
         by typing the command with the player's username"""
         user = User(playername)
         data = self.jf.read()
         data[playername] = {"name": playername, "uuid": user.get_uuid(), "status": False}
+        infoEmbed = discord.Embed(description=f"Added {playername} to the database", colour=config.getDiscordColour("green"))
+        infoEmbed.add_field(name=playername, value=user.get_uuid())
+        await ctx.send(embed=infoEmbed)
+        self.jf.write(data)
+
+    @commands.command(name="remove_hypixel_player")
+    @commands.has_role(config.getBotAdminRole())
+    async def remove_hypixel_player(self, ctx, playername):
+        """Add a player to the hypixel online task
+        by typing the command with the player's username"""
+        user = User(playername)
+        data = dict(self.jf.read())
+        del(data[playername])
+        infoEmbed = discord.Embed(description=f"Removed {playername} from the database", colour=config.getDiscordColour("green"))
+        infoEmbed.add_field(name=playername, value=user.get_uuid())
+        await ctx.send(embed=infoEmbed)
         self.jf.write(data)
 
     @tasks.loop(seconds=20.0)

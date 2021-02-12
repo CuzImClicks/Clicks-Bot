@@ -12,6 +12,9 @@ class User:
 
         return MojangAPI.get_uuid(self.nickname)
 
+    def __str__(self):
+        return f"{self.nickname} - {self.get_uuid()}"
+
     @property
     def skin(self):
         return requests.get(f"https://crafatar.com/renders/body/" + self.get_uuid()).json()
