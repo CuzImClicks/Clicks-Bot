@@ -24,6 +24,8 @@ class Config_Handler(commands.Cog):
     @commands.has_role(config.getBotAdminRole())
     async def enable_command(self, ctx, feature):
         if not config.enable(feature):
+            errorEmbed = discord.Embed(description=f"{feature} is not a changeable feature in the config file", colour=config.getDiscordColour("red"))
+            await ctx.send(embed=errorEmbed)
             return
         infoEmbed = discord.Embed(title="Enable",
         description=f"Enabled the feature {feature} and wrote the changes to the config file",
@@ -35,6 +37,8 @@ class Config_Handler(commands.Cog):
     @commands.has_role(config.getBotAdminRole())
     async def disable_command(self, ctx, feature):
         if not config.disable(feature):
+            errorEmbed = discord.Embed(description=f"{feature} is not a changeable feature in the config file", colour=config.getDiscordColour("red"))
+            await ctx.send(embed=errorEmbed)
             return
         infoEmbed = discord.Embed(title="Disable",
         description=f"Disabled the feature {feature} and wrote the changes to the config file",
@@ -46,6 +50,8 @@ class Config_Handler(commands.Cog):
     @commands.has_role(config.getBotAdminRole())
     async def toggle_command(self, ctx, feature):
         if not config.toggle(feature):
+            errorEmbed = discord.Embed(description=f"{feature} is not a changeable feature in the config file", colour=config.getDiscordColour("red"))
+            await ctx.send(embed=errorEmbed)
             return
         infoEmbed = discord.Embed(title="Toggle",
         description=f"Toggled the feature {feature} and wrote the changes to the config file",
