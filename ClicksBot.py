@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO, format="[%(asctime)s] - %(name)s - [%(le
 
 lg = logging.getLogger("Clicks-Bot")
 lg_pl = logging.getLogger("Extension Loader")
-lg_chat = logging.getLogger("Chat") #TODO: Add chat log file handler
+lg_chat = logging.getLogger("Chat")
 logging.getLogger("discord.gateway").disabled = True
 fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
@@ -65,7 +65,7 @@ for filename_ in os.listdir(f"{path}/cogs"):
 async def load(ctx, extension):
     '''Load extension'''
     if str(extension) == "all":
-        extEmbed = discord.Embed(title="Load Extensions", description="Loading all extensions", color=discord.Colour(0x0BAF07), timestamp=datetime.now())
+        extEmbed = discord.Embed(title="Load Extensions", description="Loading all extensions", colour=config.getDiscordColour("green"), timestamp=datetime.now())
 
         for file in files:
             try:
@@ -85,7 +85,7 @@ async def load(ctx, extension):
             return
         await ctx.send(
             embed=discord.Embed(title="Loading Extensions", description=f"Loading extension '{extension}'",
-                                color=discord.Colour(0x0BAF07)))
+                                colour=config.getDiscordColour("green")))
         bot.load_extension(f"cogs.{extension}")
         lg_pl.info(f"{colorama.Fore.LIGHTGREEN_EX}Loading extension: {extension}")
 
@@ -96,7 +96,7 @@ async def reload(ctx, extension):
     '''Reload extension'''
     if str(extension) == "all" or "":
 
-        extEmbed = discord.Embed(title="Reload Extensions", description="Reloading all extensions", color=discord.Colour(0x0BAF07), timestamp=datetime.now())
+        extEmbed = discord.Embed(title="Reload Extensions", description="Reloading all extensions", colour=config.getDiscordColour("green"), timestamp=datetime.now())
         for file in files:
             try:
                 bot.reload_extension(f"cogs.{file}")
@@ -117,7 +117,7 @@ async def reload(ctx, extension):
         bot.reload_extension(f"cogs.{extension}")
         await ctx.send(embed=discord.Embed(title="Reloading Extensions",
                                            description=f"Reloading extension '{extension}'",
-                                           color=discord.Colour(0x0BAF07)))
+                                           colour=config.getDiscordColour("green")))
         lg_pl.info(f"{colorama.Fore.LIGHTGREEN_EX}Reloaded the extension: {extension}")
 
 
@@ -128,7 +128,7 @@ async def unload(ctx, extension):
     if str(extension) == "all":
         extEmbed = discord.Embed(title="Unloading Extensions",
                                  descriptions="Unloading all extensions",
-                                 color=discord.Colour(0x0BA07),
+                                 colour=config.getDiscordColour("green"),
                                  timestamp=datetime.now())
         await ctx.send(embed=extEmbed)
         for file in files:
@@ -143,11 +143,11 @@ async def unload(ctx, extension):
 
     else:
         if not str(extension) + ".py" in os.listdir(f"{path}/cogs"):
-            raise commands.errors.ExtensionsNotFound(extension)
+            raise commands.errors.ExtensionNotFound
             return
         extEmbed = discord.Embed(title="Unloading Extension",
                                  description=f"Unloading extension '{extension}'",
-                                 color=discord.Colour(0x0BA07),
+                                 colour=config.getDiscordColour("green"),
                                  timestamp=datetime.now())
         await ctx.send(embed=extEmbed)
         bot.unload_extension(f"cogs.{extension}")

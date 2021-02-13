@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 from util.logger import path
 import logging
+from colorama import Fore
 
 lg = logging.getLogger(__name__)
 fl = logging.FileHandler(f"{path}\logs\log.log")
@@ -26,15 +27,15 @@ class VoiceEvents(commands.Cog):
             return
 
         if not before.channel:
-            lg.info(f"{member.guild} - {member.name} joined '{after.channel.name}'")
+            lg.info(f"{Fore.LIGHTGREEN_EX}{member.guild} - {member.name} joined '{after.channel.name}'")
 
         if before.channel and not after.channel:
-            lg.info(f"{member.guild} - {member.name} left the channel '{before.channel.name}'")
+            lg.info(f"{Fore.LIGHTRED_EX}{member.guild} - {member.name} left the channel '{before.channel.name}'")
 
         if before.channel and after.channel:
             if before.channel.id != after.channel.id:
                 lg.info(
-                    f"{member.guild} - {member.name} switched channels from '{before.channel.name}' to '{after.channel.name}'")
+                    f"{Fore.LIGHTCYAN_EX}{member.guild} - {member.name} switched channels from '{before.channel.name}' to '{after.channel.name}'")
             else:
                 if member.voice.self_stream:
                     lg.info(f"{member.guild} - {member.name} started streaming in {after.channel.name}")
