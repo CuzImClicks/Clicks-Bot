@@ -32,3 +32,29 @@ def datefromtimestamp(timestamp: int) -> str:
 def fulldatefromtimestamp(timestamp: int) -> str:
     return str(utc.fromtimestamp(timestamp/1000).now())[:-7]
 
+
+class TimeZone:
+
+    def __init__(self, name) -> None:
+
+        from_zone = tz.tzutc()
+        
+        self.name = name
+        utc = datetime.utcnow()
+        self.timezone = utc.replace(tzinfo=from_zone)
+        self.time = self.timezone.astimezone(tz.gettz(name))
+
+    def getTime(self) -> str:
+        return str(self.time.now())[:-7].split(" ")[1]
+
+    def getDateAndTime(self) -> str:
+        return str(self.time.now())[:-7]
+
+    def timefromtimestamp(self, timestamp: int) -> str:
+        return str(self.time.fromtimestamp(timestamp/1000).time())[:-7]
+
+    def datefromtimestamp(self, timestamp: int) -> str:
+        return str(self.time.fromtimestamp(timestamp/1000).date())
+
+    def fulldatefromtimestamp(self, timestamp: int) -> str:
+        return str(self.time.fromtimestamp(timestamp/1000).now())[:-7]
