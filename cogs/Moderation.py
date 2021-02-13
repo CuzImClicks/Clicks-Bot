@@ -228,12 +228,11 @@ class Moderation(commands.Cog):
     @commands.has_role(config.getBotAdminRole())
     async def shutdown(self, ctx):
 
-        shutdown_msg = "Bot1 going dark... ... ..."
+        errorEmbed = discord.Embed(description="Bot1 going dark. .. ...", colour=config.getDiscordColour("red"))
 
-        await ctx.send(shutdown_msg)
-        await log_send(ctx, shutdown_msg)
-        await lg.warning(f"Shutting down")
-        await ctx.bot.logout()
+        await ctx.send(embed=errorEmbed)
+        lg.warning(f"Shutting down")
+        raise KeyboardInterrupt
 
     @commands.command(name="info")
     @commands.has_role(config.getBotAdminRole())
