@@ -23,7 +23,7 @@ class HypixelAPI_Handler(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.jf = JsonFile("players.json", f"{path}\cogs")
+        self.jf = JsonFile("players.json", f"{path}")
         if config.getHypixelOnline():  # check if the feature is enabled
             self.online.start()  # start the task
         if config.getMagmaboss():
