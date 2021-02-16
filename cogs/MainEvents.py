@@ -78,15 +78,17 @@ class MainEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
         if not before.status == after.status:
-            lg.info(f"{after.name} changed their status from {before.status} to {after.status}")
+            if config.getActivity():
+                lg.info(f"{after.name} changed their status from {before.status} to {after.status}")
         
         if not before.activity == after.activity:
-            if before.activity:
-                if not before.activity == "Fortnite" and after.activity == "Fortnite":
-                    lg.info(f"{after.name} changed their activity from {before.activity.name} to {after.activity.name}")
+            if config.getActivity():
+                if before.activity:
+                    if not before.activity == "Fortnite" and after.activity == "Fortnite":
+                        lg.info(f"{after.name} changed their activity from {before.activity.name} to {after.activity.name}")
 
-            else:
-                lg.info(f"{after.name} started to play {after.activity.name}")
+                    else:
+                        lg.info(f"{after.name} started to play {after.activity.name}")
 
         if not before.nick == after.nick:
             lg.info(f"{after.name} changed their nick from {before.nick} to {after.nick}")
