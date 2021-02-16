@@ -150,3 +150,6 @@ def getMagmaboss() -> bool:
 
 def getHypixelOnline() -> bool:
     return data["hypixel_online"]
+
+def getActivity() -> bool:
+    return data["activities"]
