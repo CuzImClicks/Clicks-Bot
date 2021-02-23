@@ -306,18 +306,21 @@ class MusicBot(commands.Cog):
 
         global queue
 
-        try:
-            if number > len(queue):
-                errorEmbed = discord.Embed(title="Command Error", description="The queue isn't that long",
+        lg.info(len(queue))
+        number = int(number)
+        if number > len(queue):
+            errorEmbed = discord.Embed(title="Command Error", description="The queue isn't that long",
                                            color=config.getDiscordColour("red"), timestamp=datetime.now())
-                await ctx.send(embed=errorEmbed)
+            await ctx.send(embed=errorEmbed)
+            
+        if not len(queue) == 0:
             del (queue[int(number)])
             lg.info(f"Deleted {queue[int(number)]} from queue")
             infoEmbed = discord.Embed(title="Remove", description="The song was removed from the queue",
-                                      color=config.getDiscordColour("blue"), timestamp=datetime.now())
+                                        color=config.getDiscordColour("blue"), timestamp=datetime.now())
             await ctx.send(embed=infoEmbed)
 
-        except:
+        else:
             errorEmbed = discord.Embed(title="Command Error", description="The queue is empty",
                                        color=config.getDiscordColour("red"), timestamp=datetime.now())
             await ctx.send(embed=errorEmbed)
