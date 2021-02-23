@@ -47,7 +47,7 @@ class Clicks_BotAPI_Handler(commands.Cog):
         infoEmbed.add_field(name="Key", value=key, inline=False)
         infoEmbed.add_field(name="Requested by", value=ctx.author.name)
         infoEmbed.set_author(name=username, icon_url=user.avatar_url)
-        infoEmbed.set_footer(text=timeconvert.getDateAndTime())
+        infoEmbed.set_footer(text=timeconvert.getStrDateAndTime())
 
         await ctx.send(embed=infoEmbed)
 

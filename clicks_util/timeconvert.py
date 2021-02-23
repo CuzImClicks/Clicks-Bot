@@ -20,7 +20,7 @@ def getTime() -> str:
     #FIXME: returns utc time
     return str(utc.now())[:-7].split(" ")[1]
 
-def getDateAndTime() -> str:
+def getStrDateAndTime() -> str:
     return str(utc.now())[:-7]
 
 def timefromtimestamp(timestamp: int) -> str:
@@ -32,6 +32,8 @@ def datefromtimestamp(timestamp: int) -> str:
 def fulldatefromtimestamp(timestamp: int) -> str:
     return str(utc.fromtimestamp(timestamp/1000).now())[:-7]
 
+def getDateAndTime():
+    return utc.now()
 
 class TimeZone:
 
