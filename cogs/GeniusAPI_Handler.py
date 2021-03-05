@@ -57,8 +57,14 @@ class GeniusAPI_Handler(commands.Cog):
             lyric = song.lyrics
 
         infoEmbed = discord.Embed(colour=config.getDiscordColour("genius_yellow"))
-        infoEmbed.set_author(name=f"[{song.title}]({song.url})", icon_url=song.song_art_image_url)
-        parts = split(lyric, 3)
+        infoEmbed.set_author(name=song.title)#, icon_url=song.song_art_image_url)
+        def find_lowest_under(len_text):
+            i = 1
+            while not len_text / i < 1500:
+                i += 1
+
+            return i  
+        parts = split(lyric, find_lowest_under(len(lyric)))
 
         for part in parts:
             embed = discord.Embed(description=part, colour=genius_yellow)
