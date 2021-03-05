@@ -123,6 +123,8 @@ def getSteamKey():
 def getGeniusKey():
     return data["genius_key"]
 
+def getYoutubeKey():
+    return data["youtube_api"]
 
 def getDiscordColour(colourname):
     if colourname == "red":
