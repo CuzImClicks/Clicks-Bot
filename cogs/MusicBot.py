@@ -10,7 +10,7 @@ from discord.ext import commands, tasks
 from util import config, strings, logger, cleanup
 from util.logger import *
 from discord.utils import get
-from clicks_util import timeconvert
+from clicks_util import timeconvert, info
 from lyricsgenius import Genius
 from cogs.GeniusAPI_Handler import HiddenPrints
 from aiohttp import ClientSession
@@ -92,7 +92,6 @@ class MusicBot(commands.Cog):
     async def join(self, ctx):
 
         channel = ctx.author.voice.channel
-
         if not ctx.message.author.voice:
             errorEmbed = discord.Embed(title="Command Error",
                                        color=config.getDiscordColour("red"), timestamp=datetime.now())
@@ -124,9 +123,11 @@ class MusicBot(commands.Cog):
         .skip - skip a song(the next song will start playing)
         .skipall - clear the entire queue
         .remove <index(starts at 0)> - remove the song at the given index
+        .loop - play the current song endlessly
+        .pause - pause the current song
+        .play - force the bot to play
          """)
         infoEmbed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
-        infoEmbed.set_footer(text=timeconvert.getTime())
         await ctx.send(embed=infoEmbed)
 
     @commands.command(name="play", help="Starts playing the first song in the queue")
@@ -295,8 +296,9 @@ class MusicBot(commands.Cog):
 
         if url is None:
             if len(queue) == 0:
+                lg.info(timeconvert.getTime())
                 errorEmbed = discord.Embed(title="Command Error", description="There are no songs in the queue",
-                                           color=config.getDiscordColour("red"), timestamp=timeconvert.getTime())
+                                           colour=config.getDiscordColour("red"))
                 await ctx.send(embed=errorEmbed)
 
             else:
@@ -432,12 +434,19 @@ class MusicBot(commands.Cog):
 
         server = ctx.message.author.guild
         voice_channel = server.voice_client
+        if paused:
+            voice_channel.resume()
+            paused = False
+            infoEmbed = discord.Embed(description="Resumed song currently playing", colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime())
+            lg.info("Resumed the song currently playing!")
 
-        voice_channel.pause()
-        paused = True 
-        lg.info(f"Paused the song currently playing!")
-        # TODO: convert to embed
-        await ctx.send(f"Der aktuell spielende Song wurde pausiert. Mit .resume spielt der Song weiter.")
+        elif not paused:
+            voice_channel.pause()
+            paused = True
+            infoEmbed = discord.Embed(description="Paused song currently playing", colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime())
+            lg.info(f"Paused the song currently playing!")
+
+        await ctx.send(embed=infoEmbed)
 
     @commands.command(name="resume", help="Der pausierte Song wird weiter abgespielt.")
     @commands.has_role(config.getBotMusicRole())
@@ -449,8 +458,7 @@ class MusicBot(commands.Cog):
         voice_channel.resume()
         paused = False
         lg.info(f"Resumed the song currently playing!")
-        #TODO: convert to embed
-        await ctx.send(f"Resumed song currently playing!")
+        await ctx.send(embed=discord.Embed(description="Resumed song currently playing", colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime()))
 
     @commands.command(name="leave")
     @commands.has_role(config.getBotMusicRole())
