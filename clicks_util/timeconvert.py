@@ -17,8 +17,10 @@ utc = utc.replace(tzinfo=from_zone)
 timezone = utc.astimezone(to_zone)
 
 def getTime() -> str:
-    #FIXME: returns utc time
-    return str(utc.now())[:-7].split(" ")[1]
+    return timezone.now()
+
+def getStrTime() -> str:
+    return str(timezone.now())[:-7].split(" ")[1]
 
 def getStrDateAndTime() -> str:
     return str(utc.now())[:-7]

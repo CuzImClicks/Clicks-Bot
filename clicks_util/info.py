@@ -67,8 +67,12 @@ def getInfo(target, _save: bool = False) -> dict:
         return_dict = {
                 "value": target,
                 "type": str(type(target)).replace("<", "").replace(">", "").replace("'", "").split(" ")[1],
-                "length": len(target)
             }
+        try:
+            return_dict["length"] = len(target)
+
+        except:
+            pass
     if _save:
         save(return_dict)
         

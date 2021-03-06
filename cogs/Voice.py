@@ -4,6 +4,7 @@ from discord.ext import commands
 from util.logger import path
 import logging
 from colorama import Fore
+from clicks_util import info
 
 lg = logging.getLogger(__name__)
 fl = logging.FileHandler(f"{path}\logs\log.log")
@@ -27,6 +28,11 @@ class VoiceEvents(commands.Cog):
             return
 
         if not before.channel:
+            if after.channel.id == 774629025805107230:  
+                if not "Dev" == member.top_role.name or "Clicks Bot" == member.top_role.name:
+                    await member.move_to(None)
+                    return    
+            
             lg.info(f"{Fore.LIGHTGREEN_EX}{member.guild} - {member.name} joined '{after.channel.name}'")
 
         if before.channel and not after.channel:
@@ -34,8 +40,11 @@ class VoiceEvents(commands.Cog):
 
         if before.channel and after.channel:
             if before.channel.id != after.channel.id:
-                lg.info(
-                    f"{Fore.LIGHTCYAN_EX}{member.guild} - {member.name} switched channels from '{before.channel.name}' to '{after.channel.name}'")
+                if after.channel.id == 774629025805107230:  
+                    if not "Dev" == member.top_role.name or "Clicks Bot" == member.top_role.name:
+                        await member.move_to(before.channel)
+                        return   
+                lg.info(f"{Fore.LIGHTCYAN_EX}{member.guild} - {member.name} switched channels from '{before.channel.name}' to '{after.channel.name}'")
             else:
                 if member.voice.self_stream:
                     lg.info(f"{member.guild} - {member.name} started streaming in {after.channel.name}")
