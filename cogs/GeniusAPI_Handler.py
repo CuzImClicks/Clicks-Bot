@@ -10,25 +10,11 @@ import datetime
 from aiohttp import ClientSession
 import json
 import lyricsgenius
+from clicks_util import text, numbers
 
 lg = logging.getLogger(__name__[5:])
 
 import os, sys
-
-def split(sentence, num_chunks):
-    """Split the given sentence into num_chunk pieces.
-
-    If the length of the sentence is not exactly divisible by
-    num_chunks, some slices will be 1 character shorter than
-    the others.
-    https://codereview.stackexchange.com/questions/145489/slicing-a-string-into-three-pieces-and-also-controlling-manipulating-through-lo
-    """
-
-    size, remainder = divmod(len(sentence), num_chunks)
-    chunks_sizes = [size + 1] * remainder + [size] * (num_chunks - remainder)
-    offsets = [sum(chunks_sizes[:i]) for i in range(len(chunks_sizes))]
-
-    return [sentence[o:o+s] for o, s in zip(offsets, chunks_sizes)]
 
 class HiddenPrints:
     def __enter__(self):
@@ -58,13 +44,8 @@ class GeniusAPI_Handler(commands.Cog):
 
         infoEmbed = discord.Embed(colour=config.getDiscordColour("genius_yellow"))
         infoEmbed.set_author(name=song.title)#, icon_url=song.song_art_image_url)
-        def find_lowest_under(len_text):
-            i = 1
-            while not len_text / i < 1500:
-                i += 1
 
-            return i  
-        parts = split(lyric, find_lowest_under(len(lyric)))
+        parts = text.split( lyric, numbers.find_lowest_under(len_text=len(lyric)))
 
         for part in parts:
             embed = discord.Embed(description=part, colour=genius_yellow)
