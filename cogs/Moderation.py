@@ -12,7 +12,7 @@ from clicks_util.json_util import JsonFile
 from util.logger import path
 import logging
 import varname
-from clicks_util import timeconvert
+from clicks_util import timeconvert, info
 
 
 lg = logging.getLogger(__name__[5:])
@@ -211,18 +211,20 @@ class Moderation(commands.Cog):
         user = ctx.message.mentions[0]
 
         lg.info(f"Got User {user.name} as target for promotion")
+        lg.info(ctx.author.guild.roles[12].name + " " + ctx.author.guild.roles[10].name)
+        await user.add_roles(ctx.author.guild.roles[12])
+        await user.add_roles(ctx.author.guild.roles[10])
+        lg.info(f"Added Bot Access to '{user.name}'")
 
-        role = ctx.author.guild.roles[12]
-
-        await user.add_roles(role)
-        lg.info(f"Added '{role.name}' to '{user.name}'")
-
-        infoEmbed = discord.Embed(title="Access to the bots features", description=f"The admin has granted you access to the role 'bot-access'\n"\
+        infoEmbed_dm = discord.Embed(title="Access to the bots features", description=f"The admin has granted you access to the role 'bot-access'\n"\
             + "You can use .help to see all of the bots features. \nIf you have any problems with using the bot please contact a admin")
-        infoEmbed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+        infoEmbed_dm.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
 
+        infoEmbed = discord.Embed(description=f"Grandet Bot Access to '{user.nick}'")
+
+        await ctx.send(embed=infoEmbed)
         await user.create_dm()
-        await user.dm_channel.send(embed=infoEmbed)
+        await user.dm_channel.send(embed=infoEmbed_dm)
 
     @commands.command(name="shutdown", help="Shuts the Bot off.")
     @commands.has_role(config.getBotAdminRole())
@@ -237,28 +239,50 @@ class Moderation(commands.Cog):
     @commands.command(name="info")
     @commands.has_role(config.getBotAdminRole())
     async def info(self, ctx):
+        try:
+            user = ctx.message.mentions[0]
+        except IndexError:
+            user = None
+        
+        try:
+            role = ctx.message.role_mentions[0]
+        except IndexError:
+            role = None
 
-        user = ctx.message.mentions[0]
+        if type(user) == discord.Member:
+            infoEmbed = discord.Embed(title="Informations",
+                                    colour=config.getDiscordColour("blue"))
+            infoEmbed.set_author(name=user.name, icon_url=user.avatar_url)
+            infoEmbed.add_field(name="Name", value=user.name)
+            infoEmbed.add_field(name="Discriminator", value=user.discriminator)
+            infoEmbed.add_field(name="Nick", value=user.nick, inline=False)
+            if user.activity:
+                infoEmbed.add_field(name="Type", value=user.activity.type.name)
+                infoEmbed.add_field(name="Activity", value=user.activity.name)
+            infoEmbed.set_thumbnail(url=user.avatar_url)
+            infoEmbed.add_field(name="Status", value=user.status, inline=False)
+            infoEmbed.add_field(name="Mobile", value=user.is_on_mobile())
+            infoEmbed.add_field(name="Joined at", value=str(user.joined_at)[:-7])
+            roles = [role.name for role in user.roles]
+            roles.reverse()
+            infoEmbed.add_field(name="Roles", value=str(roles), inline=False)
+            infoEmbed.set_footer(text=str(user.id))
 
-        infoEmbed = discord.Embed(title="Informations",
-                                  colour=config.getDiscordColour("blue"))
-        infoEmbed.set_author(name=user.name, icon_url=user.avatar_url)
-        infoEmbed.add_field(name="Name", value=user.name)
-        infoEmbed.add_field(name="Discriminator", value=user.discriminator)
-        infoEmbed.add_field(name="Nick", value=user.nick, inline=False)
-        if user.activity:
-            infoEmbed.add_field(name="Type", value=user.activity.type.name)
-            infoEmbed.add_field(name="Activity", value=user.activity.name)
-        infoEmbed.set_thumbnail(url=user.avatar_url)
-        infoEmbed.add_field(name="Status", value=user.status, inline=False)
-        infoEmbed.add_field(name="Mobile", value=user.is_on_mobile())
-        infoEmbed.add_field(name="Joined at", value=str(user.joined_at)[:-7])
-        roles = [role.name for role in user.roles]
-        roles.reverse()
-        infoEmbed.add_field(name="Roles", value=str(roles), inline=False)
-        infoEmbed.set_footer(text=str(user.id))
+            await ctx.send(embed=infoEmbed)
 
-        await ctx.send(embed=infoEmbed)
+        elif type(role) == discord.Role:
+            infoEmbed = discord.Embed(title="Informations",
+                                    colour=role.colour)
+            infoEmbed.add_field(name="Name", value=role.name)
+            infoEmbed.add_field(name="Position", value=role.position)
+            infoEmbed.add_field(name="Mentionable", value=role.mentionable, inline=False)
+            infoEmbed.add_field(name="Hoist", value=role.hoist)
+            infoEmbed.add_field(name="Created at", value=str(role.created_at)[:-7])
+            infoEmbed.set_footer(text=str(role.id))
+
+            await ctx.send(embed=infoEmbed)
+
+
 
     @commands.command(name="add_role", aliases=["create_role"])
     @commands.has_role(config.getBotAdminRole())
