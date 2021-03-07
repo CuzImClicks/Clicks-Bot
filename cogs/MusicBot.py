@@ -236,7 +236,7 @@ class MusicBot(commands.Cog):
         lg.info(f"Cleared the queue!")
         loop = False
         infoEmbed = discord.Embed(title="Die", description="Resetted the MusicBot", color=config.getDiscordColour("red"),
-                                  timestamp=timeconvert.getTIme())
+                                  timestamp=timeconvert.getTime())
         await ctx.send(embed=infoEmbed)
 
     @commands.command(name="loop", help="Continues to play the same song")
@@ -329,7 +329,7 @@ class MusicBot(commands.Cog):
             
             infoEmbed = discord.Embed(title="Queue", description=f"Added [{await video.title()}]({video.url}) to the queue", colour=config.getDiscordColour("blue"))
             infoEmbed.set_image(url=await video.thumbnail())
-            infoEmbed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+            infoEmbed.set_author(name=ctx.author.nick, icon_url=ctx.author.avatar_url)
             infoEmbed.add_field(name="Position in queue", value=int(len(queue)))
             await ctx.send(embed=infoEmbed)
             try:
