@@ -7,6 +7,7 @@ import logging
 from util import config
 import datetime
 from clicks_util.timeconvert import TimeZone
+from pytz import common_timezones_set
 
 lg = logging.getLogger(__name__[5:])
 
@@ -20,10 +21,20 @@ class TimeConvert(commands.Cog):
     @commands.command(name="get_otto_time")
     @commands.has_role(config.getBotAdminRole())
     async def get_otto_time(self, ctx):
-        tz = TimeZone("USA/Los_Angeles")
+        tz = TimeZone("America/Los_Angeles")
+        lg.info(tz.time.time())
         infoEmbed = discord.Embed(description=f"Ottomated lives in PST, it's {tz.getTime()}")
         await ctx.send(embed=infoEmbed)
 
+    @commands.command(name="getTime")
+    async def get_time(self, ctx, timezone: str = "Europe/Berlin"):
+        if not timezone in common_timezones_set:
+            errorEmbed = discord.Embed(description="Not a valid timezone", colour=config.getDiscordColour("red"))
+            await ctx.send(embed=errorEmbed)
+            return
+        tz = TimeZone(timezone)
+        infoEmbed = discord.Embed(description=f"Time for timezone '{timezone}' is {tz.getTime()}")
+        await ctx.send(embed=infoEmbed)
 
 def setup(bot):
 
