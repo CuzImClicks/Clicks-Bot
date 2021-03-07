@@ -45,11 +45,10 @@ class TimeZone:
         
         self.name = name
         utc = datetime.utcnow()
-        self.timezone = utc.replace(tzinfo=from_zone)
-        self.time = self.timezone.astimezone(tz.gettz(name))
+        self.time = utc.replace(tzinfo=from_zone).astimezone(tz.gettz(name))
 
     def getTime(self) -> str:
-        return str(self.time.now())[:-7].split(" ")[1]
+        return str(self.time.time())[:-7]
 
     def getDateAndTime(self) -> str:
         return str(self.time.now())[:-7]
