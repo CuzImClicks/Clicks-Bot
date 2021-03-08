@@ -220,7 +220,7 @@ class Moderation(commands.Cog):
             + "You can use .help to see all of the bots features. \nIf you have any problems with using the bot please contact a admin")
         infoEmbed_dm.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
 
-        infoEmbed = discord.Embed(description=f"Grandet Bot Access to '{user.nick}'")
+        infoEmbed = discord.Embed(description=f"Grandet Bot Access to '{user.name}'")
 
         await ctx.send(embed=infoEmbed)
         await user.create_dm()
@@ -237,7 +237,7 @@ class Moderation(commands.Cog):
         raise KeyboardInterrupt
 
     @commands.command(name="info")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotAccessRole())
     async def info(self, ctx):
         try:
             user = ctx.message.mentions[0]
@@ -278,6 +278,7 @@ class Moderation(commands.Cog):
             infoEmbed.add_field(name="Mentionable", value=role.mentionable, inline=False)
             infoEmbed.add_field(name="Hoist", value=role.hoist)
             infoEmbed.add_field(name="Created at", value=str(role.created_at)[:-7])
+            infoEmbed.add_field(name="Administrator", value=role.permissions.administrator)
             infoEmbed.set_footer(text=str(role.id))
 
             await ctx.send(embed=infoEmbed)

@@ -52,7 +52,7 @@ class MainEvents(commands.Cog):
             embed.set_footer(text=f"{member.guild} - {timeconvert.getStrDateAndTime()}", icon_url=member.guild.icon_url)
             embed.set_thumbnail(member.guild.banner_url)
             #TODO: Test and change channel to lobby
-            channel = self.bot.get_channel(get(member.guild.channels, "bot-testing"))
+            channel = self.bot.get(member.guild.channels, "bot-testing")
 
             await channel.send(embed=embed)
 
@@ -68,7 +68,7 @@ class MainEvents(commands.Cog):
             embed.set_footer(text=f"{member.guild} - {timeconvert.getStrDateAndTime()}", icon_url=member.guild.icon_url)
             embed.set_thumbnail(member.guild.banner_url)
             #TODO: Test and change channel to lobby
-            channel = self.bot.get_channel(get(member.guild.channels, "bot-testing"))
+            channel = self.bot.get(member.guild.channels, "bot-testing")
 
             await channel.send(embed=embed)
 
