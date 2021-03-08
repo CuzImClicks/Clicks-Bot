@@ -30,8 +30,26 @@ class VoiceEvents(commands.Cog):
         if not before.channel:
             if after.channel.id == 774629025805107230:  
                 if not "Dev" == member.top_role.name or "Clicks Bot" == member.top_role.name:
-                    await member.move_to(None)
-                    return    
+                    
+                    await member.edit(muted=True)
+                    infoEmbed = discord.Embed(description="You tried to connect to a private channel, a request has been sent to the admin of this channel. Please wait for confirmation.")
+                    await member.create_dm()
+                    await member.dm_channel.send(embed=infoEmbed)
+
+                    infoEmbed = discord.Embed(description=f"{member.name} tried to connect to your channel. Please type 'Yes' or 'No'")
+                    user = discord.utils.get(member.guild.members, id=408722814808358914)
+                    await user.create_dm()
+                    await user.dm_channel.send(embed=infoEmbed)
+                    check = lambda m: m.content == "Yes" or m.content == "No" and m.author == user
+                    answer = await self.bot.wait_for("message", check=check)
+                        
+                    if str(answer.content).lower() in ("yes", "y"):
+                        await member.edit(muted=False)
+                        return
+                    else:
+                        await member.edit(muted=False)
+                        await member.move_to(None)
+                        return   
             
             lg.info(f"{Fore.LIGHTGREEN_EX}{member.guild} - {member.name} joined '{after.channel.name}'")
 
@@ -42,8 +60,25 @@ class VoiceEvents(commands.Cog):
             if before.channel.id != after.channel.id:
                 if after.channel.id == 774629025805107230:  
                     if not "Dev" == member.top_role.name or "Clicks Bot" == member.top_role.name:
-                        await member.move_to(before.channel)
-                        return   
+                        await member.edit(muted=True)
+                        infoEmbed = discord.Embed(description="You tried to connect to a private channel, a request has been sent to the admin of this channel. Please wait for confirmation.")
+                        await member.create_dm()
+                        await member.dm_channel.send(embed=infoEmbed)
+
+                        infoEmbed = discord.Embed(description=f"{member.name} tried to connect to your channel. Please type 'Yes' or 'No'")
+                        user = discord.utils.get(member.guild.members, id=408722814808358914)
+                        await user.create_dm()
+                        await user.dm_channel.send(embed=infoEmbed)
+                        check = lambda m: m.content == "Yes" or m.content == "No" and m.author == user
+                        answer = await self.bot.wait_for("message", check=check)
+                        
+                        if str(answer.content).lower() in ("yes", "y"):
+                            await member.edit(muted=False)
+                            return
+                        else:
+                            await member.edit(muted=False)
+                            await member.move_to(before.channel)
+                            return     
                 lg.info(f"{Fore.LIGHTCYAN_EX}{member.guild} - {member.name} switched channels from '{before.channel.name}' to '{after.channel.name}'")
             else:
                 if member.voice.self_stream:
