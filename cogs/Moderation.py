@@ -202,7 +202,7 @@ class Moderation(commands.Cog):
     async def clear(self, ctx):
 
         channel = ctx.message.channel
-        await channel.purge(await channel.history().flatten())
+        await channel.purge(limit=len(await channel.history().flatten()))
 
     @commands.command(name="botaccess")
     @commands.has_role(config.getBotAdminRole())
