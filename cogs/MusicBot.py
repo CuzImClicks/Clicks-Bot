@@ -306,9 +306,10 @@ class MusicBot(commands.Cog):
                 for i in range(0, len(queue)):
                     song = queue[i]
                     infoEmbed.add_field(name="Song", value=f"[{await song.title()}]({song.url})", inline=False)
-                    if song.author:
+                    if song.author.nick:
                         infoEmbed.add_field(name="Requested by", value=song.author.nick, inline=True)
-
+                    elif song.author.name:
+                        infoEmbed.add_field(name="Requested by", value=song.author.name, inline=True)
                 await ctx.send(embed=infoEmbed)
 
         else:
@@ -329,7 +330,10 @@ class MusicBot(commands.Cog):
             
             infoEmbed = discord.Embed(title="Queue", description=f"Added [{await video.title()}]({video.url}) to the queue", colour=config.getDiscordColour("blue"))
             infoEmbed.set_image(url=await video.thumbnail())
-            infoEmbed.set_author(name=ctx.author.nick, icon_url=ctx.author.avatar_url)
+            if video.author.nick:
+                infoEmbed.add_field(name="Requested by", value=video.author.nick, inline=True)
+            elif video.author.name:
+                infoEmbed.add_field(name="Requested by", value=video.author.name, inline=True)
             infoEmbed.add_field(name="Position in queue", value=int(len(queue)))
             await ctx.send(embed=infoEmbed)
             try:
