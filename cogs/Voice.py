@@ -7,7 +7,7 @@ from colorama import Fore
 from clicks_util import info
 
 lg = logging.getLogger(__name__)
-fl = logging.FileHandler(f"{path}\logs\log.log")
+fl = logging.FileHandler(f"{path}\logs\log.log", encoding='utf-8')
 fl.setLevel(logging.INFO)
 lg.addHandler(fl)
 
