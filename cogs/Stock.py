@@ -13,7 +13,7 @@ import datetime
 lg = logging.getLogger(__name__[5:])
 
 
-class example_cog(commands.Cog):
+class Stock(commands.Cog):
 
     def __init__(self, bot):
 
@@ -25,23 +25,30 @@ class example_cog(commands.Cog):
     @commands.command(name="stock")
     @commands.has_role(config.getBotAccessRole())
     async def stock(self, ctx, _stock: str, currency: str = "EUR", source: str = "yahoo"):
-        #FIXME
         lg.info(f"{_stock.upper()}-{currency.upper()}")
-        data = web.DataReader(f"{_stock.upper()}", source.lower(), self.__start, self.__end)
-        
-        plt.plot(data, label=_stock)
-        plt.ylabel(currency)
-        plt.xlabel("time")
-        name = f"{path}/stocks/{_stock}-{currency}.png"
-        plt.savefig(name)
+        try:
+            try:
+                data = web.DataReader(f"{_stock.upper()}", source.lower(), self.__start, self.__end)
+            except:
+                errorEmbed = discord.Embed(description=f"'{_stock}' is not a valid stock", colour=config.getDiscordColour("red"))
+                await ctx.send(embed=errorEmbed)
+                return
+
+            plt.plot(data, label=_stock)
+            plt.ylabel(currency)
+            plt.xlabel("time")
+            name = f"{path}/stocks/{_stock}-{currency}.png"
+            plt.savefig(name)
+        except KeyError:
+            errorEmbed = discord.Embed(description=f"'{_stock}' is not a valid stock", colour=config.getDiscordColour("red"))
+            await ctx.send(embed=errorEmbed)
+            return
 
         infoEmbed = discord.Embed(description=f"Showing the development of {_stock} in {currency}")
         await ctx.send(embed=infoEmbed)
         await ctx.send(file=discord.File(name))
 
 
-
-
 def setup(bot):
 
-    bot.add_cog(example_cog(bot))
+    bot.add_cog(Stock(bot))
