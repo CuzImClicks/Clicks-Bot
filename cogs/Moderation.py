@@ -78,8 +78,7 @@ class Moderation(commands.Cog):
         user = ctx.message.mentions[0]
 
         lg.info(user)
-        unmuteEmbed = discord.Embed(title="Unmute", description=f"Unmuted {user.name}", colour=config.getDiscordColour("blue"),
-                                    timestamp=timeconvert.getTime())
+        unmuteEmbed = discord.Embed(title="Unmute", description=f"Unmuted {user.name}", colour=config.getDiscordColour("blue"))
         await ctx.send(embed=unmuteEmbed)
 
         lg.info(f"Unmuted {user.name}")
@@ -87,14 +86,22 @@ class Moderation(commands.Cog):
 
     @commands.command(name="kick")
     @commands.has_role(config.getBotAccessRole())
-    async def kick(self, ctx):
+    async def kick(self, ctx, *args):
 
         user = ctx.message.mentions[0]
 
         kickEmbed = discord.Embed(title="Kick", description=f"Kicked {user.name} from the server",
-                                  colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime())
+                                  colour=config.getDiscordColour("blue"))
+        try:
+            if len(args) == 0:
+                args = None
+            await ctx.guild.kick(user, reason=args)
+
+        except: 
+            errorEmbed = discord.Embed(description="The bot doesn't have the permission to do that", colour=config.getDiscordColour("red"))
+            await ctx.send(embed=errorEmbed)
+            return
         await ctx.send(embed=kickEmbed)
-        await self.bot.kick(user)
 
     @commands.command(name="muteall", help=strings.get_help("help_muteall"), aliases=["ma"])
     @commands.has_role(config.getBotAccessRole())
@@ -111,12 +118,12 @@ class Moderation(commands.Cog):
                     lg.info(f"Muted user: {user.nick}")
 
             maEmbed = discord.Embed(title="Mute All", description=f"Muted all users in {ctx.author.voice.channel.name}",
-                                    colour=config.getDiscordColour("red"), timestamp=timeconvert.getTime())
+                                    colour=config.getDiscordColour("red"))
             await ctx.send(embed=maEmbed)
 
         except Exception as e:
             errorEmbed = discord.Embed(title="Command Error", description="You're not in a voice channel",
-                                       colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime())
+                                       colour=config.getDiscordColour("blue"))
             await ctx.send(embed=errorEmbed)
             lg.error(e)
 
@@ -132,7 +139,8 @@ class Moderation(commands.Cog):
                 except discord.errors.NotFound as e:
                     lg.error(f"User {user.nick} is not connected to the voice chat anymore")
 
-            await ctx.send(f"Unmuted all users in '{ctx.author.voice.channel.name}'")
+            infoEmbed = discord.Embed(title="Mute All", description=f"Unmuted all users in {ctx.author.voice.channel.name}", colour=config.getDiscordColour("red"))
+            await ctx.send(embed=infoEmbed)
 
         except Exception as e:
             await ctx.send("Du bist in keinem Voice Channel")
@@ -190,6 +198,20 @@ class Moderation(commands.Cog):
                                                                      name=f"Online on {len(self.bot.guilds)} servers"))
             lg.info(f"Changed the status to: Online on {len(self.bot.guilds)} servers")
             await ctx.send(f"Changed status to: Online on {len(self.bot.guilds)} servers")
+
+        elif str(args[0]) == "users":
+            total_users = 0
+            for guild in self.bot.guilds:
+
+                if guild.name == "GUILD":
+                    break
+                
+                lg.info(f'{self.bot.user} is connected to the following guild: {guild.name}')
+                total_users += len(guild.members)
+            
+            await self.bot.change_presence(
+                activity=discord.Activity(type=discord.ActivityType.watching, name=f"{total_users} Benutzer an"))
+
 
         else:
 
