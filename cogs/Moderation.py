@@ -34,7 +34,7 @@ class Moderation(commands.Cog):
         self.bot = bot
 
     @commands.command(name="blacklist")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.is_owner()
     async def blacklist(self, ctx):
 
         user = ctx.message.mentions[0]
@@ -72,7 +72,7 @@ class Moderation(commands.Cog):
         await user.edit(mute=True)
 
     @commands.command(name="unmute", help="Unmutes a user")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotAccessRole())
     async def unmute(self, ctx):
 
         user = ctx.message.mentions[0]
@@ -86,7 +86,7 @@ class Moderation(commands.Cog):
         await user.edit(mute=False)
 
     @commands.command(name="kick")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotAccessRole())
     async def kick(self, ctx):
 
         user = ctx.message.mentions[0]
@@ -139,7 +139,7 @@ class Moderation(commands.Cog):
             lg.error(e)
 
     @commands.command(name="lock", help="Locks the channel user limit to the current amount of users inside")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotAccessRole())
     async def lock(self, ctx):
         try:
             await ctx.author.voice.channel.edit(user_limit=len(ctx.author.voice.channel.members))
@@ -160,7 +160,7 @@ class Moderation(commands.Cog):
             lg.error(e)
 
     @commands.command(name="unlock", help="Sets the user limit of your current channel to infinite")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotAccessRole())
     async def unlock(self, ctx):
         try:
             await ctx.author.voice.channel.edit(user_limit=0)
@@ -179,7 +179,7 @@ class Moderation(commands.Cog):
             lg.error(e)
 
     @commands.command(name="status", help="Changes the Status of the bot")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.is_owner()
     async def status(self, ctx, *args):
 
         lg.info(f"Changing the status to {str(args[0])}")
@@ -198,14 +198,14 @@ class Moderation(commands.Cog):
             await ctx.send("Changing status to {}".format(" ".join(args)))
 
     @commands.command(name="clear")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotAccessRole())
     async def clear(self, ctx):
 
         channel = ctx.message.channel
         await channel.purge(limit=len(await channel.history().flatten()))
 
     @commands.command(name="botaccess")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.is_owner()
     async def botaccess(self, ctx):
 
         user = ctx.message.mentions[0]
@@ -227,7 +227,7 @@ class Moderation(commands.Cog):
         await user.dm_channel.send(embed=infoEmbed_dm)
 
     @commands.command(name="shutdown", help="Shuts the Bot off.")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.is_owner()
     async def shutdown(self, ctx):
 
         errorEmbed = discord.Embed(description="Bot1 going dark. .. ...", colour=config.getDiscordColour("red"))
@@ -286,7 +286,7 @@ class Moderation(commands.Cog):
 
 
     @commands.command(name="add_role", aliases=["create_role"])
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotAccessRole())
     async def add_role(self, ctx):
         user = ctx.message.mentions[0]
         role = ctx.message.role_mentions[0]
@@ -299,7 +299,7 @@ class Moderation(commands.Cog):
         await ctx.send(embed=infoEmbed)
 
     @commands.command(name="remove_role", aliases=["rem_role"])
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotAccessRole())
     async def remove_role(self, ctx):
         user = ctx.message.mentions[0]
         role = ctx.message.role_mentions[0]
@@ -311,7 +311,7 @@ class Moderation(commands.Cog):
         await user.remove_roles(role)
         await ctx.send(embed=infoEmbed)
 
-    @commands.command(name="bugreport")
+    @commands.command(name="bugreport", hidden=True)
     @commands.has_role(config.getBotAdminRole())
     async def bugreport(self, ctx, name: str, theme: str, command:str ="",description: str=""):
         jf = JsonFile("bugreports.json", f"{os.getcwd()}/bugreports")
@@ -328,7 +328,7 @@ class Moderation(commands.Cog):
         data[name] = bugreport
         jf.write(data)
 
-    @commands.command(name="get_bugreports")
+    @commands.command(name="get_bugreports", hidden=True)
     @commands.has_role(config.getBotAdminRole())
     async def get_bugreports(self, ctx):
 
@@ -346,7 +346,7 @@ class Moderation(commands.Cog):
             if bugreport["status"] == False:
                 await ctx.send(embed=infoEmbed)
 
-    @commands.command(name="fixed")
+    @commands.command(name="fixed", hidden=True)
     @commands.has_role(config.getBotAdminRole())
     async def fixed(self, ctx, name):
         jf = JsonFile("bugreports.json", f"{os.getcwd()}/bugreports")
@@ -358,7 +358,7 @@ class Moderation(commands.Cog):
             jf.write(data)
 
 
-    @commands.command(name="friend_add")
+    @commands.command(name="friend_add", hidden=True)
     @commands.has_role(config.getBotAdminRole())
     async def friend_add(self, ctx):
         try:

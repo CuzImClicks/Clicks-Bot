@@ -38,7 +38,7 @@ class Commands(commands.Cog):
         await ctx.send(embed=pingEmbed)
 
     @commands.command(name="count", help="Zählt hoch bis zu der eingegebenen Zahl")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.is_owner()
     async def count(self, ctx, target):
 
         target = int(target)
@@ -49,8 +49,7 @@ class Commands(commands.Cog):
             x += 1
             await ctx.send(x)
 
-    @commands.command(name="setup")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.command(name="setup", hidden=True)
     async def setup(self, ctx):
 
         guild = ctx.guild
@@ -92,8 +91,8 @@ class Commands(commands.Cog):
 
             pass
 
-    @commands.command(name="shout")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.command(name="shout", hidden=True)
+    @commands.is_owner()
     async def shout(self, ctx, *args):
         if not args:
             errorEmbed = discord.Embed(title="Shout Error", description="Missing text", colour=discord.Colour(0x9D1309))

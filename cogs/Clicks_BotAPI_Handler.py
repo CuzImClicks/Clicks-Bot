@@ -19,7 +19,7 @@ class Clicks_BotAPI_Handler(commands.Cog):
         self.bot = bot
 
     @commands.command(name="create_api_key")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.is_owner()
     async def create_api_key(self, ctx):
         user = ctx.message.mentions[0]
         username = user.name
@@ -36,7 +36,7 @@ class Clicks_BotAPI_Handler(commands.Cog):
         await ctx.send(embed=infoEmbed)
 
     @commands.command(name="get_api_key")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.is_owner()
     async def get_api_key(self, ctx):
         user = ctx.message.mentions[0]
         username = user.name

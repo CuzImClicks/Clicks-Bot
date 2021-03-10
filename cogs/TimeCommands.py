@@ -18,8 +18,8 @@ class TimeConvert(commands.Cog):
 
         self.bot = bot
 
-    @commands.command(name="get_otto_time")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.command(name="get_otto_time", hidden=True)
+    @commands.is_owner()
     async def get_otto_time(self, ctx):
         tz = TimeZone("America/Los_Angeles")
         lg.info(tz.time.time())

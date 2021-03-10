@@ -31,7 +31,7 @@ class VoiceEvents(commands.Cog):
             if after.channel.id == 774629025805107230:  
                 if not "Dev" == member.top_role.name or "Clicks Bot" == member.top_role.name:
                     
-                    await member.edit(muted=True)
+                    await member.edit(mute=True)
                     infoEmbed = discord.Embed(description="You tried to connect to a private channel, a request has been sent to the admin of this channel. Please wait for confirmation.")
                     await member.create_dm()
                     await member.dm_channel.send(embed=infoEmbed)
@@ -43,11 +43,13 @@ class VoiceEvents(commands.Cog):
                     check = lambda m: m.content == "Yes" or m.content == "No" and m.author == user
                     answer = await self.bot.wait_for("message", check=check)
                         
-                    if str(answer.content).lower() in ("yes", "y"):
-                        await member.edit(muted=False)
+                    if str(answer.content).lower() == "yes" or str(answer.content).lower() == "y":
+                        await member.edit(mute=False)
+                        lg.info("Unmuted the user")
                         return
                     else:
-                        await member.edit(muted=False)
+                        await member.edit(mute=False)
+                        lg.info("Unmuted the user")
                         await member.move_to(None)
                         return   
             
@@ -60,7 +62,7 @@ class VoiceEvents(commands.Cog):
             if before.channel.id != after.channel.id:
                 if after.channel.id == 774629025805107230:  
                     if not "Dev" == member.top_role.name or "Clicks Bot" == member.top_role.name:
-                        await member.edit(muted=True)
+                        await member.edit(mute=True)
                         infoEmbed = discord.Embed(description="You tried to connect to a private channel, a request has been sent to the admin of this channel. Please wait for confirmation.")
                         await member.create_dm()
                         await member.dm_channel.send(embed=infoEmbed)
@@ -69,14 +71,16 @@ class VoiceEvents(commands.Cog):
                         user = discord.utils.get(member.guild.members, id=408722814808358914)
                         await user.create_dm()
                         await user.dm_channel.send(embed=infoEmbed)
-                        check = lambda m: m.content == "Yes" or m.content == "No" and m.author == user
+                        check = lambda m: m.channel == user.dm_channel and m.author == user
                         answer = await self.bot.wait_for("message", check=check)
                         
-                        if str(answer.content).lower() in ("yes", "y"):
-                            await member.edit(muted=False)
+                        if str(answer.content).lower() == "yes" or str(answer.content).lower() == "y":
+                            await member.edit(mute=False)
+                            lg.info("Unmuted the user")
                             return
                         else:
-                            await member.edit(muted=False)
+                            await member.edit(mute=False)
+                            lg.info("Unmuted the user")
                             await member.move_to(before.channel)
                             return     
                 lg.info(f"{Fore.LIGHTCYAN_EX}{member.guild} - {member.name} switched channels from '{before.channel.name}' to '{after.channel.name}'")

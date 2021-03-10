@@ -20,8 +20,8 @@ class PiHoleAPI_Handler(commands.Cog):
 
         self.bot = bot
 
-    @commands.command(name="get_pihole_summary")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.command(name="get_pihole_summary", hidden=True)
+    @commands.is_owner()
     async def get_pihole_summary(self, ctx):
         async with ClientSession() as session:
             async with session.get(url=f"http://{config.getPiHoleIp()}/admin/api.php?summary") as data:

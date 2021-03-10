@@ -61,7 +61,7 @@ for filename_ in os.listdir(f"{path}/cogs"):
 
 
 @bot.command(name="load", aliases=["l"])
-@commands.has_role("Dev")
+@commands.is_owner()
 async def load(ctx, extension):
     '''Load extension'''
     if str(extension) == "all":
@@ -91,7 +91,7 @@ async def load(ctx, extension):
 
 
 @bot.command(name="reload", aliases=["rl"])
-@commands.has_role("Dev")
+@commands.is_owner()
 async def reload(ctx, extension):
     '''Reload extension'''
     if str(extension) == "all" or "":
@@ -122,7 +122,7 @@ async def reload(ctx, extension):
 
 
 @bot.command(name="unload", aliases=["ul"])
-@commands.has_role("Dev")
+@commands.is_owner()
 async def unload(ctx, extension):
     '''Unload extensions'''
     if str(extension) == "all":
@@ -159,8 +159,11 @@ async def on_message(message):
     '''Message Even'''
     if message.author.bot:
         return
-    
-    lg_chat.info(f"{colorama.Fore.LIGHTYELLOW_EX}[{message.guild}] -  {message.channel}: {message.author.name}: {message.content}")
+    try:
+        lg_chat.info(f"{colorama.Fore.LIGHTYELLOW_EX}[{message.guild}] -  {message.channel}: {message.author.name}: {message.content}")
+
+    except UnicodeEncodeError:
+        pass
 
     if str(message.author.id) in blacklisted:
         #Blacklisted people can't send messages on servers that the bot is running on

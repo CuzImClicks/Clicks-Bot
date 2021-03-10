@@ -218,7 +218,7 @@ class MusicBot(commands.Cog):
             await self.play(ctx)
 
     @commands.command(name="die", help="Hard resets the queue and stops playing")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def die(self, ctx):
         global queue
         try:
@@ -374,7 +374,7 @@ class MusicBot(commands.Cog):
             await ctx.send(embed=errorEmbed)
 
     @commands.command(name="insert")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.has_role(config.getBotMusicRole())
     async def insert(self, ctx, url):
         global queue
         video = YouTubeVideo(url)

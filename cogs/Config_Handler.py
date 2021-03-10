@@ -21,7 +21,7 @@ class Config_Handler(commands.Cog):
         self.bot = bot
 
     @commands.command(name="enable")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.is_owner()
     async def enable_command(self, ctx, feature):
         if not config.enable(feature):
             errorEmbed = discord.Embed(description=f"{feature} is not a changeable feature in the config file", colour=config.getDiscordColour("red"))
@@ -34,7 +34,7 @@ class Config_Handler(commands.Cog):
         await ctx.send(embed=infoEmbed)
 
     @commands.command(name="disable")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.is_owner()
     async def disable_command(self, ctx, feature):
         if not config.disable(feature):
             errorEmbed = discord.Embed(description=f"{feature} is not a changeable feature in the config file", colour=config.getDiscordColour("red"))
@@ -47,7 +47,7 @@ class Config_Handler(commands.Cog):
         await ctx.send(embed=infoEmbed)
 
     @commands.command(name="toggle")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.is_owner()
     async def toggle_command(self, ctx, feature):
         if not config.toggle(feature):
             errorEmbed = discord.Embed(description=f"{feature} is not a changeable feature in the config file", colour=config.getDiscordColour("red"))
@@ -60,7 +60,7 @@ class Config_Handler(commands.Cog):
         await ctx.send(embed=infoEmbed)
 
     @commands.command(name="add_blocked_channel")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.is_owner()
     async def add_blocked_channel(self, ctx):
         channel_id = ctx.channel.id
         blocked_channels = jf_blocked_channels.read()
@@ -68,7 +68,7 @@ class Config_Handler(commands.Cog):
         jf_blocked_channels.write(blocked_channels)
 
     @commands.command(name="remove_blocked_channel")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.is_owner()
     async def remove_blocked_channel(self, ctx, channel_id):
         channel_id = int(channel_id)
         blocked_channels = list(jf_blocked_channels.read())

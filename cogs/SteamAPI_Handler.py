@@ -52,7 +52,7 @@ class SteamAPI_Handler(commands.Cog):
         return JsonFile(name="users.json", path=f"{path}/steam")
 
     @commands.command(name="add_steam_player")
-    @commands.has_role(config.getBotAccessRole())
+    @commands.is_owner()
     async def add_steam_player(self, ctx, steam_id):
         """Add a player to the steam online task
         by typing the command with the player's steam id"""

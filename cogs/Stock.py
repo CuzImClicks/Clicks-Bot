@@ -25,6 +25,7 @@ class example_cog(commands.Cog):
     @commands.command(name="stock")
     @commands.has_role(config.getBotAccessRole())
     async def stock(self, ctx, _stock: str, currency: str = "EUR", source: str = "yahoo"):
+        #FIXME
         lg.info(f"{_stock.upper()}-{currency.upper()}")
         data = web.DataReader(f"{_stock.upper()}", source.lower(), self.__start, self.__end)
         

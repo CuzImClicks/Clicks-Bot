@@ -47,7 +47,7 @@ class HypixelAPI_Handler(commands.Cog):
         return self.bot.get_channel(799220589243007007)
 
     @commands.command(name="add_hypixel_player")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.is_owner()
     async def add_hypixel_player(self, ctx, playername):
         """Add a player to the hypixel online task
         by typing the command with the player's username"""
@@ -60,7 +60,7 @@ class HypixelAPI_Handler(commands.Cog):
         self.jf.write(data)
 
     @commands.command(name="remove_hypixel_player")
-    @commands.has_role(config.getBotAdminRole())
+    @commands.is_owner()
     async def remove_hypixel_player(self, ctx, playername):
         """Add a player to the hypixel online task
         by typing the command with the player's username"""
@@ -178,6 +178,7 @@ class HypixelAPI_Handler(commands.Cog):
     @commands.has_role(config.getBotAccessRole())
     async def fairy_souls(self, ctx, playername):
         """Get the collected fairy souls of a player"""
+        #FIXME
         pl = Player(playername)
         skyblock = pl.SkyBlock(pl.data, pl.name, pl.uuid)
         infoEmbed = discord.Embed(title="Fairy Souls",
