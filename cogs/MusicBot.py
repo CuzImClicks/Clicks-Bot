@@ -90,7 +90,7 @@ class MusicBot(commands.Cog):
     @commands.command(name="join", help="The bot joins your channel")
     @commands.has_role(config.getBotMusicRole())
     async def join(self, ctx):
-
+        
         channel = ctx.author.voice.channel
         if not ctx.message.author.voice:
             errorEmbed = discord.Embed(title="Command Error",
@@ -101,10 +101,9 @@ class MusicBot(commands.Cog):
             return
 
         else:
-
-            channel = ctx.message.author.voice.channel
-
+            
             try:
+                channel = ctx.message.author.voice.channel
                 await channel.connect()
 
             except discord.ClientException:
