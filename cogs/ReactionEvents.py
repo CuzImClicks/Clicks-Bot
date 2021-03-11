@@ -4,10 +4,12 @@ from discord.ext import commands
 from util.logger import *
 from util.logger import path
 
+from clicks_util import info
+
 lg = logging.getLogger(__name__)
 from util.logger import path
 import logging
-fl = logging.FileHandler(f"{path}\logs\log.log")
+fl = logging.FileHandler(f"{path}\logs\log.log", encoding="utf-8")
 fl.setLevel(logging.INFO)
 lg.addHandler(fl)
 
@@ -33,11 +35,21 @@ class ReactionEvents(commands.Cog):
             message = await channel.fetch_message(payload.message_id)
             user = self.bot.get_user(payload.user_id)
             emoji = payload.emoji
-            lg.info("Got emoji")
             await message.remove_reaction(emoji, user)
+            return
 
-        else:
-            pass
+        elif str(payload.message_id) == "819259300852662282":
+
+            roles = payload.member.guild.roles
+            role = discord.utils.get(roles, name="Mitglied")
+            channel = self.bot.get_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+            user = payload.member
+            emoji = payload.emoji
+            
+            await user.add_roles(role)
+            await message.remove_reaction(emoji, user)
+            return
 
         await log_reaction(payload)
 
