@@ -159,6 +159,9 @@ async def on_message(message):
     '''Message Even'''
     if message.author.bot:
         return
+
+    if message.is_system():
+        return
         
     lg_chat.info(f"{colorama.Fore.LIGHTYELLOW_EX}[{str(message.guild)}] -  {str(message.channel)}: {str(message.author.name)}: {str(message.content)}")
 
