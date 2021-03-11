@@ -29,17 +29,24 @@ class VoiceEvents(commands.Cog):
 
         if not before.channel:
             if after.channel.id == 774629025805107230:  
-                if not "Dev" == member.top_role.name or "Clicks Bot" == member.top_role.name:
+                if (not "Dev" == member.top_role.name or "Clicks Bot" == member.top_role.name) and not member.permissions.administrator:
                     
                     await member.edit(mute=True)
                     infoEmbed = discord.Embed(description="You tried to connect to a private channel, a request has been sent to the admin of this channel. Please wait for confirmation.")
-                    await member.create_dm()
-                    await member.dm_channel.send(embed=infoEmbed)
+                    try:
+                        await member.create_dm()
+                        await member.dm_channel.send(embed=infoEmbed)
+                    except discord.Forbidden:
+                        pass
 
                     infoEmbed = discord.Embed(description=f"{member.name} tried to connect to your channel. Please type 'Yes' or 'No'")
                     user = discord.utils.get(member.guild.members, id=408722814808358914)
-                    await user.create_dm()
-                    await user.dm_channel.send(embed=infoEmbed)
+                    try:
+                        await user.create_dm()
+                        await user.dm_channel.send(embed=infoEmbed)
+                    
+                    except discord.Forbidden:
+                        pass
                     check = lambda m: m.content == "Yes" or m.content == "No" and m.author == user
                     answer = await self.bot.wait_for("message", check=check)
                         
@@ -61,16 +68,22 @@ class VoiceEvents(commands.Cog):
         if before.channel and after.channel:
             if before.channel.id != after.channel.id:
                 if after.channel.id == 774629025805107230:  
-                    if not "Dev" == member.top_role.name or "Clicks Bot" == member.top_role.name:
+                    if (not "Dev" == member.top_role.name or "Clicks Bot" == member.top_role.name) and not member.permissions.administrator:
                         await member.edit(mute=True)
                         infoEmbed = discord.Embed(description="You tried to connect to a private channel, a request has been sent to the admin of this channel. Please wait for confirmation.")
-                        await member.create_dm()
-                        await member.dm_channel.send(embed=infoEmbed)
-
+                        try:
+                            await member.create_dm()
+                            await member.dm_channel.send(embed=infoEmbed)
+                    
+                        except discord.Forbidden:
+                            pass
                         infoEmbed = discord.Embed(description=f"{member.name} tried to connect to your channel. Please type 'Yes' or 'No'")
                         user = discord.utils.get(member.guild.members, id=408722814808358914)
-                        await user.create_dm()
-                        await user.dm_channel.send(embed=infoEmbed)
+                        try:
+                            await user.create_dm()
+                            await user.dm_channel.send(embed=infoEmbed)
+                        except discord.Forbidden:
+                            pass
                         check = lambda m: m.channel == user.dm_channel and m.author == user
                         answer = await self.bot.wait_for("message", check=check)
                         
