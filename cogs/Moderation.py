@@ -35,21 +35,22 @@ class Moderation(commands.Cog):
 
     @commands.command(name="blacklist")
     @commands.is_owner()
-    async def blacklist(self, ctx):
-
-        user = ctx.message.mentions[0]
+    async def blacklist(self, ctx, id: str = ""):
+        member_ids = [member.id for member in ctx.author.guild.members]
         jf = JsonFile(name="blacklist.json", path=path)
-        infoEmbed = discord.Embed(title="Blacklist",
-                                  color=config.getDiscordColour("blue"),
-                                  timestamp=timeconvert.getTime())
-        if user.id == "list":
-            member_ids = [member.id for member in ctx.author.guild.members]
+        infoEmbed = discord.Embed(title="Blacklist", colour=config.getDiscordColour("blue"))
+        if id == "list":
+            
             for user in jf.read()["blacklisted"]:
                 user = discord.get(member_ids, id=user)
                 infoEmbed.add_field(name=user, value="Blacklisted", inline=False)
+                await ctx.send(embed=infoEmbed)
 
-            await ctx.send(embed=infoEmbed)
-        else:
+        try:
+            user = ctx.message.mentions[0]
+        except IndexError:
+            user = discord.utils.get(member_ids, id=id)
+        if type(user) == discord.Member: 
             user = discord.utils.get([member.id for member in ctx.author.guild.members], id=user.id)
             blacklisted = jf.read()["blacklisted"]
             blacklisted.append(user)

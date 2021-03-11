@@ -165,16 +165,18 @@ async def on_message(message):
         
     lg_chat.info(f"{colorama.Fore.LIGHTYELLOW_EX}[{str(message.guild)}] -  {str(message.channel)}: {str(message.author.name)}: {str(message.content)}")
 
-    if str(message.author.id) in blacklisted:
+    if message.author.id in blacklisted:
         #Blacklisted people can't send messages on servers that the bot is running on
         lg.info(f"Blacklisted user {message.author.name} tried to send '{message.content}' in the channel {message.channel}")
+        await message.delete()
         return
 
     if message.channel.id in blocked_channels:
         #check if the message is in the list of blocked channelsu
         await message.delete()
         return
-    
+
+
     await bot.process_commands(message)
 
 try:
