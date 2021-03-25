@@ -5,6 +5,7 @@ from util.logger import path
 import logging
 from colorama import Fore
 from clicks_util import info
+from util import config
 
 lg = logging.getLogger(__name__)
 fl = logging.FileHandler(f"{path}\logs\log.log", encoding='utf-8')
@@ -29,6 +30,22 @@ class VoiceEvents(commands.Cog):
     def __init__(self, bot):
 
         self.bot = bot
+
+    @commands.command(name="fmute", hidden=True)
+    @commands.has_guild_permissions(administrator=True)
+    async def fmute(self, ctx):
+        user = ctx.message.mentions[0]
+        if not user:
+            return
+        await ctx.message.delete()
+        if isBlocked(user):
+            blocked.remove(user)
+            await user.edit(mute=False)
+            
+        else:
+            await user.edit(mute=True)
+            blocked.append(user)
+
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
