@@ -1,22 +1,32 @@
-import logging
-from attr import __description__
 import discord
 from discord.ext import commands
-import lyricsgenius
-from util.logger import path
 import logging
 from util import config
-import datetime
-from aiohttp import ClientSession
-import json
 import lyricsgenius
-from clicks_util import text, numbers
+from clicks_util import text, numbers, HiddenPrints
+from cogs.MusicBot import getLastSong
+import sys, os
+import logging
+import os
+import sys
+
+import discord
+import lyricsgenius
+from discord.ext import commands
+
+from clicks_util import text, numbers, HiddenPrints
+from cogs.MusicBot import getLastSong
+from util import config
 
 lg = logging.getLogger(__name__[5:])
 
-import os, sys
 
 class HiddenPrints:
+    """
+    Usage:
+    with HiddenPrints():
+        ...
+    """
     def __enter__(self):
         self._original_stdout = sys.stdout
         sys.stdout = open(os.devnull, 'w')
@@ -24,6 +34,7 @@ class HiddenPrints:
     def __exit__(self, exc_type, exc_val, exc_tb):
         sys.stdout.close()
         sys.stdout = self._original_stdout
+
 
 class GeniusAPI_Handler(commands.Cog):
 
@@ -34,6 +45,13 @@ class GeniusAPI_Handler(commands.Cog):
     @commands.command(name="lyrics")
     @commands.has_role(config.getBotMusicRole())
     async def lyrics(self, ctx, *args):
+        if not args:
+            last_song = await getLastSong()
+            title = last_song.title()
+            title = str(title).replace("(Official Video)", "").replace("(Lyric Video)", "")
+            #channel = await last_song.channel()
+            args = title  # + channel
+        lg.info(args)
         convertTuple = lambda tup: str(tup).replace("(", "").replace("'", "").replace(")", "").replace(",", "")
         msg = convertTuple(args)
         genius = lyricsgenius.Genius(config.getGeniusKey())
@@ -50,6 +68,7 @@ class GeniusAPI_Handler(commands.Cog):
         for part in parts:
             embed = discord.Embed(description=part, colour=genius_yellow)
             await ctx.send(embed=embed)
+
 
 def setup(bot):
 
