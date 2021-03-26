@@ -1,20 +1,21 @@
 import asyncio
+import json
+import os
+import sys
 from datetime import datetime
 from random import choice
 
 import discord
-from requests import __title__
 import youtube_dl
-from discord.ext import commands, tasks
-
-from util import config, strings, logger, cleanup
-from util.logger import *
-from discord.utils import get
-from clicks_util import timeconvert, info
-from lyricsgenius import Genius
-from cogs.GeniusAPI_Handler import HiddenPrints
 from aiohttp import ClientSession
-import json
+from discord.ext import commands
+from discord.utils import get
+from lyricsgenius import Genius
+
+from clicks_util import HiddenPrints
+from clicks_util import timeconvert
+from util import config, strings
+from util.logger import *
 
 lg = logging.getLogger(__name__[5:])
 
@@ -29,6 +30,25 @@ global last_song, loop, paused
 last_song = ""
 loop = False
 paused = False
+
+
+async def getLastSong():
+    return last_song
+
+
+class HiddenPrints:
+    """
+    Usage:
+    with HiddenPrints():
+        ...
+    """
+    def __enter__(self):
+        self._original_stdout = sys.stdout
+        sys.stdout = open(os.devnull, 'w')
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout.close()
+        sys.stdout = self._original_stdout
 
 
 class YTDLSource(discord.PCMVolumeTransformer):
@@ -51,46 +71,50 @@ class YTDLSource(discord.PCMVolumeTransformer):
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **strings.get_ytdl_ffmpeg_options()), data=data)
 
+
 class YouTubeVideo:
 
-    def __init__(self, url, author = None) -> None:
+    def __init__(self, url, author=None, original_search=None) -> None:
         self.id = url.split("https://www.youtube.com/watch?v=")[1]
         self.url = url
         self.author = author
+        self.original_search = original_search
 
     async def data(self) -> dict:
         async with ClientSession() as session:
-            async with session.get("https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + self.id  + "&key=" + config.getYoutubeKey()) as data:
+            async with session.get(
+                    "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + self.id + "&key=" + config.getYoutubeKey()) as data:
                 video = json.loads(await data.text())["items"][0]["snippet"]
                 return video
-                
+
     async def title(self):
-        return dict(await self.data())["title"]
+        return str(dict(await self.data())["title"])
 
     async def description(self):
-        return dict(await self.data())["description"]
+        return str(dict(await self.data())["description"])
 
     async def channel(self):
-        return dict(await self.data())["channel"]
+        return str(dict(await self.data())["channel"])
 
     async def thumbnail(self):
         return f"https://img.youtube.com/vi/{self.id}/sddefault.jpg"
-                
+
+
 class MusicBot(commands.Cog):
 
     def __init__(self, bot):
 
         self.bot = bot
-        #self.cleanup.start()
+        # self.cleanup.start()
 
     def cog_unload(self):
-        #self.cleanup.cancel()
+        # self.cleanup.cancel()
         pass
 
     @commands.command(name="join", help="The bot joins your channel")
     @commands.has_role(config.getBotMusicRole())
     async def join(self, ctx):
-        
+
         channel = ctx.author.voice.channel
         if not ctx.message.author.voice:
             errorEmbed = discord.Embed(title="Command Error",
@@ -101,7 +125,7 @@ class MusicBot(commands.Cog):
             return
 
         else:
-            
+
             try:
                 channel = ctx.message.author.voice.channel
                 await channel.connect()
@@ -114,8 +138,8 @@ class MusicBot(commands.Cog):
                 await ctx.send(embed=errorEmbed)
 
         infoEmbed = discord.Embed(title="Join",
-                    description=f"Joined the channel {channel} in guild {ctx.author.guild.name}",
-                    colour=config.getDiscordColour("blue"))
+                                  description=f"Joined the channel {channel} in guild {ctx.author.guild.name}",
+                                  colour=config.getDiscordColour("blue"))
         infoEmbed.add_field(name="Queue commands", value=f"""
         .queue <url> - add a song to the queue(the bot will start playing automaticly)
         .insert <url> - insert a song at the start of the queue
@@ -184,7 +208,6 @@ class MusicBot(commands.Cog):
             await asyncio.sleep(1)
             is_playing = True
         is_playing = False
-            
 
     @commands.command(name="among_us", help="Queues all configured Among Us songs")
     @commands.has_role(config.getBotMusicRole())
@@ -225,16 +248,17 @@ class MusicBot(commands.Cog):
             voice_channel = server.voice_client
             voice_channel.pause()
         except AttributeError:
-            errorEmbed = discord.Embed(title="Die Error", 
-            description="You are not connected to a voice channel",
-            colour=config.getDiscordColour("red"))
+            errorEmbed = discord.Embed(title="Die Error",
+                                       description="You are not connected to a voice channel",
+                                       colour=config.getDiscordColour("red"))
             errorEmbed.set_author(name=ctx.author.nick, icon_url=ctx.author.avatar_url)
             await ctx.send(embed=errorEmbed)
             return
         queue.clear()
         lg.info(f"Cleared the queue!")
         loop = False
-        infoEmbed = discord.Embed(title="Die", description="Resetted the MusicBot", color=config.getDiscordColour("red"),
+        infoEmbed = discord.Embed(title="Die", description="Resetted the MusicBot",
+                                  color=config.getDiscordColour("red"),
                                   timestamp=timeconvert.getTime())
         await ctx.send(embed=infoEmbed)
 
@@ -245,12 +269,14 @@ class MusicBot(commands.Cog):
         if not loop:
             loop = True
             queue.append(last_song)
-            infoEmbed = discord.Embed(title="Loop", description="Looping the current song", color=config.getDiscordColour("blue"))
+            infoEmbed = discord.Embed(title="Loop", description="Looping the current song",
+                                      color=config.getDiscordColour("blue"))
             await ctx.send(embed=infoEmbed)
 
         elif loop:
             loop = False
-            infoEmbed = discord.Embed(title="Loop", description="Not looping song anymore", color=config.getDiscordColour("blue"))
+            infoEmbed = discord.Embed(title="Loop", description="Not looping song anymore",
+                                      color=config.getDiscordColour("blue"))
             queue.remove(0)
             await ctx.send(embed=infoEmbed)
 
@@ -262,7 +288,7 @@ class MusicBot(commands.Cog):
         if args:
             if str(args[0]).startswith("https://"):
                 url = args[0]
-            
+
             else:
                 convertTuple = lambda tup: str(tup).replace("(", "").replace("'", "").replace(")", "").replace(",", "")
                 msg = convertTuple(args)
@@ -278,18 +304,19 @@ class MusicBot(commands.Cog):
 
                         if url == "":
                             errorEmbed = discord.Embed(title="Command Error",
-                            description="Could not find song on YouTube",
-                            colour=config.getDiscordColour("red"))
+                                                       description="Could not find song on YouTube",
+                                                       colour=config.getDiscordColour("red"))
                             await ctx.send(embed=errorEmbed)
                             return
 
-                except AttributeError:
-                            errorEmbed = discord.Embed(title="Command Error",
-                            description="Could not find song on Genius, please provide more information or post the song directly with a youtube.com link",
-                            colour=config.getDiscordColour("red"))
-                            await ctx.send(embed=errorEmbed)
-                            return
-                
+                except AttributeError as e:
+                    lg.error(e)
+                    errorEmbed = discord.Embed(title="Command Error",
+                                               description="Could not find song on Genius, please provide more information or post the song directly with a youtube.com link",
+                                               colour=config.getDiscordColour("red"))
+                    await ctx.send(embed=errorEmbed)
+                    return
+
         else:
             url = None
 
@@ -321,13 +348,16 @@ class MusicBot(commands.Cog):
             except IndexError:
                 errorEmbed = discord.Embed(title="Command Error", description="Invalid URL",
                                            color=config.getDiscordColour("red"))
-                errorEmbed.add_field(name="Possible causes", value="youtube short urls and indirect links can cause errors while downloading")
+                errorEmbed.add_field(name="Possible causes",
+                                     value="youtube short urls and indirect links can cause errors while downloading")
                 errorEmbed.set_footer(text=timeconvert.getTime())
 
                 await ctx.send(embed=errorEmbed)
                 return
-            
-            infoEmbed = discord.Embed(title="Queue", description=f"Added [{await video.title()}]({video.url}) to the queue", colour=config.getDiscordColour("blue"))
+
+            infoEmbed = discord.Embed(title="Queue",
+                                      description=f"Added [{await video.title()}]({video.url}) to the queue",
+                                      colour=config.getDiscordColour("blue"))
             infoEmbed.set_image(url=await video.thumbnail())
             if video.author.nick:
                 infoEmbed.add_field(name="Requested by", value=video.author.nick, inline=True)
@@ -357,14 +387,14 @@ class MusicBot(commands.Cog):
         number = int(number)
         if number > len(queue):
             errorEmbed = discord.Embed(title="Command Error", description="The queue isn't that long",
-                                           color=config.getDiscordColour("red"), timestamp=timeconvert.getTIme())
+                                       color=config.getDiscordColour("red"), timestamp=timeconvert.getTIme())
             await ctx.send(embed=errorEmbed)
-            
+
         if not len(queue) == 0:
             del (queue[int(number)])
             lg.info(f"Deleted {queue[int(number)]} from queue")
             infoEmbed = discord.Embed(title="Remove", description="The song was removed from the queue",
-                                        color=config.getDiscordColour("blue"), timestamp=timeconvert.getTIme())
+                                      color=config.getDiscordColour("blue"), timestamp=timeconvert.getTIme())
             await ctx.send(embed=infoEmbed)
 
         else:
@@ -379,8 +409,8 @@ class MusicBot(commands.Cog):
         video = YouTubeVideo(url)
         queue.insert(0, video)
         infoEmbed = discord.Embed(title="Queue",
-        description=f"Inserted [{await video.title()}]({video.url}) at index 0", 
-        colour=config.getDiscordColour("blue"))
+                                  description=f"Inserted [{await video.title()}]({video.url}) at index 0",
+                                  colour=config.getDiscordColour("blue"))
         await ctx.send(embed=infoEmbed)
 
     @commands.command(name="rick")
@@ -391,7 +421,8 @@ class MusicBot(commands.Cog):
         await self.play(ctx)
 
     @commands.command(name="skipall", help="Dieser Befehl löscht die gesamte Song-Warteschleife und hört auf Musik "
-                                           "abzuspielen. Nun kannst du neue Songs in die Queue stellen.", aliases=["sa", "queue_clear", "qc"])
+                                           "abzuspielen. Nun kannst du neue Songs in die Queue stellen.",
+                      aliases=["sa", "queue_clear", "qc"])
     @commands.has_role(config.getBotMusicRole())
     async def skipall(self, ctx):
 
@@ -440,13 +471,15 @@ class MusicBot(commands.Cog):
         if paused:
             voice_channel.resume()
             paused = False
-            infoEmbed = discord.Embed(description="Resumed song currently playing", colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime())
+            infoEmbed = discord.Embed(description="Resumed song currently playing",
+                                      colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime())
             lg.info("Resumed the song currently playing!")
 
         elif not paused:
             voice_channel.pause()
             paused = True
-            infoEmbed = discord.Embed(description="Paused song currently playing", colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime())
+            infoEmbed = discord.Embed(description="Paused song currently playing",
+                                      colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime())
             lg.info(f"Paused the song currently playing!")
 
         await ctx.send(embed=infoEmbed)
@@ -461,14 +494,16 @@ class MusicBot(commands.Cog):
         voice_channel.resume()
         paused = False
         lg.info(f"Resumed the song currently playing!")
-        await ctx.send(embed=discord.Embed(description="Resumed song currently playing", colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime()))
+        await ctx.send(
+            embed=discord.Embed(description="Resumed song currently playing", colour=config.getDiscordColour("blue"),
+                                timestamp=timeconvert.getTime()))
 
     @commands.command(name="leave")
     @commands.has_role(config.getBotMusicRole())
     async def leave(self, ctx):
 
         if not ctx.message.author.voice:
-            #TODO: convert to embed
+            # TODO: convert to embed
             await ctx.send("You are not connected to a voice channel!")
             return
 
