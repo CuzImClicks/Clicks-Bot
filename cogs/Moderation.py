@@ -51,10 +51,14 @@ class Moderation(commands.Cog):
         except IndexError:
             user = discord.utils.get(member_ids, id=id)
         if type(user) == discord.Member: 
-            user = discord.utils.get([member.id for member in ctx.author.guild.members], id=user.id)
+            user = discord.utils.get([member for member in ctx.author.guild.members], id=user.id)
             blacklisted = jf.read()["blacklisted"]
-            blacklisted.append(user)
-            infoEmbed.add_field(name=user, value=f"Blacklisted")
+            if user.id in blacklisted:
+                blacklisted.remove(user.id)
+                infoEmbed.add_field(name=user, value=f"Removed  from the Blacklisted")
+            else:
+                blacklisted.append(user.id)
+                infoEmbed.add_field(name=user, value=f"Blacklisted")
             await ctx.send(embed=infoEmbed)
             jf.write({"blacklisted": blacklisted})
 
