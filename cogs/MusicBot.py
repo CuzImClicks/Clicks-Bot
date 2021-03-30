@@ -17,6 +17,7 @@ from clicks_util import timeconvert
 from util import config, strings
 from util.logger import *
 
+
 lg = logging.getLogger(__name__[5:])
 
 global ytdl, queue
@@ -52,6 +53,9 @@ class HiddenPrints:
 
 
 class YTDLSource(discord.PCMVolumeTransformer):
+    
+    #YouTube said: Unable to extract video data
+    #pip install -U youtube-dl
     def __init__(self, source, *, data, volume=0.5):
         super().__init__(source, volume)
 

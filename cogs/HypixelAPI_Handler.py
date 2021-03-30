@@ -3,7 +3,6 @@ import json
 import logging
 import aiohttp
 from discord.ext import commands, tasks
-from util.logger import path
 from util import config
 import asyncio
 import discord
@@ -13,10 +12,11 @@ from varname import nameof
 from util.minecraft import User
 from clicks_util.json_util import JsonFile
 from util.hypixel.player import Player
+from clicks_util import info
+from util.logger import path
 
 key = config.getHypixelKey()
 lg = logging.getLogger(__name__[5:])
-path = os.getcwd()
 
 
 class HypixelAPI_Handler(commands.Cog):
@@ -25,8 +25,10 @@ class HypixelAPI_Handler(commands.Cog):
         self.bot = bot
         self.jf = JsonFile("players.json", f"{path}")
         if config.getHypixelOnline():  # check if the feature is enabled
+            lg.info(f"Started the Hypixel Online Tracker")
             self.online.start()  # start the task
         if config.getMagmaboss():
+            lg.info(f"Started the Hypixel Magma Boss Tracker")
             self.magmaboss.start()  # start the task
 
     def cog_unload(self):
@@ -76,12 +78,12 @@ class HypixelAPI_Handler(commands.Cog):
     async def online(self):
         """Announce when players join or leave the hypixel network"""
         channel = self.player_channel
+        
         if not channel:
-            await asyncio.sleep(5)
-            channel = self.player_channel
+            return
         try:
             async with aiohttp.ClientSession() as session:
-                self.jf = JsonFile("players.json", f"{path}\cogs")
+                self.jf = JsonFile("players.json", f"{path}")
                 jf_data = self.jf.read()
                 for player in jf_data.keys():
                     playername = jf_data[player]["name"]
@@ -96,10 +98,11 @@ class HypixelAPI_Handler(commands.Cog):
                                                   color=config.getDiscordColour("blue"), timestamp=datetime.now())
                         infoEmbed.set_thumbnail(url=f"https://crafatar.com/avatars/{uuid}")
                         infoEmbed.set_footer(text="mc.hypixel.net",
-                                             icon_url="https://de.wikipedia.org/wiki/Hypixel#/media/Datei:LogoHypixel.png")
+                                             icon_url="https://de.wsikipedia.org/wiki/Hypixel#/media/Datei:LogoHypixel.png")
                         await channel.send(embed=infoEmbed)
 
                     elif not online and status:
+                        lg.info(f"{playername} is now in offline")
                         infoEmbed = discord.Embed(title="Offline", description=f"{playername} is in now offline",
                                                   color=config.getDiscordColour("blue"), timestamp=datetime.now())
                         infoEmbed.set_thumbnail(url=f"https://crafatar.com/avatars/{uuid}")
@@ -110,7 +113,8 @@ class HypixelAPI_Handler(commands.Cog):
                     jf_data[player]["status"] = online
                     self.jf.write(jf_data)
 
-        except KeyError:
+        except Exception as e:
+            lg.info(e)
             pass
 
     @tasks.loop(minutes=1)
