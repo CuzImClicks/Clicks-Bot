@@ -95,7 +95,7 @@ class HypixelAPI_Handler(commands.Cog):
                     if online == True and status == False:
                         game = content["session"]["gameType"]
                         infoEmbed = discord.Embed(title="Online", description=f"{playername} is now in {game}  online",
-                                                  color=config.getDiscordColour("blue"), timestamp=datetime.now())
+                                                  color=config.getDiscordColour("green"))
                         infoEmbed.set_thumbnail(url=f"https://crafatar.com/avatars/{uuid}")
                         infoEmbed.set_footer(text="mc.hypixel.net",
                                              icon_url="https://de.wsikipedia.org/wiki/Hypixel#/media/Datei:LogoHypixel.png")
@@ -104,7 +104,7 @@ class HypixelAPI_Handler(commands.Cog):
                     elif not online and status:
                         lg.info(f"{playername} is now in offline")
                         infoEmbed = discord.Embed(title="Offline", description=f"{playername} is in now offline",
-                                                  color=config.getDiscordColour("blue"), timestamp=datetime.now())
+                                                  color=config.getDiscordColour("red"))
                         infoEmbed.set_thumbnail(url=f"https://crafatar.com/avatars/{uuid}")
                         infoEmbed.set_footer(text="mc.hypixel.net",
                                              icon_url="https://de.wikipedia.org/wiki/Hypixel#/media/Datei:LogoHypixel.png")
