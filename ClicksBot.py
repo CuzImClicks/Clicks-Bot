@@ -19,7 +19,7 @@ lg = logging.getLogger("Clicks-Bot")
 lg_pl = logging.getLogger("Extension Loader")
 lg_chat = logging.getLogger("Chat")
 logging.getLogger("discord.gateway").disabled = True
-fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
+fmt = logging.Formatter(fmt="[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
 fl = logging.FileHandler(f"{path}/logs/log.log", encoding='utf-8')
 fl.setLevel(logging.INFO)
