@@ -1,7 +1,7 @@
 from datetime import datetime
 from dateutil import tz
 
-#https://stackoverflow.com/questions/4770297/convert-utc-datetime-string-to-local-datetime
+# https://stackoverflow.com/questions/4770297/convert-utc-datetime-string-to-local-datetime
 
 # METHOD 2: Auto-detect zones:
 from_zone = tz.tzutc()
@@ -16,33 +16,40 @@ utc = utc.replace(tzinfo=from_zone)
 # Convert time zone
 timezone = utc.astimezone(to_zone)
 
+
 def getTime() -> str:
     return timezone.now()
+
 
 def getStrTime() -> str:
     return str(timezone.now())[:-7].split(" ")[1]
 
+
 def getStrDateAndTime() -> str:
     return str(utc.now())[:-7]
 
+
 def timefromtimestamp(timestamp: int) -> str:
-    return str(utc.fromtimestamp(timestamp/1000).time())[:-7]
+    return str(utc.fromtimestamp(timestamp / 1000).time())[:-7]
+
 
 def datefromtimestamp(timestamp: int) -> str:
-    return str(utc.fromtimestamp(timestamp/1000).date())
+    return str(utc.fromtimestamp(timestamp / 1000).date())
+
 
 def fulldatefromtimestamp(timestamp: int) -> str:
-    return str(utc.fromtimestamp(timestamp/1000).now())[:-7]
+    return str(utc.fromtimestamp(timestamp / 1000).now())[:-7]
+
 
 def getDateAndTime():
     return utc.now()
 
+
 class TimeZone:
 
     def __init__(self, name) -> None:
-
         from_zone = tz.tzutc()
-        
+
         self.name = name
         utc = datetime.utcnow()
         self.time = utc.replace(tzinfo=from_zone).astimezone(tz.gettz(name))
@@ -54,10 +61,10 @@ class TimeZone:
         return str(self.time.now())[:-7]
 
     def timefromtimestamp(self, timestamp: int) -> str:
-        return str(self.time.fromtimestamp(timestamp/1000).time())[:-7]
+        return str(self.time.fromtimestamp(timestamp / 1000).time())[:-7]
 
     def datefromtimestamp(self, timestamp: int) -> str:
-        return str(self.time.fromtimestamp(timestamp/1000).date())
+        return str(self.time.fromtimestamp(timestamp / 1000).date())
 
     def fulldatefromtimestamp(self, timestamp: int) -> str:
-        return str(self.time.fromtimestamp(timestamp/1000).now())[:-7]
+        return str(self.time.fromtimestamp(timestamp / 1000).now())[:-7]

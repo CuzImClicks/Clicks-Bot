@@ -1,6 +1,8 @@
 import logging
 import discord
 from discord.ext import commands, tasks
+
+from clicks_util import timeconvert
 from clicks_util.json_util import JsonFile
 from util.logger import path
 from util.steam.user import User
@@ -88,14 +90,14 @@ class SteamAPI_Handler(commands.Cog):
                 lg.info(f"{user.name} is now online - status code: {state}")
                 infoEmbed = discord.Embed(title="Online", description=f"{user.name} is now in Steam  "
                                                                       f"{translate_state_code(user.state)}",
-                                          color=config.getDiscordColour("blue"), timestamp=datetime.now())
+                                          color=config.getDiscordColour("blue"))
                 infoEmbed.set_thumbnail(url=user.avatar)
                 await channel.send(embed=infoEmbed)
 
             elif state == 0 and status == 1:
                 lg.info(f"{user.name} is now offline")
                 infoEmbed = discord.Embed(title="Online", description=f"{user.name} is in Steam now offline",
-                                          color=config.getDiscordColour("blue"), timestamp=datetime.now())
+                                          color=config.getDiscordColour("blue"))
                 await channel.send(embed=infoEmbed)
 
             jf_data[user.name]["status"] = state
