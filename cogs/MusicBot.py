@@ -12,7 +12,7 @@ from discord.ext import commands
 from discord.utils import get
 from lyricsgenius import Genius
 
-from clicks_util import HiddenPrints
+from clicks_util import HiddenPrints, info
 from clicks_util import timeconvert
 from util import config, strings
 from util.logger import *
@@ -23,7 +23,7 @@ lg = logging.getLogger(__name__[5:])
 global ytdl, queue
 ytdl = youtube_dl.YoutubeDL(strings.get_ytdl_format_options())
 queue = []
-youtube_dl.utils.bug_reports_message = lambda msg: lg.error(msg)
+youtube_dl.utils.bug_reports_message = lambda: lg.error("msg")
 
 genius = Genius(config.getGeniusKey())
 
@@ -178,10 +178,10 @@ class MusicBot(commands.Cog):
                     lg.info(f"Removed song {await queue[0].title()} from the queue ")
                     del (queue[0])
 
-                infoEmbed = discord.Embed(description=f"Now playing [{player.title}]({last_song.url})",
+                infoEmbed = discord.Embed(description=f"Now playing [{player.title}]({await last_song.url()})",
                                           color=config.getDiscordColour("blue"))
                 infoEmbed.set_image(url=await last_song.thumbnail())
-                infoEmbed.set_author(name=last_song.author.nick, icon_url=last_song.author.avatar_url)
+                infoEmbed.set_author(name=await last_song.author.nick, icon_url=await last_song.author.avatar_url())
 
                 if not loop:
                     await ctx.send(embed=infoEmbed)
@@ -190,8 +190,9 @@ class MusicBot(commands.Cog):
             if queue and not paused:
                 await self.play(ctx)
 
-        except IndexError as e:
-
+        except Exception as e:
+            lg.info(type(server))
+            lg.info(type(last_song))
             lg.error(f"No songs left in queue!")
             errorEmbed = discord.Embed(title="Command Error", description="No songs left in the queue",
                                        color=config.getDiscordColour("red"), timestamp=timeconvert.getTime())
@@ -367,7 +368,7 @@ class MusicBot(commands.Cog):
                 infoEmbed.add_field(name="Requested by", value=video.author.nick, inline=True)
             elif video.author.name:
                 infoEmbed.add_field(name="Requested by", value=video.author.name, inline=True)
-            infoEmbed.add_field(name="Position in queue", value=int(len(queue)))
+            infoEmbed.add_field(name="Position in queue", value=str(len(queue)))
             await ctx.send(embed=infoEmbed)
             try:
                 voice = get(self.bot.voice_clients, guild=ctx.author.guild)
