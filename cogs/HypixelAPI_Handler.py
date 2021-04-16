@@ -28,7 +28,7 @@ class HypixelAPI_Handler(commands.Cog):
         if config.getHypixelOnline():  # check if the feature is enabled
             lg.info(f"Started the Hypixel Online Tracker")
             self.online.start()  # start the task
-            self.banking.start()
+            #self.banking.start()
         if config.getMagmaboss():
             lg.info(f"Started the Hypixel Magma Boss Tracker")
             self.magmaboss.start()  # start the task
@@ -37,7 +37,7 @@ class HypixelAPI_Handler(commands.Cog):
         """Unload the tasks"""
         if config.getHypixelOnline():
             self.online.cancel()  # cancel the task
-            self.banking.cancel()
+            #self.banking.cancel()
         if config.getMagmaboss():
             self.magmaboss.cancel()  # cancel the task
 
