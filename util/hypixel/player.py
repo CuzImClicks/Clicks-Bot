@@ -88,6 +88,7 @@ class Player:
                 self.profile = profile
                 self.uuid = uuid
                 self.user = self.User(self.data_profile)
+                self.banking = self.Banking(self.content)
 
             @property
             def content(self) -> dict:
@@ -125,6 +126,30 @@ class Player:
                     str: [the ingame name of the profile("Kiwi", "Pineapple", "Orange", ...)]
                 """
                 return self.profile["cute_name"]
+
+            class Banking:
+                def __init__(self, banking_data: dict):
+                    try:
+                        banking_data = banking_data["profile"]["banking"]
+                        self.banking_data = banking_data
+                    except KeyError:
+                        self.banking_data = None
+
+                @property
+                def balance(self) -> int:
+
+                    if not self.banking_data:
+                        return None
+
+                    return int(self.banking_data["balance"])
+
+                @property
+                def transactions(self) -> list:
+                    try:
+                        return self.banking_data["transactions"]
+
+                    except KeyError:
+                        return None
 
             class User:
 
@@ -270,8 +295,7 @@ class Player:
 
                 @property
                 def coin_purse(self):
-                    #FIXME: returns None
-                    self.profile_data["coin_purse"]
+                    return int(self.profile_data["coin_purse"])
 
                 @property
                 def last_death(self) -> datetime.time:

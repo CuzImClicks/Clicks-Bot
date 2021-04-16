@@ -14,6 +14,7 @@ from clicks_util.json_util import JsonFile
 from util.hypixel.player import Player
 from clicks_util import info
 from util.logger import path
+import time
 
 key = config.getHypixelKey()
 lg = logging.getLogger(__name__[5:])
@@ -27,6 +28,7 @@ class HypixelAPI_Handler(commands.Cog):
         if config.getHypixelOnline():  # check if the feature is enabled
             lg.info(f"Started the Hypixel Online Tracker")
             self.online.start()  # start the task
+            self.banking.start()
         if config.getMagmaboss():
             lg.info(f"Started the Hypixel Magma Boss Tracker")
             self.magmaboss.start()  # start the task
@@ -34,7 +36,8 @@ class HypixelAPI_Handler(commands.Cog):
     def cog_unload(self):
         """Unload the tasks"""
         if config.getHypixelOnline():
-            self.online.cancel()  # cancel the task 
+            self.online.cancel()  # cancel the task
+            self.banking.cancel()
         if config.getMagmaboss():
             self.magmaboss.cancel()  # cancel the task
 
@@ -42,6 +45,10 @@ class HypixelAPI_Handler(commands.Cog):
     def player_channel(self):
         """Get the player online channel"""
         return self.bot.get_channel(799291117425524756)
+
+    @property
+    def coin_channel(self):
+        return self.bot.get_channel(773974638963195942)
 
     @property
     def magma_boss_channel(self):
@@ -114,8 +121,40 @@ class HypixelAPI_Handler(commands.Cog):
                     self.jf.write(jf_data)
 
         except Exception as e:
-            lg.info(e)
+            lg.error(e)
             pass
+
+    @tasks.loop(minutes=1.0)
+    async def banking(self):
+        """Check the bank balance of the players in the config file"""
+        channel = self.coin_channel
+
+        if not channel:
+            return
+        async with aiohttp.ClientSession() as session:
+            self.jf = JsonFile("players.json", f"{path}")
+            jf_data = self.jf.read()
+            for player in jf_data.keys():
+                bal = None
+                purse = None
+
+                username = jf_data[player]["name"]
+                lg.info(f"Checking coins of {username}")
+                uuid = jf_data[player]["uuid"]
+                pl = Player(username)
+                pr = pl.skyblock.profiles[list(pl.skyblock.profiles.keys())[0]]
+
+                try:
+                    bal = pr.banking.balance
+                except KeyError:
+                    bal = "Banking API disabled"
+                try:
+                    purse = pr.user.coin_purse
+                except KeyError:
+                    purse = "Banking API disabled"
+                lg.info({"balance": bal, "purse": purse})
+
+                await channel.send(str({username: {"balance": bal, "purse": purse}}))
 
     @tasks.loop(minutes=1)
     async def magmaboss(self):

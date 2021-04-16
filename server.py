@@ -19,6 +19,7 @@ server = FastAPI()
 
 lg = logging.getLogger("Server")
 
+
 @server.get("/")
 async def index():
     return RedirectResponse("/docs")
@@ -149,6 +150,18 @@ async def skyblock_user_stats(key: str = "", username: str = ""):
         profile = pl.skyblock.profiles[list(pl.skyblock.profiles.keys())[0]]
 
         return JSONResponse(status_code=200, content={"stats": dict(profile.user.stats.__dict__())})
+
+
+@server.get("/api/hypixel/skyblock/user/banking")
+async def skyblock_user_banking(key: str = "", username: str = ""):
+    if not check_key(key):
+        return JSONResponse(status_code=401, content={"success": False, "cause": "Invalid key"})
+
+    else:
+        pl = Player(username)
+        profile = pl.skyblock.profiles[list(pl.skyblock.profiles.keys())[0]]
+
+        return JSONResponse(status_code=200, content={"success": True, "banking": profile.banking.banking_data})
 
 
 @server.get("/api/steam")
