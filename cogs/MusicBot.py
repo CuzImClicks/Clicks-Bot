@@ -178,10 +178,10 @@ class MusicBot(commands.Cog):
                     lg.info(f"Removed song {await queue[0].title()} from the queue ")
                     del (queue[0])
 
-                infoEmbed = discord.Embed(description=f"Now playing [{player.title}]({await last_song.url()})",
+                infoEmbed = discord.Embed(description=f"Now playing [{player.title}]({last_song.url})",
                                           color=config.getDiscordColour("blue"))
                 infoEmbed.set_image(url=await last_song.thumbnail())
-                infoEmbed.set_author(name=await last_song.author.nick, icon_url=await last_song.author.avatar_url())
+                infoEmbed.set_author(name=last_song.author.nick, icon_url=last_song.author.avatar_url)
 
                 if not loop:
                     await ctx.send(embed=infoEmbed)
@@ -190,13 +190,12 @@ class MusicBot(commands.Cog):
             if queue and not paused:
                 await self.play(ctx)
 
-        except Exception as e:
-            lg.info(type(server))
-            lg.info(type(last_song))
-            lg.error(f"No songs left in queue!")
-            errorEmbed = discord.Embed(title="Command Error", description="No songs left in the queue",
-                                       color=config.getDiscordColour("red"), timestamp=timeconvert.getTime())
-            await ctx.send(embed=errorEmbed)
+        except IndexError as e:
+            if len(queue) == 0:
+                errorEmbed = discord.Embed(title="Command Error", description="No songs left in the queue",
+                                           color=config.getDiscordColour("red"), timestamp=timeconvert.getTime())
+                await ctx.send(embed=errorEmbed)
+                return
 
     async def wait_for_end(self, ctx):
         global is_playing
