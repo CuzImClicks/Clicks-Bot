@@ -296,6 +296,7 @@ class MusicBot(commands.Cog):
             else:
                 infoEmbed = discord.Embed(description="Searching songs is currently disabled due to an error with the Genius API", colour=config.getDiscordColour("red"))
                 await ctx.send(embed=infoEmbed)
+                return
                 convertTuple = lambda tup: str(tup).replace("(", "").replace("'", "").replace(")", "").replace(",", "")
                 msg = convertTuple(args)
                 infoEmbed = discord.Embed(title=f"Searching song '{msg}'")
