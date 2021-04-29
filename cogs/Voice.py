@@ -12,12 +12,14 @@ fl = logging.FileHandler(f"{path}\logs\log.log", encoding='utf-8')
 fl.setLevel(logging.INFO)
 lg.addHandler(fl)
 blocked = []
-def isBlocked(member: discord.Member):
+
+async def isBlocked(member: discord.Member):
     if member in blocked:
         lg.info(f"{member.nick} is blocked")
         return True
     lg.info(f"{member.nick} is not blocked")
     return False
+
 
 class VoiceEvents(commands.Cog):
 
@@ -38,7 +40,7 @@ class VoiceEvents(commands.Cog):
         if not user:
             return
         await ctx.message.delete()
-        if isBlocked(user):
+        if await isBlocked(user):
             blocked.remove(user)
             await user.edit(mute=False)
             
@@ -53,7 +55,7 @@ class VoiceEvents(commands.Cog):
             return
 
         if not before.channel:
-            if after.channel.id == 774629025805107230:  
+            if after.channel.id == 774629025805107230:
                 if (not "Dev" == member.top_role.name or "Clicks Bot" == member.top_role.name):
                     
                     await member.edit(mute=True)
@@ -87,8 +89,6 @@ class VoiceEvents(commands.Cog):
                         await member.edit(mute=False)
                         lg.info("Unmuted the user")
                         await member.move_to(None)
-                        
-                           
             
             lg.info(f"{Fore.LIGHTGREEN_EX}{member.guild} - {member.name} joined '{after.channel.name}'")
 
@@ -97,8 +97,8 @@ class VoiceEvents(commands.Cog):
 
         if before.channel and after.channel:
             if before.channel.id != after.channel.id:
-                if after.channel.id == 774629025805107230:  
-                    if (not "Dev" == member.top_role.name or "Clicks Bot" == member.top_role.name):
+                if after.channel.id == 774629025805107230:
+                    if not "Dev" == member.top_role.name or "Clicks Bot" == member.top_role.name:
                         await member.edit(mute=True)
                         blocked.append(member)
                         infoEmbed = discord.Embed(description="You tried to connect to a private channel, a request has been sent to the admin of this channel. Please wait for confirmation.")
@@ -175,7 +175,7 @@ class VoiceEvents(commands.Cog):
                         if not member.voice.mute:
                             self.current_fmuted.remove(member.id)
                             lg.info(f"{member.guild} - {member.name} was unmuted by the guild")
-                            if isBlocked(member):
+                            if await isBlocked(member):
                                 lg.info(f"{member.nick} tried to unmute but failed due to being in a locked channel")
                                 await member.edit(mute=True)
 

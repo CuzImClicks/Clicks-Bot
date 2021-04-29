@@ -1,9 +1,8 @@
 from fastapi import FastAPI, status
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+
+from util.genius.Song import Song
 from web_server.database import *
-from clicks_util import logger
-from PIL import Image
-import asyncio
 import logging
 from util.hypixel.player import Player
 from util.hypixel.hypixel_server import Hypixel
@@ -210,3 +209,21 @@ async def lyrics(key: str="", song_name: str=""):
         if song == None:
             return JSONResponse(status_code=204, content={"success": False, "error": {""}})
         return JSONResponse(status_code=200, content={"success": True, song_name: song.lyrics})
+
+@server.get("/api/song")
+async def song(key: str="", song_name: str=""):
+    if not check_key(key):
+        return JSONResponse(status_code=401, content={"success": False, "cause": "Invalid key"})
+
+    else:
+        s = Song(name=song_name)
+        return JSONResponse(status_code=200, content={"success": True, song_name: s.song_info})
+
+@server.get("/api/song/media")
+async def song(key: str="", song_name: str=""):
+    if not check_key(key):
+        return JSONResponse(status_code=401, content={"success": False, "cause": "Invalid key"})
+
+    else:
+        s = Song(name=song_name)
+        return JSONResponse(status_code=200, content={"success": True, song_name: s.media})

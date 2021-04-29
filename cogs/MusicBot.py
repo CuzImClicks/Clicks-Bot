@@ -12,11 +12,11 @@ from discord.ext import commands
 from discord.utils import get
 from lyricsgenius import Genius
 
-from clicks_util import HiddenPrints, info
+from clicks_util import HiddenPrints, info, text
 from clicks_util import timeconvert
 from util import config, strings
+from util.genius.Song import Song
 from util.logger import *
-
 
 lg = logging.getLogger(__name__[5:])
 
@@ -43,6 +43,7 @@ class HiddenPrints:
     with HiddenPrints():
         ...
     """
+
     def __enter__(self):
         self._original_stdout = sys.stdout
         sys.stdout = open(os.devnull, 'w')
@@ -53,9 +54,9 @@ class HiddenPrints:
 
 
 class YTDLSource(discord.PCMVolumeTransformer):
-    
-    #YouTube said: Unable to extract video data
-    #pip install -U youtube-dl
+
+    # YouTube said: Unable to extract video data
+    # pip install -U youtube-dl
     def __init__(self, source, *, data, volume=0.5):
         super().__init__(source, volume)
 
@@ -168,9 +169,14 @@ class MusicBot(commands.Cog):
         playing = False
 
         try:
+            if not voice_channel.is_connected():
+                return
             async with ctx.typing():
                 player = await YTDLSource.from_url(str(queue[0].url), loop=self.bot.loop)
-                voice_channel.play(player, after=lambda e: lg.error(e) if e else None)
+                error_msg = ""
+                voice_channel.play(player, after=lambda e: error_msg.join(e) if e else None)
+                if error_msg.__contains__("DownloadError"):
+                    raise youtube_dl.DownloadError("error_msg")
                 playing = True
                 global last_song
                 last_song = queue[0]
@@ -196,6 +202,19 @@ class MusicBot(commands.Cog):
                                            color=config.getDiscordColour("red"), timestamp=timeconvert.getTime())
                 await ctx.send(embed=errorEmbed)
                 return
+
+        except youtube_dl.DownloadError as e:
+            if e.args.__contains__("This video is not available"):
+                errorEmbed = discord.Embed(title="Download Error",
+                                           description="This video is not available.",
+                                           colour=config.getDiscordColour("red"))
+                await ctx.send(embed=errorEmbed)
+
+            elif e.args.__contains__("This video is only available to Music Premium members"):
+                errorEmbed = discord.Embed(title="Download Error",
+                                           description="This video is only available to Music Premium members",
+                                           colour=config.getDiscordColour("red"))
+                await ctx.send(embed=errorEmbed)
 
     async def wait_for_end(self, ctx):
         global is_playing
@@ -294,27 +313,23 @@ class MusicBot(commands.Cog):
                 url = args[0]
 
             else:
-                infoEmbed = discord.Embed(description="Searching songs is currently disabled due to an error with the Genius API", colour=config.getDiscordColour("red"))
-                await ctx.send(embed=infoEmbed)
-                return
                 convertTuple = lambda tup: str(tup).replace("(", "").replace("'", "").replace(")", "").replace(",", "")
                 msg = convertTuple(args)
                 infoEmbed = discord.Embed(title=f"Searching song '{msg}'")
                 await ctx.send(embed=infoEmbed)
                 try:
-                    with HiddenPrints():
-                        song = genius.search_song(msg)
-                        url = ""
-                        for provider in song.media:
-                            if provider["provider"] == "youtube":
-                                url = song.media[int(song.media.index(provider))]["url"].replace("http", "https")
+                    song = Song(msg)
+                    url = ""
+                    for provider in song.media:
+                        if provider["provider"] == "youtube":
+                            url = song.media[int(song.media.index(provider))]["url"].replace("http", "https")
 
-                        if url == "":
-                            errorEmbed = discord.Embed(title="Command Error",
-                                                       description="Could not find song on YouTube",
-                                                       colour=config.getDiscordColour("red"))
-                            await ctx.send(embed=errorEmbed)
-                            return
+                    if url == "":
+                        errorEmbed = discord.Embed(title="Command Error",
+                                                   description="Could not find song on YouTube",
+                                                   colour=config.getDiscordColour("red"))
+                        await ctx.send(embed=errorEmbed)
+                        return
 
                 except AttributeError as e:
                     lg.error(e)
@@ -324,12 +339,15 @@ class MusicBot(commands.Cog):
                     await ctx.send(embed=errorEmbed)
                     return
 
+                except Exception as e:
+                    lg.error(e)
+                    return
+
         else:
             url = None
 
         if url is None:
             if len(queue) == 0:
-                lg.info(timeconvert.getTime())
                 errorEmbed = discord.Embed(title="Command Error", description="There are no songs in the queue",
                                            colour=config.getDiscordColour("red"))
                 await ctx.send(embed=errorEmbed)
@@ -380,7 +398,7 @@ class MusicBot(commands.Cog):
                 await self.join(ctx)
                 await self.play(ctx)
             try:
-                if not voice.is_playing():
+                if not voice.is_playing() & voice.is_connected():
                     await self.play(ctx)
             except AttributeError:
                 pass
