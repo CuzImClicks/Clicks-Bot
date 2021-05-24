@@ -12,12 +12,22 @@ fl = logging.FileHandler(f"{path}\logs\log.log", encoding='utf-8')
 fl.setLevel(logging.INFO)
 lg.addHandler(fl)
 blocked = []
+fkicked = []
+
 
 async def isBlocked(member: discord.Member):
     if member in blocked:
         lg.info(f"{member.nick} is blocked")
         return True
     lg.info(f"{member.nick} is not blocked")
+    return False
+
+
+async def isfKicked(member: discord.Member):
+    if member in fkicked:
+        lg.info(f"{member.nick} is fkicked")
+        return True
+    lg.info(f"{member.nick} is not fkicked")
     return False
 
 
@@ -48,6 +58,18 @@ class VoiceEvents(commands.Cog):
             await user.edit(mute=True)
             blocked.append(user)
 
+    @commands.command(name="fkick", hidden=True)
+    @commands.has_guild_permissions(administrator=True)
+    async def fkick(self, ctx):
+        user = ctx.message.mentions[0]
+        if not user:
+            return
+        await ctx.message.delete()
+        if await isfKicked(user):
+            fkicked.remove(user)
+
+        else:
+            fkicked.append(user)
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
@@ -89,7 +111,10 @@ class VoiceEvents(commands.Cog):
                         await member.edit(mute=False)
                         lg.info("Unmuted the user")
                         await member.move_to(None)
-            
+                        
+            if await isfKicked(member):
+                await member.move_to(None)
+                return
             lg.info(f"{Fore.LIGHTGREEN_EX}{member.guild} - {member.name} joined '{after.channel.name}'")
 
         if before.channel and not after.channel:
@@ -129,7 +154,10 @@ class VoiceEvents(commands.Cog):
                             await member.edit(mute=False)
                             lg.info("Unmuted the user")
                             await member.move_to(before.channel)
-                                 
+
+                if await isfKicked(member):
+                    await member.move_to(None)
+                    return
                 lg.info(f"{Fore.LIGHTCYAN_EX}{member.guild} - {member.name} switched channels from '{before.channel.name}' to '{after.channel.name}'")
             else:
                 if member.voice.self_stream:
