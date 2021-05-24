@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import discord
 from discord.ext import commands
@@ -27,7 +28,6 @@ async def isfKicked(member: discord.Member):
     if member in fkicked:
         lg.info(f"{member.nick} is fkicked")
         return True
-    lg.info(f"{member.nick} is not fkicked")
     return False
 
 
@@ -76,6 +76,8 @@ class VoiceEvents(commands.Cog):
         if member.bot:
             return
 
+        #FIXME: when a user connects to a different channel they are still fmuted
+
         if not before.channel:
             if after.channel.id == 774629025805107230:
                 if (not "Dev" == member.top_role.name or "Clicks Bot" == member.top_role.name):
@@ -103,14 +105,16 @@ class VoiceEvents(commands.Cog):
                         
                     if str(answer.content).lower() == "yes" or str(answer.content).lower() == "y":
                         blocked.remove(member)
+                        await asyncio.sleep(1)
                         await member.edit(mute=False)
                         lg.info("Unmuted the user")
                         
                     else:
                         blocked.remove(member)
+                        await member.move_to(None)
+                        await asyncio.sleep(1)
                         await member.edit(mute=False)
                         lg.info("Unmuted the user")
-                        await member.move_to(None)
                         
             if await isfKicked(member):
                 await member.move_to(None)
@@ -146,19 +150,27 @@ class VoiceEvents(commands.Cog):
                         
                         if str(answer.content).lower() == "yes" or str(answer.content).lower() == "y":
                             blocked.remove(member)
+                            await asyncio.sleep(1)
                             await member.edit(mute=False)
                             lg.info("Unmuted the user")
                             
                         else:
                             blocked.remove(member)
+                            await member.move_to(before.channel)
+                            await asyncio.sleep(1)
                             await member.edit(mute=False)
                             lg.info("Unmuted the user")
-                            await member.move_to(before.channel)
 
-                if await isfKicked(member):
-                    await member.move_to(None)
-                    return
-                lg.info(f"{Fore.LIGHTCYAN_EX}{member.guild} - {member.name} switched channels from '{before.channel.name}' to '{after.channel.name}'")
+                else:
+                    if await isBlocked(member):
+                        blocked.remove(member)
+                        await asyncio.sleep(1)
+                        await member.edit(mute=False)
+
+                    if await isfKicked(member):
+                        await member.move_to(None)
+                        return
+                    lg.info(f"{Fore.LIGHTCYAN_EX}{member.guild} - {member.name} switched channels from '{before.channel.name}' to '{after.channel.name}'")
             else:
                 if member.voice.self_stream:
                     lg.info(f"{member.guild} - {member.name} started streaming in {after.channel.name}")
