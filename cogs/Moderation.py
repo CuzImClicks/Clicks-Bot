@@ -90,7 +90,7 @@ class Moderation(commands.Cog):
         await user.edit(mute=False)
 
     @commands.command(name="kick")
-    @commands.has_role(config.getBotAccessRole())
+    @commands.has_role(config.getBotAdminRole())
     async def kick(self, ctx, *args):
 
         user = ctx.message.mentions[0]
@@ -109,7 +109,7 @@ class Moderation(commands.Cog):
         await ctx.send(embed=kickEmbed)
 
     @commands.command(name="muteall", help=strings.get_help("help_muteall"), aliases=["ma"])
-    @commands.has_role(config.getBotAccessRole())
+    @commands.has_role(config.getBotAdminRole())
     async def muteall(self, ctx):
 
         try:
@@ -133,7 +133,7 @@ class Moderation(commands.Cog):
             lg.error(e)
 
     @commands.command(name="unmuteall", help=strings.get_help("help_unmuteall"), aliases=["uma"])
-    @commands.has_role(config.getBotAccessRole())
+    @commands.has_role(config.getBotAdminRole())
     async def unmuteall(self, ctx):
 
         try:
@@ -152,7 +152,7 @@ class Moderation(commands.Cog):
             lg.error(e)
 
     @commands.command(name="lock", help="Locks the channel user limit to the current amount of users inside")
-    @commands.has_role(config.getBotAccessRole())
+    @commands.has_role(config.getBotAdminRole())
     async def lock(self, ctx):
         try:
             await ctx.author.voice.channel.edit(user_limit=len(ctx.author.voice.channel.members))
@@ -173,7 +173,7 @@ class Moderation(commands.Cog):
             lg.error(e)
 
     @commands.command(name="unlock", help="Sets the user limit of your current channel to infinite")
-    @commands.has_role(config.getBotAccessRole())
+    @commands.has_role(config.getBotAdminRole())
     async def unlock(self, ctx):
         try:
             await ctx.author.voice.channel.edit(user_limit=0)

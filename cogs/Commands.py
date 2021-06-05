@@ -52,10 +52,29 @@ class Commands(commands.Cog):
     async def setup(self, ctx):
 
         guild = ctx.guild
-        await ctx.send(embed=discord.Embed(title="Server Setup", description="Setting up the server roles", color=config.getDiscordColour("blue")))
-        await guild.create_role(name="Bot Access", color=Color.orange())
-        await guild.create_role(name="Dev", color=Color.purple())
-        await guild.create_role(name="Bot Admin Access", color=Color.dark_red())
+        infoEmbed = discord.Embed(title="Server Setup", description="Setting up the server roles.", color=config.getDiscordColour("blue"))
+        role = discord.utils.get(guild.roles, name = "Bot Access")
+        role2 = discord.utils.get(guild.roles, name = "Dev")
+        role3 = discord.utils.get(guild.roles, name = "Bot Admin Access")
+        role4 = discord.utils.get(guild.roles, name = "Bot Music Access")
+        list_of_roles = []
+        if (not role):
+            await guild.create_role(name="Bot Access", color=Color.orange())
+            list_of_roles.append("Bot Access")
+        if (not role2):      
+            await guild.create_role(name="Dev", color=Color.purple())
+            list_of_roles.append("Dev")
+        if (not role3):
+            await guild.create_role(name="Bot Admin Access", color=Color.dark_red())
+            list_of_roles.append("Bot Admin Access")
+        if (not role4):
+            await guild.create_role(name="Bot Music Access", color=Color.dark_red())
+            list_of_roles.append("Bot Music Access")
+
+        if (not list_of_roles.__len__ == 0):
+            infoEmbed.add_field(name="Added Roles", value=list_of_roles)
+
+        await ctx.send(embed=infoEmbed)
 
         for role in ctx.guild.roles:
 
