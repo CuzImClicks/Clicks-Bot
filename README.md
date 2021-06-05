@@ -1,4 +1,4 @@
-Clicks Bot
+##Clicks Bot
 
 A discord bot specificly programmed for a private server.
 It uses discord.py from:
@@ -10,7 +10,7 @@ https://gist.github.com/mg393/3119259
 integrated a few functions from Smudge-Studios/HypixelBot
 cogs/GitHubFetcher.py is by mass1ve-err0r -> GitHub link in file
 
-To create a webhook:
+###To create a webhook:
 
 1. Create a channel
 2. Create a webhook in the tab "Integrations"
@@ -24,7 +24,7 @@ install dependencies:
 windows: python -m pip install -r requirements.txt
 linux: sudo python3.8 -m pip install -r requirements.txt
 
-TODO:
+###TODO:
 X Fix the loop function
 X Create more moderation tools
 - More documentation in the files
@@ -43,11 +43,13 @@ X Lyrics command
 
 
 
-FIXME:
+###FIXME:
+There is a general problem regarding the use of linux
 X timestamp shows utc time not localtime
 	- https://stackoverflow.com/questions/4770297/convert-utc-datetime-string-to-local-datetime
 X timestamp doesn't accept date.time()
 	X use footer instead?
 - cleanup function runs on every reload
 X die command AtrributeError
+- timeconvert.getTime() returns wrong time -> idgf
 

@@ -26,14 +26,13 @@ class Commands(commands.Cog):
     @commands.command(name="github")
     @commands.has_role(config.getBotAccessRole())
     async def github(self, ctx):
-        #await ctx.send("Die GitHub Page des Bots ist https://github.com/CuzImClicks/Clicks-Bot", delete_after=5)
         gitEmbed = discord.Embed(title="GitHub", description= "Die GitHub Page des Bots ist https://github.com/CuzImClicks/Clicks-Bot", color=config.getDiscordColour("blue"))
         await ctx.send(embed=gitEmbed)
 
     @commands.command(name="ping")
     @commands.has_role(config.getBotAccessRole())
     async def ping(self, ctx):
-        pingEmbed = discord.Embed(title="Bot Latency", description=f"Pong! Dein Ping ist {round(self.bot.latency, 2) * 1000}ms", color=config.getDiscordColour("blue"), timestamp=timeconvert.getTime())
+        pingEmbed = discord.Embed(title="Bot Latency", description=f"Pong! Dein Ping ist {round(self.bot.latency, 2) * 1000}ms", color=config.getDiscordColour("blue"))
 
         await ctx.send(embed=pingEmbed)
 
@@ -53,7 +52,7 @@ class Commands(commands.Cog):
     async def setup(self, ctx):
 
         guild = ctx.guild
-        await ctx.send(embed=discord.Embed(title="Server Setup", description="Setting up the server roles", color=config.getDiscordColour("blue"), timestamp=timeconvert.getTime()))
+        await ctx.send(embed=discord.Embed(title="Server Setup", description="Setting up the server roles", color=config.getDiscordColour("blue")))
         await guild.create_role(name="Bot Access", color=Color.orange())
         await guild.create_role(name="Dev", color=Color.purple())
         await guild.create_role(name="Bot Admin Access", color=Color.dark_red())
@@ -99,6 +98,7 @@ class Commands(commands.Cog):
             await ctx.send(embed=errorEmbed)
             return
 
+        await ctx.message.delete()
         string = ""
         args = list(args)
         for word in args:
