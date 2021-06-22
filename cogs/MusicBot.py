@@ -23,7 +23,7 @@ lg = logging.getLogger(__name__[5:])
 global ytdl, queue
 ytdl = youtube_dl.YoutubeDL(strings.get_ytdl_format_options())
 queue = []
-youtube_dl.utils.bug_reports_message = lambda: lg.error("msg")
+youtube_dl.utils.bug_reports_message = lambda msg: lg.error(msg)
 
 genius = Genius(config.getGeniusKey())
 
@@ -306,10 +306,13 @@ class MusicBot(commands.Cog):
     @commands.command(name="queue", help=strings.get_help("queue_help"), aliases=["q"])
     @commands.has_role(config.getBotMusicRole())
     async def queue_func(self, ctx, *args):
-
         global queue
         if args:
-            if str(args[0]).startswith("https://"):
+            url = None
+            if str(args[0]).startswith("https://youtu.be/"):
+                url = "https://www.youtube.com/watch?v=" + str(args[0]).split("https://youtu.be/")[1]
+
+            elif str(args[0]).startswith("https://"):
                 url = args[0]
 
             else:
