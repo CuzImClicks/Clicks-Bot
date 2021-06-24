@@ -2,6 +2,7 @@ from clicks_util import numbers
 import string
 import numbers
 
+
 def split(sentence, num_chunks: int = 0):
     """Split the given sentence into num_chunk pieces.
 
@@ -18,5 +19,13 @@ def split(sentence, num_chunks: int = 0):
 
     return [sentence[o:o+s] for o, s in zip(offsets, chunks_sizes)]
 
+
 all_letters = string.ascii_letters
 all_digits = string.digits
+
+
+def listToString(list_: list):
+    full = ""
+    for st in list_:
+        full = full + str(st) + " "
+    return full

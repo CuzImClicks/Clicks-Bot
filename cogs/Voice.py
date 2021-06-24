@@ -5,7 +5,7 @@ from discord.ext import commands
 from util.logger import path
 import logging
 from colorama import Fore
-from clicks_util import info
+from clicks_util import info, text
 from util import config
 
 lg = logging.getLogger(__name__)
@@ -45,24 +45,33 @@ class VoiceEvents(commands.Cog):
 
     @commands.command(name="fmute", hidden=True)
     @commands.has_guild_permissions(administrator=True)
-    async def fmute(self, ctx):
-        user = ctx.message.mentions[0]
+    async def fmute(self, ctx, *args):
+        user = None
+        try:
+            user = ctx.message.mentions[0]
+        except IndexError:
+            errorEmbed = discord.Embed(description="Please tag the person you want to unmute!", colour=config.getDiscordColour("red"))
+            await ctx.send(embed=errorEmbed)
+            return
         if not user:
             return
-        await ctx.message.delete()
-        if await isBlocked(user):
+        block = await isBlocked(user)
+        if block:
             blocked.remove(user)
-            await user.edit(mute=False)
-            
+            await user.edit(mute=not block)
         else:
-            await user.edit(mute=True)
             blocked.append(user)
+            await user.edit(mute=not block)
+        await ctx.message.delete()
 
     @commands.command(name="fkick", hidden=True)
     @commands.has_guild_permissions(administrator=True)
     async def fkick(self, ctx):
-        user = ctx.message.mentions[0]
-        if not user:
+        try:
+            user = ctx.message.mentions[0]
+        except IndexError:
+            errorEmbed = discord.Embed(description="Please tag the person you want to kick!", colour=config.getDiscordColour("red"))
+            await ctx.send(embed=errorEmbed)
             return
         await ctx.message.delete()
         if await isfKicked(user):
@@ -70,6 +79,7 @@ class VoiceEvents(commands.Cog):
 
         else:
             fkicked.append(user)
+            await user.move_to(None)
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
