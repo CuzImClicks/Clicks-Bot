@@ -27,10 +27,9 @@ youtube_dl.utils.bug_reports_message = lambda msg: lg.error(msg)
 
 genius = Genius(config.getGeniusKey())
 
-global last_song, loop, paused
+global last_song, loop
 last_song = ""
 loop = False
-paused = False
 
 
 async def getLastSong():
@@ -107,6 +106,8 @@ class YouTubeVideo:
 
 class MusicBot(commands.Cog):
 
+    paused = False
+
     def __init__(self, bot):
 
         self.bot = bot
@@ -178,6 +179,7 @@ class MusicBot(commands.Cog):
                 if error_msg.__contains__("DownloadError"):
                     raise youtube_dl.DownloadError("error_msg")
                 playing = True
+                self.paused = False
                 global last_song
                 last_song = queue[0]
                 if not loop:
@@ -193,7 +195,7 @@ class MusicBot(commands.Cog):
                     await ctx.send(embed=infoEmbed)
 
             await self.wait_for_end(ctx)
-            if queue and not paused:
+            if queue and not self.paused:
                 await self.play(ctx)
 
         except IndexError as e:
@@ -492,20 +494,19 @@ class MusicBot(commands.Cog):
     @commands.command(name="pause", help="Pausiert den aktuell spielenden Song.")
     @commands.has_role(config.getBotMusicRole())
     async def pause(self, ctx):
-        global paused
 
         server = ctx.message.author.guild
         voice_channel = server.voice_client
-        if paused:
+        if self.paused:
             voice_channel.resume()
-            paused = False
+            self.paused = False
             infoEmbed = discord.Embed(description="Resumed song currently playing",
                                       colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime())
             lg.info("Resumed the song currently playing!")
 
-        elif not paused:
+        elif not self.paused:
             voice_channel.pause()
-            paused = True
+            self.paused = True
             infoEmbed = discord.Embed(description="Paused song currently playing",
                                       colour=config.getDiscordColour("blue"), timestamp=timeconvert.getTime())
             lg.info(f"Paused the song currently playing!")
@@ -515,12 +516,11 @@ class MusicBot(commands.Cog):
     @commands.command(name="resume", help="Der pausierte Song wird weiter abgespielt.")
     @commands.has_role(config.getBotMusicRole())
     async def resume(self, ctx):
-        global paused
         server = ctx.message.author.guild
         voice_channel = server.voice_client
 
         voice_channel.resume()
-        paused = False
+        self.paused = False
         lg.info(f"Resumed the song currently playing!")
         await ctx.send(
             embed=discord.Embed(description="Resumed song currently playing", colour=config.getDiscordColour("blue"),
