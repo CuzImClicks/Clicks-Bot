@@ -121,7 +121,6 @@ class HypixelAPI_Handler(commands.Cog):
                     self.jf.write(jf_data)
 
         except Exception as e:
-            lg.error(e)
             pass
 
     @tasks.loop(minutes=1.0)
