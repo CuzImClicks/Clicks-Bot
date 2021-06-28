@@ -14,6 +14,7 @@ fl.setLevel(logging.INFO)
 lg.addHandler(fl)
 blocked = []
 fkicked = []
+antiafk = []
 
 
 async def isBlocked(member: discord.Member):
@@ -27,6 +28,12 @@ async def isBlocked(member: discord.Member):
 async def isfKicked(member: discord.Member):
     if member in fkicked:
         lg.info(f"{member.nick} is fkicked")
+        return True
+    return False
+
+
+async def isAntiAFK(member: discord.Member):
+    if member in fkicked:
         return True
     return False
 
@@ -81,6 +88,22 @@ class VoiceEvents(commands.Cog):
             fkicked.append(user)
             await user.move_to(None)
 
+    @commands.command(name="antiafk", hidden=True)
+    @commands.has_guild_permissions(administrator=True)
+    async def antiafk(self, ctx):
+        try:
+            user = ctx.message.mentions[0]
+        except IndexError:
+            errorEmbed = discord.Embed(description="Please tag the person you want to kick!", colour=config.getDiscordColour("red"))
+            await ctx.send(embed=errorEmbed)
+            return
+        await ctx.message.delete()
+        if await isfKicked(user):
+            antiafk.remove(user)
+
+        else:
+            antiafk.append(user)
+
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         if member.bot:
@@ -129,6 +152,7 @@ class VoiceEvents(commands.Cog):
             if await isfKicked(member):
                 await member.move_to(None)
                 return
+
             lg.info(f"{Fore.LIGHTGREEN_EX}{member.guild} - {member.name} joined '{after.channel.name}'")
 
         if before.channel and not after.channel:
@@ -179,6 +203,12 @@ class VoiceEvents(commands.Cog):
 
                     if await isfKicked(member):
                         await member.move_to(None)
+                        return
+
+                    if after.channel.id == 710773995473076236:
+                        lg.info(f"{Fore.LIGHTCYAN_EX}{member.guild} - {member.name} was moved to the afk-channel")
+                        if before.channel.category.name == "High society":
+                            await member.move_to(before.channel)
                         return
                     lg.info(f"{Fore.LIGHTCYAN_EX}{member.guild} - {member.name} switched channels from '{before.channel.name}' to '{after.channel.name}'")
             else:
