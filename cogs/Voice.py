@@ -21,7 +21,6 @@ async def isBlocked(member: discord.Member):
     if member in blocked:
         lg.info(f"{member.nick} is blocked")
         return True
-    lg.info(f"{member.nick} is not blocked")
     return False
 
 
@@ -34,6 +33,7 @@ async def isfKicked(member: discord.Member):
 
 async def isAntiAFK(member: discord.Member):
     if member in fkicked:
+        lg.info(f"{member.nick} is antiafk")
         return True
     return False
 
@@ -205,9 +205,9 @@ class VoiceEvents(commands.Cog):
                         await member.move_to(None)
                         return
 
-                    if after.channel.id == 710773995473076236:
+                    if after.channel == member.guild.afk_channel:
                         lg.info(f"{Fore.LIGHTCYAN_EX}{member.guild} - {member.name} was moved to the afk-channel")
-                        if before.channel.category.name == "High society":
+                        if await isAntiAFK(member):
                             await member.move_to(before.channel)
                         return
                     lg.info(f"{Fore.LIGHTCYAN_EX}{member.guild} - {member.name} switched channels from '{before.channel.name}' to '{after.channel.name}'")
