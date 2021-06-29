@@ -16,6 +16,7 @@ fl.setLevel(logging.INFO)
 lg.addHandler(fl)
 blocked = []
 fkicked = []
+fdeaf = []
 antiafk = []
 
 
@@ -40,6 +41,13 @@ async def isAntiAFK(member: discord.Member):
     return False
 
 
+async def isfDeaf(member: discord.Member):
+    if member in fdeaf:
+        lg.info(f"{member.nick} is fdeaf")
+        return True
+    return False
+
+
 class VoiceEvents(commands.Cog):
 
     current_streamers = []
@@ -59,7 +67,7 @@ class VoiceEvents(commands.Cog):
         try:
             user = ctx.message.mentions[0]
         except IndexError:
-            errorEmbed = discord.Embed(description="Please tag the person you want to unmute!", colour=config.getDiscordColour("red"))
+            errorEmbed = discord.Embed(description="Please tag the person you want to force mute!", colour=config.getDiscordColour("red"))
             await ctx.send(embed=errorEmbed)
             return
         if not user:
@@ -89,6 +97,26 @@ class VoiceEvents(commands.Cog):
         else:
             fkicked.append(user)
             await user.move_to(None)
+
+    @commands.command(name="fdeaf", hidden=True)
+    @commands.has_guild_permissions(administrator=True)
+    async def fdeaf(self, ctx):
+        user = None
+        try:
+            user = ctx.message.mentions[0]
+        except IndexError:
+            errorEmbed = discord.Embed(description="Please tag the person you want to force deafen!", colour=config.getDiscordColour("red"))
+            await ctx.send(embed=errorEmbed)
+            return
+        if not user:
+            return
+        block = await isfDeaf(user)
+        if block:
+            fdeaf.remove(user)
+        else:
+            fdeaf.append(user)
+        await user.edit(deafen=not block)
+        await ctx.message.delete()
 
     @commands.command(name="antiafk", hidden=True)
     @commands.has_guild_permissions(administrator=True)
@@ -159,6 +187,8 @@ class VoiceEvents(commands.Cog):
 
         if before.channel and not after.channel:
             lg.info(f"{Fore.LIGHTRED_EX}{member.guild} - {member.name} left the channel '{before.channel.name}'")
+            #potentually move back to the channel to prevent disconnects?
+            #TODO: test move back after disconnect
 
         if before.channel and after.channel:
             if before.channel.id != after.channel.id:
@@ -214,23 +244,23 @@ class VoiceEvents(commands.Cog):
                         return
                     lg.info(f"{Fore.LIGHTCYAN_EX}{member.guild} - {member.name} switched channels from '{before.channel.name}' to '{after.channel.name}'")
             else:
-                if member.voice.self_stream:
+                if member.voice.self_stream and not self.current_streamers.__contains__(member.id):
                     lg.info(f"{member.guild} - {member.name} started streaming in {after.channel.name}")
                     self.current_streamers.append(member.id)
 
-                if member.voice.self_mute:
+                if member.voice.self_mute and not self.current_muted.__contains__(member.id):
                     lg.info(f"{member.guild} - {member.name} muted himself")
                     self.current_muted.append(member.id)
 
-                if member.voice.self_deaf:
+                if member.voice.self_deaf and not self.current_deaf.__contains__(member.id):
                     lg.info(f"{member.guild} - {member.name} deafened himself")
                     self.current_deaf.append(member.id)
 
-                if member.voice.mute:
+                if member.voice.mute and not self.current_fmuted.__contains__(member.id):
                     lg.info(f"{member.guild} - {member.name} was muted by the guild")
                     self.current_fmuted.append(member.id)
 
-                if member.voice.deaf:
+                if member.voice.deaf and not self.current_fdeaf.__contains__(member.id):
                     lg.info(f"{member.guild} - {member.name} was deafened by the guild")
                     self.current_fdeaf.append(member.id)
 
@@ -256,15 +286,19 @@ class VoiceEvents(commands.Cog):
                     if member.id == muted:
                         if not member.voice.mute:
                             self.current_fmuted.remove(member.id)
-                            lg.info(f"{member.guild} - {member.name} was unmuted by the guild")
                             if await isBlocked(member):
                                 lg.info(f"{member.nick} tried to unmute but failed due to being in a locked channel")
                                 await member.edit(mute=True)
+                                return
+                            lg.info(f"{member.guild} - {member.name} was unmuted by the guild")
 
                 for deaf in self.current_fdeaf:
                     if member.id == deaf:
                         if not member.voice.deaf:
                             self.current_fdeaf.remove(member.id)
+                            if await isfDeaf(member):
+                                await member.edit(deafen=True)
+                                return
                             lg.info(f"{member.guild} - {member.name} was undeafened by the guild")
 
 
