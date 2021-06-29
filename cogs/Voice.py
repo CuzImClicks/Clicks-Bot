@@ -2,6 +2,8 @@ import asyncio
 import logging
 import discord
 from discord.ext import commands
+
+import ClicksBot
 from util.logger import path
 import logging
 from colorama import Fore
@@ -9,7 +11,7 @@ from clicks_util import info, text
 from util import config
 
 lg = logging.getLogger(__name__)
-fl = logging.FileHandler(f"{path}\logs\log.log", encoding='utf-8')
+fl = ClicksBot.fl
 fl.setLevel(logging.INFO)
 lg.addHandler(fl)
 blocked = []

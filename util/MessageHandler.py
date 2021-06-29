@@ -1,4 +1,6 @@
 import logging
+
+import ClicksBot
 from util import config
 from util.embed import send_embed
 from util.logger import *
@@ -6,7 +8,7 @@ from util.logger import *
 path = os.getcwd()
 
 lg = logging.getLogger(__name__)
-fl = logging.FileHandler(f"{path}/logs/chat.log")
+fl = ClicksBot.fl_chat
 fl.setLevel(config.getFileLoggingLevel())
 fmt = logging.Formatter("[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 fl.setFormatter(fmt)

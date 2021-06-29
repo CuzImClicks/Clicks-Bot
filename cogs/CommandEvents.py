@@ -2,6 +2,8 @@ import time
 import discord
 from discord.ext import commands
 import logging
+
+import ClicksBot
 from util import logger
 from util.logger import path
 from datetime import datetime
@@ -10,7 +12,7 @@ import colorama
 
 lg = logging.getLogger(__name__[5:])
 import logging
-fl = logging.FileHandler(f"{path}\logs\log.log")
+fl = ClicksBot.fl
 fl.setLevel(logging.INFO)
 lg.addHandler(fl)
 

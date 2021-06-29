@@ -1,10 +1,11 @@
 import logging
 import os
+from datetime import datetime
 
 lg = logging.getLogger(__name__[5:])
 path = os.getcwd()
 
-fl = logging.FileHandler(f"{path}/logs/log.log")
+fl = logging.FileHandler(f"{path}/logs/log-{datetime.today().date()}.log")
 fl.setLevel(logging.INFO)
 
 

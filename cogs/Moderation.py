@@ -17,6 +17,7 @@ from clicks_util import timeconvert, info
 
 lg = logging.getLogger(__name__[5:])
 
+
 async def make_bugreport_embed(ctx, bugreport: dict) -> discord.Embed:
     user = get(ctx.guild.members, name=bugreport["author"])
     infoEmbed = discord.Embed(title="Bugreport", colour=config.getDiscordColour("green"))
@@ -309,8 +310,6 @@ class Moderation(commands.Cog):
             infoEmbed.set_footer(text=str(role.id))
 
             await ctx.send(embed=infoEmbed)
-
-
 
     @commands.command(name="add_role", aliases=["create_role"])
     @commands.has_role(config.getBotAccessRole())

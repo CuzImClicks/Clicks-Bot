@@ -1,3 +1,5 @@
+import sys
+
 import discord
 import logging
 from util import config
@@ -21,13 +23,14 @@ lg_chat = logging.getLogger("Chat")
 logging.getLogger("discord.gateway").disabled = True
 fmt = logging.Formatter(fmt="[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s", datefmt="%H:%M:%S")
 
-fl = logging.FileHandler(f"{path}/logs/log.log", encoding='utf-8')
+fl = logging.FileHandler(f"{path}/logs/log-{datetime.today().date()}.log", encoding='utf-8')
 fl.setLevel(logging.INFO)
 fl.setFormatter(fmt)
 
+lg.addHandler(logging.StreamHandler(sys.stdout))
 lg.addHandler(fl)
 
-fl_chat = logging.FileHandler(f"{path}/logs/chat.log", encoding="utf-8")
+fl_chat = logging.FileHandler(f"{path}/logs/chat-{datetime.today().date()}.log", encoding="utf-8")
 fl_chat.setLevel(logging.INFO)
 fl_chat.setFormatter(fmt)
 
@@ -178,7 +181,7 @@ async def on_message(message):
         return
 
     if message.channel.id in blocked_channels:
-        # check if the message is in the list of blocked channelsu
+        # check if the message is in the list of blocked channels
         await message.delete()
         return
 

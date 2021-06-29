@@ -7,7 +7,7 @@
 *.log
 *.xml
 *.iml
-logs/log.log
+logs/*.log
 remove
 *.json
 *.m4a
