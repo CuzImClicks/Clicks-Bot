@@ -142,6 +142,12 @@ def getDiscordColour(colourname):
     elif colourname == "black":
         return discord.Colour()
 
+    elif str(colourname) == "False":
+        return discord.Colour(0x9D1309)
+
+    elif str(colourname) == "True":
+        return discord.Colour(0x0BAF07)
+
 def getPiHoleIp() -> str:
     return data["pihole_ip"]
 

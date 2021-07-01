@@ -1,5 +1,7 @@
 ##Clicks Bot
 
+[s16le @ 0x21fb9e0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 162551064 >= 162550128
+
 A discord bot specificly programmed for a private server.
 It uses discord.py from:
 https://www.github.com/Rapptz/discord.py

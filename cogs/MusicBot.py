@@ -105,8 +105,8 @@ class YouTubeVideo:
 
 
 class MusicBot(commands.Cog):
-
     paused = False
+    save_queue = False
 
     def __init__(self, bot):
 
@@ -183,6 +183,8 @@ class MusicBot(commands.Cog):
                 global last_song
                 last_song = queue[0]
                 if not loop:
+                    if self.save_queue:
+                        queue.append(queue[0])
                     lg.info(f"Removed song {await queue[0].title()} from the queue ")
                     del (queue[0])
 
@@ -311,6 +313,15 @@ class MusicBot(commands.Cog):
         global queue
         if args:
             url = None
+            if str(args[0]) == "loop":
+                self.save_queue = not self.save_queue
+                infoEmbed = discord.Embed(
+                    description="Don't remove songs from the queue has been set to " + str(self.save_queue),
+                    colour=config.getDiscordColour(self.save_queue))
+                await ctx.send(embed=infoEmbed)
+                if not self.save_queue:
+                    del(queue[0])
+                return
             if str(args[0]).startswith("https://youtu.be/"):
                 url = "https://www.youtube.com/watch?v=" + str(args[0]).split("https://youtu.be/")[1]
 
