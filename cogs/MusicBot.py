@@ -191,7 +191,8 @@ class MusicBot(commands.Cog):
                 infoEmbed = discord.Embed(description=f"Now playing [{player.title}]({last_song.url})",
                                           color=config.getDiscordColour("blue"))
                 infoEmbed.set_image(url=await last_song.thumbnail())
-                infoEmbed.set_author(name=last_song.author.nick, icon_url=last_song.author.avatar_url)
+                if last_song.author:
+                    infoEmbed.set_author(name=last_song.author.nick, icon_url=last_song.author.avatar_url)
 
                 if not loop:
                     await ctx.send(embed=infoEmbed)
@@ -450,7 +451,7 @@ class MusicBot(commands.Cog):
     @commands.has_role(config.getBotMusicRole())
     async def insert(self, ctx, url):
         global queue
-        video = YouTubeVideo(url)
+        video = YouTubeVideo(url, ctx.author)
         queue.insert(0, video)
         infoEmbed = discord.Embed(title="Queue",
                                   description=f"Inserted [{await video.title()}]({video.url}) at index 0",
@@ -461,7 +462,7 @@ class MusicBot(commands.Cog):
     @commands.has_role(config.getBotMusicRole())
     async def rick(self, ctx):
 
-        queue.insert(0, YouTubeVideo("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
+        queue.insert(0, YouTubeVideo("https://www.youtube.com/watch?v=dQw4w9WgXcQ", ctx.author))
         await self.play(ctx)
 
     @commands.command(name="skipall", help="Dieser Befehl löscht die gesamte Song-Warteschleife und hört auf Musik "
