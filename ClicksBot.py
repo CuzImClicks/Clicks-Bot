@@ -11,10 +11,11 @@ import colorama
 from util import cleanup
 
 cleanup.remove_songs()
+cleanup.remove_hypixel_jsons()
 
 path = os.getcwd()
 
-logging.basicConfig(level=logging.INFO, format="[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s"
+logging.basicConfig(level=logging.INFO, format='[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s'
                                                + colorama.Fore.RESET, datefmt="%H:%M:%S", encoding='utf-8')
 
 lg = logging.getLogger("Clicks-Bot")
@@ -79,7 +80,7 @@ async def load(ctx, extension):
                 extEmbed.add_field(name=file, value="Load complete")
                 lg_pl.info(f"{colorama.Fore.LIGHTGREEN_EX}Loaded the extension: {file[:-3]}")
 
-            except Exception as e:
+            except Exception:
                 extEmbed.insert_field_at(index=0, name=file, value="Failed to load")
                 lg_pl.info(f"{colorama.Fore.LIGHTRED_EX}Failed to load extension: {file}")
 
@@ -110,7 +111,7 @@ async def reload(ctx, extension):
                 extEmbed.add_field(name=file, value="Reload complete")
                 lg_pl.info(f"{colorama.Fore.LIGHTGREEN_EX}Reloaded the extension: {file}")
 
-            except Exception as e:
+            except Exception as error:
                 extEmbed.insert_field_at(index=0, name=file, value="Failed to reload")
                 lg_pl.info(f"{colorama.Fore.LIGHTRED_EX}Failed to reload extension: {file}")
                 lg_pl.info(f"{colorama.Fore.LIGHTRED_EX}Failed with: {e}")
@@ -144,7 +145,7 @@ async def unload(ctx, extension):
                 extEmbed.add_field(name=file, value="Unload complete")
                 lg_pl.info(f"{colorama.Fore.LIGHTGREEN_EX}Unloaded the extension: {file[:-3]}")
 
-            except Exception as e:
+            except Exception as error:
                 extEmbed.insert_field_at(index=0, name=file, value="Failed to unload")
                 lg_pl.info(f"{colorama.Fore.LIGHTRED_EX}Failed to unload extension: {file}")
 
@@ -182,6 +183,11 @@ async def on_message(message):
 
     if message.channel.id in blocked_channels:
         # check if the message is in the list of blocked channels
+        await message.delete()
+        return
+
+    if str(message.content).startswith(config.getCommandPrefix()) and message.channel.id == 773499837270196224:
+        await message.channel.send(f"Please use {bot.get_channel(773974638963195942).mention} for commands. If you don't have the permission to use this channel please ask a admin of the server for the permissions.", delete_after = 5)
         await message.delete()
         return
 
