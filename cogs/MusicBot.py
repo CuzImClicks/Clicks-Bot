@@ -284,10 +284,13 @@ class MusicBot(commands.Cog):
         queue.clear()
         lg.info(f"Cleared the queue!")
         loop = False
+        self.save_queue = False
         infoEmbed = discord.Embed(title="Die", description="Resetted the MusicBot",
-                                  color=config.getDiscordColour("red"),
-                                  timestamp=timeconvert.getTime())
+                                  color=config.getDiscordColour("red"))
         await ctx.send(embed=infoEmbed)
+        await self.leave(ctx)
+        await asyncio.sleep(2)
+        await self.join(ctx)
 
     @commands.command(name="loop", help="Continues to play the same song")
     @commands.has_role(config.getBotMusicRole())
