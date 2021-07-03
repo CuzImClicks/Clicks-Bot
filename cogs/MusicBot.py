@@ -78,8 +78,10 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
 class YouTubeVideo:
 
-    def __init__(self, url, author=None, original_search=None) -> None:
+    def __init__(self, url: str, author: discord.Member = None, original_search: str = None) -> None:
         self.id = url.split("https://www.youtube.com/watch?v=")[1]
+        if url.startswith("https://youtu.be/"):
+            url = "https://www.youtube.com/watch?v=" + url.split("https://youtu.be/")[1]
         self.url = url
         self.author = author
         self.original_search = original_search
@@ -326,8 +328,6 @@ class MusicBot(commands.Cog):
                 if not self.save_queue:
                     del(queue[0])
                 return
-            if str(args[0]).startswith("https://youtu.be/"):
-                url = "https://www.youtube.com/watch?v=" + str(args[0]).split("https://youtu.be/")[1]
 
             elif str(args[0]).startswith("https://"):
                 url = args[0]
@@ -451,6 +451,8 @@ class MusicBot(commands.Cog):
     @commands.has_role(config.getBotMusicRole())
     async def insert(self, ctx, url):
         global queue
+        if url.startswith("https://youtu.be/"):
+            url = "https://www.youtube.com/watch?v=" + url.split("https://youtu.be/")[1]
         video = YouTubeVideo(url, ctx.author)
         queue.insert(0, video)
         infoEmbed = discord.Embed(title="Queue",
