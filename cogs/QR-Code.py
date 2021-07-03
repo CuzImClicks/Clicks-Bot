@@ -20,22 +20,21 @@ class QR_Code(commands.Cog):
     @commands.has_role(config.getBotAccessRole())
     async def qr_code(self, ctx, *args):
 
-        if not args:
-            errorEmbed = discord.Embed(title="QR-Code Error",
-                                       description="No content provided",
-                                       colour=config.getDiscordColour("red"),
-                                       timestamp=datetime.now())
+        if not len(args) == 2:
+            errorEmbed = discord.Embed(description="Not enough arguments provided. Please use this format <'content', version(1 to 40)>",
+                                       colour=config.getDiscordColour("red"))
             await ctx.send(embed=errorEmbed)
             return
 
         try:
             version = int(args[-1])
+            if version < 1 or version > 40:
+                raise ValueError
 
-        except:
+        except ValueError:
             errorEmbed = discord.Embed(title="QR-Code Error",
-                                       description="Last element is not a version integer. Try something like 1 or 5",
-                                       colour=config.getDiscordColour("red"),
-                                       timestamp=datetime.now())
+                                           description="Last element is not a version integer. Try something between 1 and 40",
+                                           colour=config.getDiscordColour("red"))
             await ctx.send(embed=errorEmbed)
             return
 

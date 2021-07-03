@@ -56,9 +56,14 @@ class GeniusAPI_Handler(commands.Cog):
         msg = convertTuple(args)
         genius = lyricsgenius.Genius(config.getGeniusKey())
         genius_yellow = config.getDiscordColour("genius_yellow")
-        with HiddenPrints():
-            song = genius.search_song(msg)
-            lyric = song.lyrics
+        try:
+            with HiddenPrints():
+                song = genius.search_song(msg)
+                lyric = song.lyrics
+        except AttributeError:
+            errorEmbed = discord.Embed(description="The current song was not found on Genius", colour=config.getDiscordColour("genius_yellow"))
+            await ctx.send(embed=errorEmbed)
+            return
 
         infoEmbed = discord.Embed(colour=config.getDiscordColour("genius_yellow"))
         infoEmbed.set_author(name=song.title)#, icon_url=song.song_art_image_url)
