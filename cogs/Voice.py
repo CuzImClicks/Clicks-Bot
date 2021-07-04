@@ -1,11 +1,13 @@
 import asyncio
 import logging
-
 import discord
-from colorama import Fore
 from discord.ext import commands
 
 import ClicksBot
+from util.logger import path
+import logging
+from colorama import Fore
+from clicks_util import info, text
 from util import config
 
 lg = logging.getLogger(__name__)

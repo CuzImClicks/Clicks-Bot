@@ -1,9 +1,9 @@
 import logging
-import os
 
-import discord
-
+from discord import colour
 from clicks_util import json_util
+import os
+import discord
 
 path = str(os.getcwd())
 

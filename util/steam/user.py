@@ -1,7 +1,9 @@
-import json
-# from util import config  # module not found error, don't know why
-import logging
 import urllib.request
+import json
+from clicks_util.json_util import JsonFile
+#from util import config  # module not found error, don't know why
+import logging
+from clicks_util import logger
 
 lg = logging.getLogger(__name__[10:])
 

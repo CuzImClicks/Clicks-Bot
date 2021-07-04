@@ -1,15 +1,14 @@
-import logging
-import os
 import sys
-from datetime import datetime
 
-import colorama
 import discord
-from discord.ext import commands
-
-from clicks_util.json_util import JsonFile
-from util import cleanup
+import logging
 from util import config
+from discord.ext import commands
+import os
+from clicks_util.json_util import JsonFile
+from datetime import datetime
+import colorama
+from util import cleanup
 
 os.system("git pull")
 
@@ -18,7 +17,7 @@ cleanup.remove_hypixel_jsons()
 
 path = os.getcwd()
 
-logging.basicConfig(level=logging.INFO, format='[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s'
+logging.basicConfig(level=logging.INFO, format="[%(asctime)s] - %(name)s - [%(levelname)s]: %(message)s"
                                                + colorama.Fore.RESET, datefmt="%H:%M:%S", encoding='utf-8')
 
 lg = logging.getLogger("Clicks-Bot")

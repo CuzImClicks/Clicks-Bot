@@ -1,8 +1,8 @@
+import json
+from clicks_util.json_util import JsonFile
 import os
 import random
 import string
-
-from clicks_util.json_util import JsonFile
 
 jf = JsonFile("keys.json", path=os.getcwd()+"/web_server")
 

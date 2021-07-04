@@ -1,7 +1,5 @@
-import logging
-
 import discord
-
+import logging
 import util.logger
 
 lg = logging.getLogger(__name__)

@@ -1,9 +1,11 @@
-import logging
-
+import discord
 from discord.ext import commands
 
 from util import config
 from util.logger import *
+from util.logger import path
+import logging
+import os
 
 lg = logging.getLogger(__name__[5:])
 

@@ -1,14 +1,14 @@
-import datetime
 import logging
-
 import discord
-import matplotlib.pyplot as plt
-import pandas_datareader as web
 from discord.ext import commands
-
-from clicks_util import timeconvert
-from util import config
 from util.logger import path
+import logging
+from util import config
+from clicks_util import timeconvert, info
+import pandas_datareader as web
+import matplotlib.pyplot as plt
+import mplfinance as mpf
+import datetime
 
 lg = logging.getLogger(__name__[5:])
 

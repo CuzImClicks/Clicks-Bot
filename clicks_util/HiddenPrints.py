@@ -1,5 +1,4 @@
-import os
-import sys
+import sys, os
 
 
 class HiddenPrints:

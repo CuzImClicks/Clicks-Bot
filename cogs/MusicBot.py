@@ -1,6 +1,8 @@
 import asyncio
 import json
+import os
 import sys
+from datetime import datetime
 from random import choice
 
 import discord
@@ -10,11 +12,12 @@ from discord.ext import commands
 from discord.utils import get
 from lyricsgenius import Genius
 
+from clicks_util import HiddenPrints, info, text
 from clicks_util import timeconvert
 from util import config, strings
-from util.cleanup import remove_songs
 from util.genius.Song import Song
 from util.logger import *
+from util.cleanup import remove_songs
 
 lg = logging.getLogger(__name__[5:])
 

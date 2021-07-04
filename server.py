@@ -1,16 +1,15 @@
-import logging
-
-import qrcode
 from fastapi import FastAPI, status
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
-from lyricsgenius import Genius
 
-from util import config
 from util.genius.Song import Song
-from util.hypixel.hypixel_server import Hypixel
-from util.hypixel.player import Player
-from util.steam.user import User
 from web_server.database import *
+import logging
+from util.hypixel.player import Player
+from util.hypixel.hypixel_server import Hypixel
+import qrcode
+from util.steam.user import User
+from lyricsgenius import Genius
+from util import config
 
 server = FastAPI()
 

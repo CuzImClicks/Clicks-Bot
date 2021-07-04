@@ -1,3 +1,11 @@
+import discord
+from discord.ext import commands
+import logging
+from util import config
+import lyricsgenius
+from clicks_util import text, numbers, HiddenPrints
+from cogs.MusicBot import getLastSong
+import sys, os
 import logging
 import os
 import sys
