@@ -1,13 +1,13 @@
 # https://www.github.com/mass1ve-err0r/GitHound
 
-from asyncio import get_event_loop
-from requests import get
-from datetime import datetime
-from discord import Embed, Colour
-from discord.ext import commands
-
 # added logger - removed print statements
 import logging
+from asyncio import get_event_loop
+from datetime import datetime
+
+from discord import Embed, Colour
+from discord.ext import commands
+from requests import get
 
 lg = logging.getLogger(__name__[5:])
 

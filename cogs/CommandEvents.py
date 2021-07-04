@@ -1,14 +1,12 @@
-import time
+import logging
+from datetime import datetime
+
+import colorama
 import discord
 from discord.ext import commands
-import logging
 
 import ClicksBot
-from util import logger
-from util.logger import path
-from datetime import datetime
 from util import config
-import colorama
 
 lg = logging.getLogger(__name__[5:])
 import logging

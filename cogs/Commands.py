@@ -1,16 +1,12 @@
 import logging
+import os
+
 import discord
+from discord import Color
 from discord.ext import commands
-from util import MessageHandler
 
 from util import config
 from util.logger import *
-from util import embed
-import logging
-from discord import Color
-import os
-from datetime import datetime
-from clicks_util import timeconvert
 
 path = os.getcwd()
 

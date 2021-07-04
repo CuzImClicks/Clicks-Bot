@@ -5,6 +5,7 @@ Created on 28.10.2020
 '''
 
 import logging
+
 import colorama
 
 colorama.init()

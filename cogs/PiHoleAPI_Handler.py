@@ -1,15 +1,17 @@
-import logging
-from attr import __title__
 import discord
 from discord.ext import commands
-from util.logger import path
 import logging
 from util import config
-import datetime
-import aiohttp
 from aiohttp import ClientSession
 import json
+import json
+import logging
 
+import discord
+from aiohttp import ClientSession
+from discord.ext import commands
+
+from util import config
 
 lg = logging.getLogger(__name__[5:])
 

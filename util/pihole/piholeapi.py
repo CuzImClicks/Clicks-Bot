@@ -1,7 +1,9 @@
 import json
-from util import config
-import aiohttp
+
 from aiohttp import ClientSession
+
+from util import config
+
 
 class PiHoleAPI:
 

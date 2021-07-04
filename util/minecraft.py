@@ -1,5 +1,5 @@
-from mojang import MojangAPI
 import requests
+from mojang import MojangAPI
 
 
 class User:

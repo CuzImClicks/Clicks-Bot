@@ -1,14 +1,15 @@
-import sys
-
-import discord
 import logging
-from util import config
-from discord.ext import commands
 import os
-from clicks_util.json_util import JsonFile
+import sys
 from datetime import datetime
+
 import colorama
+import discord
+from discord.ext import commands
+
+from clicks_util.json_util import JsonFile
 from util import cleanup
+from util import config
 
 os.system("git pull")
 

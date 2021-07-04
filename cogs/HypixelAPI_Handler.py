@@ -1,20 +1,16 @@
-import requests
 import json
 import logging
-import aiohttp
-from discord.ext import commands, tasks
-from util import config
-import asyncio
-import discord
 from datetime import datetime
-import os
-from varname import nameof
-from util.minecraft import User
+
+import aiohttp
+import discord
+from discord.ext import commands, tasks
+
 from clicks_util.json_util import JsonFile
+from util import config
 from util.hypixel.player import Player
-from clicks_util import info
 from util.logger import path
-import time
+from util.minecraft import User
 
 key = config.getHypixelKey()
 lg = logging.getLogger(__name__[5:])
@@ -120,7 +116,7 @@ class HypixelAPI_Handler(commands.Cog):
                     jf_data[player]["status"] = online
                     self.jf.write(jf_data)
 
-        except Exception as e:
+        except Exception:
             pass
 
     @tasks.loop(minutes=1.0)

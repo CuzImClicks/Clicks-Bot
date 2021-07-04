@@ -1,18 +1,13 @@
+import asyncio
 import logging
+
 import discord
 from discord.ext import commands, tasks
 
-from clicks_util import timeconvert
 from clicks_util.json_util import JsonFile
+from util import config
 from util.logger import path
 from util.steam.user import User
-import urllib.request
-import json
-import sys
-import asyncio
-from datetime import datetime
-from util import config
-
 
 lg = logging.getLogger(__name__[5:])
 

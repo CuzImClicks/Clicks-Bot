@@ -1,15 +1,10 @@
-import logging
 import discord
 from discord.ext import commands
 
 import ClicksBot
 from util.logger import *
-from util.logger import path
-
-from clicks_util import info
 
 lg = logging.getLogger(__name__)
-from util.logger import path
 import logging
 fl = ClicksBot.fl
 fl.setLevel(logging.INFO)

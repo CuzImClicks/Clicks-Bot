@@ -1,11 +1,12 @@
-import qrcode
 import logging
-import discord
-from discord.ext import commands
-from util.logger import path
-import logging
-from util import config
 from datetime import datetime
+
+import discord
+import qrcode
+from discord.ext import commands
+
+from util import config
+from util.logger import path
 
 lg = logging.getLogger(__name__)
 

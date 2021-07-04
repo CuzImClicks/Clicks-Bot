@@ -1,5 +1,3 @@
-import logging
-
 import ClicksBot
 from util import config
 from util.embed import send_embed

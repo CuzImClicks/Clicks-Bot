@@ -1,12 +1,11 @@
 import logging
+import os
+
 import discord
 from discord.ext import commands
-from discord.utils import get
-from util import config
-import datetime
-from multiprocessing import Process, Lock
-import os
+
 from clicks_util import timeconvert
+from util import config
 
 path = os.getcwd()
 
@@ -50,7 +49,7 @@ class MainEvents(commands.Cog):
             embed = discord.Embed(color=0x2b4f22, description=f"Ein wildes {member.name} erscheint!")
             embed.set_thumbnail(url=str(member.avatar_url))
             embed.set_footer(text=f"{member.guild} - {timeconvert.getStrDateAndTime()}", icon_url=member.guild.icon_url)
-            embed.set_thumbnail(member.guild.banner_url)
+            embed.set_thumbnail(url=member.guild.banner_url)
             #TODO: Test and change channel to lobby
             channel = self.bot.get(member.guild.channels, "bot-testing")
 
@@ -66,7 +65,7 @@ class MainEvents(commands.Cog):
             embed = discord.Embed(color=0x2b4f22, description=f"Das wilde {member.name} ist geflüchtet!")
             embed.set_thumbnail(url=str(member.avatar_url))
             embed.set_footer(text=f"{member.guild} - {timeconvert.getStrDateAndTime()}", icon_url=member.guild.icon_url)
-            embed.set_thumbnail(member.guild.banner_url)
+            embed.set_thumbnail(url=member.guild.banner_url)
             #TODO: Test and change channel to lobby
             channel = self.bot.get(member.guild.channels, "bot-testing")
 

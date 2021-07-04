@@ -2,7 +2,6 @@
 Findet die Quwurzeldrwurzeltwurzel von der eingebenen Nummer und returnt diese
 
 '''
-import logger
 import logging
 
 lg = logging.getLogger(__name__)

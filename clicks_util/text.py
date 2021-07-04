@@ -1,6 +1,7 @@
-from clicks_util import numbers
-import string
 import numbers
+import string
+
+from clicks_util import numbers
 
 
 def split(sentence, num_chunks: int = 0):

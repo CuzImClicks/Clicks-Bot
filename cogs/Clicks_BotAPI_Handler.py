@@ -1,13 +1,17 @@
-import logging
 import discord
 from discord.ext import commands
-from util.logger import path
 import logging
 from util import config
-import datetime
 from web_server.database import create_key, get_key
 from clicks_util import timeconvert
+import logging
 
+import discord
+from discord.ext import commands
+
+from clicks_util import timeconvert
+from util import config
+from web_server.database import create_key, get_key
 
 lg = logging.getLogger(__name__[5:])
 

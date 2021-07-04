@@ -1,10 +1,8 @@
-import json
-import aiohttp
-import os
 import logging
+import os
+
 from aiohttp.client import ClientSession
-import requests
-from util import minecraft
+
 from util import config
 
 key = config.getHypixelKey()

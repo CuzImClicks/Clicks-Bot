@@ -1,13 +1,13 @@
 import json
-from datetime import datetime
-import aiohttp
-from nbt import nbt
-import requests
-from util.minecraft import User
-from util import config
 import logging
 import os
+from datetime import datetime
+
+import requests
+
 from clicks_util import timeconvert, nbt_data
+from util import config
+from util.minecraft import User
 
 lg = logging.getLogger(__name__)
 key = config.getHypixelKey()
