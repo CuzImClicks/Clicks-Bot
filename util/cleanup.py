@@ -11,7 +11,7 @@ def remove_songs():
     # Removes all files created by the music bot ending on .webm or .m4a
     for song in os.listdir(os.getcwd()):
 
-        if song.endswith(".webm" or ".m4a"):
+        if song.endswith(".webm" or song.endswith(".m4a")):
             lg.info(f"Removing the file of {song[:-5]}")
 
             file_io.remove(f"{os.getcwd()}/{song}")
@@ -21,10 +21,11 @@ def remove_song(name: str):
     # Removes a specific file created by the music bot ending on .webm or .m4a
     for song in os.listdir(os.getcwd()):
 
-        if song.endswith(".webm" or ".m4a") and song.__contains__(name):
+        if (song.endswith(".webm" or song.endswith(".m4a"))) and song.__contains__(name):
             lg.info(f"Removing the file of {song[:-5]}")
 
             file_io.remove(f"{os.getcwd()}/{song}")
+            break
 
 
 def remove_hypixel_jsons():
