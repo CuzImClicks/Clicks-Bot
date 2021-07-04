@@ -10,6 +10,8 @@ from datetime import datetime
 import colorama
 from util import cleanup
 
+os.system("git pull")
+
 cleanup.remove_songs()
 cleanup.remove_hypixel_jsons()
 
