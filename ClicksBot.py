@@ -116,7 +116,7 @@ async def reload(ctx, extension):
             except Exception as error:
                 extEmbed.insert_field_at(index=0, name=file, value="Failed to reload")
                 lg_pl.info(f"{colorama.Fore.LIGHTRED_EX}Failed to reload extension: {file}")
-                lg_pl.info(f"{colorama.Fore.LIGHTRED_EX}Failed with: {e}")
+                lg_pl.info(f"{colorama.Fore.LIGHTRED_EX}Failed with: {error}")
 
         await ctx.send(embed=extEmbed)
 
@@ -147,7 +147,7 @@ async def unload(ctx, extension):
                 extEmbed.add_field(name=file, value="Unload complete")
                 lg_pl.info(f"{colorama.Fore.LIGHTGREEN_EX}Unloaded the extension: {file[:-3]}")
 
-            except Exception as error:
+            except Exception:
                 extEmbed.insert_field_at(index=0, name=file, value="Failed to unload")
                 lg_pl.info(f"{colorama.Fore.LIGHTRED_EX}Failed to unload extension: {file}")
 
