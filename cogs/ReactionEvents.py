@@ -53,7 +53,8 @@ class ReactionEvents(commands.Cog):
             await message.remove_reaction(emoji, user)
             return
 
-        await log_reaction(payload)
+        user = self.bot.get_user(payload.user_id)
+        lg.info(f"{user.name} reacted with {payload.emoji} to message_id: {payload.message_id}")
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):

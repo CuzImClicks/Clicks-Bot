@@ -54,8 +54,8 @@ class Bet_Handler(commands.Cog):
 
         message = await channel.fetch_message(payload.message_id)
         rl_msg = get_reload_message(message)
-        if message in reload_messages and payload.emoji.name == white_check_mark and not payload.member.bot:
-            user = self.bot.get_user(payload.user_id)
+        user = self.bot.get_user(payload.user_id)
+        if message in reload_messages and payload.emoji.name == white_check_mark and not user.bot:
             await message.remove_reaction(white_check_mark, user)
             self.bot.reload_extension(f"cogs.{rl_msg.extension}")
             lg.info(f"Reloading the extension {rl_msg.extension}")
