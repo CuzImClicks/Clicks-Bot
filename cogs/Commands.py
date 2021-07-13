@@ -1,6 +1,8 @@
 import logging
 import discord
 from discord.ext import commands
+
+import ClicksBot
 from util import MessageHandler
 
 from util import config
@@ -15,6 +17,9 @@ from clicks_util import timeconvert
 path = os.getcwd()
 
 lg = logging.getLogger(__name__[5:])
+fl = ClicksBot.fl
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 
 class Commands(commands.Cog):

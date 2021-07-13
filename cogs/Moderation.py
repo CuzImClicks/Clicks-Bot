@@ -5,6 +5,8 @@ from discord.errors import Forbidden
 from discord.ext import commands
 from datetime import datetime
 from discord.utils import get
+
+import ClicksBot
 from util import strings
 from util.logger import *
 from util import config
@@ -16,6 +18,9 @@ from clicks_util import timeconvert, info
 
 
 lg = logging.getLogger(__name__[5:])
+fl = ClicksBot.fl
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 
 async def make_bugreport_embed(ctx, bugreport: dict) -> discord.Embed:

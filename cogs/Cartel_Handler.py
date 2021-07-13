@@ -5,6 +5,7 @@ import time
 import discord
 from discord.ext import commands
 
+import ClicksBot
 from cogs.MusicBot import YTDLSource, YouTubeVideo
 from util.logger import path
 import logging
@@ -12,6 +13,9 @@ from util import config
 import datetime
 
 lg = logging.getLogger(__name__[5:])
+fl = ClicksBot.fl
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 vorraum_id = 862061998966702110
 council_id = 862043176294547497

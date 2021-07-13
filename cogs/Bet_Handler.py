@@ -2,6 +2,7 @@ import logging
 import discord
 from discord.ext import commands
 
+import ClicksBot
 from clicks_util import info
 from util.logger import path
 import logging
@@ -10,6 +11,9 @@ import datetime
 from clicks_util import json_util
 
 lg = logging.getLogger(__name__[5:])
+fl = ClicksBot.fl
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 one = "1️⃣"
 two = "2️⃣"

@@ -16,6 +16,7 @@ fl = ClicksBot.fl
 fl.setLevel(logging.INFO)
 lg.addHandler(fl)
 
+
 class CommandEvents(commands.Cog):
     '''
     instead of using @bot.event use @bot.Cog.listener()

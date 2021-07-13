@@ -2,6 +2,8 @@ import logging
 import discord
 from discord.ext import commands
 from discord.utils import get
+
+import ClicksBot
 from util import config
 import datetime
 from multiprocessing import Process, Lock
@@ -11,6 +13,9 @@ from clicks_util import timeconvert
 path = os.getcwd()
 
 lg = logging.getLogger(__name__[5:])
+fl = ClicksBot.fl
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 
 class MainEvents(commands.Cog):

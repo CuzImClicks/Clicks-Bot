@@ -3,6 +3,8 @@ import json
 import logging
 import aiohttp
 from discord.ext import commands, tasks
+
+import ClicksBot
 from util import config
 import asyncio
 import discord
@@ -18,6 +20,9 @@ import time
 
 key = config.getHypixelKey()
 lg = logging.getLogger(__name__[5:])
+fl = ClicksBot.fl
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 
 class HypixelAPI_Handler(commands.Cog):

@@ -1,3 +1,4 @@
+import ClicksBot
 import clicks_util
 import logging
 import discord
@@ -10,6 +11,9 @@ from clicks_util.timeconvert import TimeZone
 from pytz import common_timezones_set
 
 lg = logging.getLogger(__name__[5:])
+fl = ClicksBot.fl
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 
 class TimeConvert(commands.Cog):

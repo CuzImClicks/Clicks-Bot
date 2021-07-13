@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 import logging
+
+import ClicksBot
 from util import config
 import lyricsgenius
 from clicks_util import text, numbers, HiddenPrints
@@ -19,6 +21,9 @@ from cogs.MusicBot import getLastSong
 from util import config
 
 lg = logging.getLogger(__name__[5:])
+fl = ClicksBot.fl
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 
 class HiddenPrints:

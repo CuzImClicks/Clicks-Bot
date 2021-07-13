@@ -1,6 +1,8 @@
 import logging
 import discord
 from discord.ext import commands
+
+import ClicksBot
 from util.logger import path
 import logging
 from util import config
@@ -11,6 +13,9 @@ import mplfinance as mpf
 import datetime
 
 lg = logging.getLogger(__name__[5:])
+fl = ClicksBot.fl
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 
 class Stock(commands.Cog):

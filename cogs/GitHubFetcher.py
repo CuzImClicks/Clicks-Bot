@@ -9,7 +9,12 @@ from discord.ext import commands
 # added logger - removed print statements
 import logging
 
+import ClicksBot
+
 lg = logging.getLogger(__name__[5:])
+fl = ClicksBot.fl
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 
 class GitHubFetcher(commands.Cog):

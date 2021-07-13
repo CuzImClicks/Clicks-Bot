@@ -1,3 +1,4 @@
+import ClicksBot
 from clicks_util.json_util import JsonFile
 from util import config
 import logging
@@ -10,6 +11,9 @@ import datetime
 from clicks_util import timeconvert
 
 lg = logging.getLogger(__name__[5:])
+fl = ClicksBot.fl
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 jf_blocked_channels = JsonFile("blocked_channels.json", path)
 

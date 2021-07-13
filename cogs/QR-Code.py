@@ -2,12 +2,17 @@ import qrcode
 import logging
 import discord
 from discord.ext import commands
+
+import ClicksBot
 from util.logger import path
 import logging
 from util import config
 from datetime import datetime
 
 lg = logging.getLogger(__name__)
+fl = ClicksBot.fl
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 
 class QR_Code(commands.Cog):

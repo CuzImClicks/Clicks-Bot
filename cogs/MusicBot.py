@@ -12,6 +12,7 @@ from discord.ext import commands
 from discord.utils import get
 from lyricsgenius import Genius
 
+import ClicksBot
 from clicks_util import HiddenPrints, info, text
 from clicks_util import timeconvert
 from util import config, strings
@@ -20,6 +21,9 @@ from util.logger import *
 from util.cleanup import remove_songs
 
 lg = logging.getLogger(__name__[5:])
+fl = ClicksBot.fl
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 youtube_dl.utils.bug_reports_message = lambda msg: lg.error(msg)
 
@@ -192,7 +196,7 @@ class MusicBot(commands.Cog):
                                           color=config.getDiscordColour("blue"))
                 infoEmbed.set_image(url=await current_song.thumbnail())
                 if current_song.author:
-                    infoEmbed.set_author(name=current_song.author.nick, icon_url=current_song.author.avatar_url)
+                    infoEmbed.set_author(name=current_song.author.display_name, icon_url=current_song.author.avatar_url)
 
                 if not self.loop:
                     await ctx.send(embed=infoEmbed)

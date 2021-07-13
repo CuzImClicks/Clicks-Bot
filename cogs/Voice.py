@@ -14,6 +14,7 @@ lg = logging.getLogger(__name__)
 fl = ClicksBot.fl
 fl.setLevel(logging.INFO)
 lg.addHandler(fl)
+
 blocked = []
 fkicked = []
 fdeaf = []

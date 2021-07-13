@@ -2,6 +2,8 @@ import logging
 from attr import __title__
 import discord
 from discord.ext import commands
+
+import ClicksBot
 from util.logger import path
 import logging
 from util import config
@@ -12,6 +14,9 @@ import json
 
 
 lg = logging.getLogger(__name__[5:])
+fl = ClicksBot.fl
+fl.setLevel(logging.INFO)
+lg.addHandler(fl)
 
 
 class PiHoleAPI_Handler(commands.Cog):

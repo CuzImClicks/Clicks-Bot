@@ -1,5 +1,5 @@
 ##Clicks Bot
-
+https://discord.com/oauth2/authorize?client_id=771469405535207465&permissions=8&scope=bot
 [s16le @ 0x21fb9e0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 162551064 >= 162550128
 
 A discord bot specificly programmed for a private server.
